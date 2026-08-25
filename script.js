@@ -1,0 +1,1 @@
+const header=document.getElementById('siteHeader');const toggle=document.getElementById('mobileToggle');if(header&&toggle){toggle.addEventListener('click',()=>header.classList.toggle('open'));}
