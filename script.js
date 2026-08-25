@@ -2,6 +2,26 @@ const header = document.getElementById('siteHeader');
 const button = document.getElementById('menuButton');
 if (header && button) button.addEventListener('click', () => header.classList.toggle('open'));
 
+// Apply the approved Girls Trip Guide logo across the site.
+const logoStyle = document.createElement('style');
+logoStyle.textContent = `
+  .brand.site-logo{display:inline-flex;align-items:center;justify-content:center;width:132px;height:88px;overflow:hidden;flex:0 0 auto}
+  .brand.site-logo img{display:block;width:132px;height:auto;max-width:none}
+  .footer .brand.site-logo{width:240px;height:190px;justify-content:flex-start;margin-bottom:8px}
+  .footer .brand.site-logo img{width:240px;height:auto}
+  @media(max-width:600px){.brand.site-logo{width:108px;height:78px}.brand.site-logo img{width:108px}.footer .brand.site-logo{width:210px;height:165px}.footer .brand.site-logo img{width:210px}}
+`;
+document.head.appendChild(logoStyle);
+
+document.querySelectorAll('.brand').forEach(brand => {
+  brand.classList.add('site-logo');
+  brand.innerHTML = '';
+  const img = document.createElement('img');
+  img.src = 'assets/images/girls-trip-guide-logo.png';
+  img.alt = 'The Girls Trip Guide — Good Plans. Better Stories.';
+  brand.appendChild(img);
+});
+
 // One front-of-house story for the planning setup.
 document.querySelectorAll('a[href="situation.html"]').forEach(link => {
   link.textContent = 'So… what’s the plan?';
