@@ -2,16 +2,19 @@ const header = document.getElementById('siteHeader');
 const button = document.getElementById('menuButton');
 if (header && button) button.addEventListener('click', () => header.classList.toggle('open'));
 
-// Apply the approved Girls Trip Guide logo across the site.
+// Apply the approved Girls Trip Guide logo and the darker brand header across the site.
 const logoStyle = document.createElement('style');
 logoStyle.textContent = `
-  .brand.site-logo{display:inline-flex;align-items:center;justify-content:center;width:122px;height:74px;overflow:hidden;flex:0 0 auto}
-  .brand.site-logo img{display:block;width:122px;height:auto;max-width:none}
-  .footer .brand.site-logo{width:150px;height:112px;justify-content:flex-start;margin:0 0 6px}
+  .site-header{background:#050406!important;backdrop-filter:none!important;border-bottom:1px solid rgba(255,79,163,.14)!important}
+  .nav{min-height:76px!important}
+  .brand.site-logo{display:inline-flex;align-items:center;justify-content:center;width:120px;height:72px;overflow:hidden;flex:0 0 auto;background:#050406}
+  .brand.site-logo img{display:block;width:120px;height:auto;max-width:none}
+  .paper-rip{display:none!important}
+  .footer .brand.site-logo{width:150px;height:112px;justify-content:flex-start;margin:0 0 6px;background:#0f0b0e}
   .footer .brand.site-logo img{width:150px;height:auto}
   @media(max-width:600px){
-    .nav{min-height:72px}
-    .brand.site-logo{width:112px;height:68px}.brand.site-logo img{width:112px}
+    .nav{min-height:70px!important}
+    .brand.site-logo{width:108px;height:66px}.brand.site-logo img{width:108px}
     .footer{padding:32px 0 18px}
     .footer .brand.site-logo{width:138px;height:100px;margin-bottom:2px}.footer .brand.site-logo img{width:138px}
     .footer-grid{gap:24px}.footer p{margin:4px 0 0}.footer h3{margin-bottom:8px}.footer a:not(.brand){margin:5px 0}.footer-bottom{margin-top:18px;padding-top:14px}
