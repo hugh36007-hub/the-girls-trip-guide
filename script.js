@@ -50,14 +50,23 @@ logoStyle.textContent = `
     .hero-note{margin-top:22px!important}
     .hero-join{margin-top:24px!important}
 
-    .footer{padding:32px 0 18px}
-    .footer .brand.site-logo{width:138px;height:100px;margin-bottom:2px}.footer .brand.site-logo img{width:138px}
-    .footer-grid{gap:24px}.footer p{margin:4px 0 0}.footer h3{margin-bottom:8px}.footer a:not(.brand){margin:5px 0}.footer-bottom{margin-top:18px;padding-top:14px}
+    /* Footer: centre the brand, give it room, and balance Explore/About as two columns. */
+    .footer{padding:68px 0 24px!important;border-top:1px solid rgba(255,79,163,.08)!important}
+    .footer-grid{display:grid!important;grid-template-columns:minmax(0,1fr) minmax(0,1fr)!important;gap:42px 28px!important;align-items:start!important}
+    .footer-grid>div:first-child{grid-column:1/-1!important;display:flex!important;flex-direction:column!important;align-items:center!important;text-align:center!important;padding-bottom:2px!important}
+    .footer .brand.site-logo{width:150px!important;height:112px!important;margin:0 auto 14px!important;justify-content:center!important;background:#0f0b0e!important}
+    .footer .brand.site-logo img{width:150px!important}
+    .footer p{margin:0!important;line-height:1.45!important}
+    .footer h3{margin:0 0 14px!important}
+    .footer a:not(.brand){display:block!important;margin:9px 0!important;line-height:1.35!important}
+    .footer-bottom{margin-top:36px!important;padding-top:20px!important;text-align:center!important}
   }
 
   @media(max-width:370px){
     .brand.site-logo{width:88px;flex-basis:88px}.brand.site-logo img{width:88px}
     .mobile-plan-link{padding:0 9px!important;font-size:8px!important;letter-spacing:.025em!important}
+    .footer-grid{gap:36px 20px!important}
+    .footer .brand.site-logo{width:142px!important}.footer .brand.site-logo img{width:142px!important}
   }
 `;
 document.head.appendChild(logoStyle);
@@ -134,6 +143,26 @@ document.querySelectorAll('a[href="arrangement.html"]').forEach(link => link.rem
 // The GALS, How it works and Free vs Full now live on one combined page.
 document.querySelectorAll('.nav-links a[href="how-it-works.html"], .nav-links a[href="plans.html"]').forEach(link => link.remove());
 document.querySelectorAll('.footer a[href="how-it-works.html"], .footer a[href="plans.html"]').forEach(link => link.remove());
+
+// Balance the footer Explore column with the core journey links.
+document.querySelectorAll('.footer').forEach(footer => {
+  const exploreHeading = [...footer.querySelectorAll('h3')].find(h => h.textContent.trim().toUpperCase() === 'EXPLORE');
+  const explore = exploreHeading?.parentElement;
+  if (explore) {
+    const links = [
+      ['the-gals.html#how-it-works', 'How It Works'],
+      ['the-gals.html#free-vs-full', 'Free vs Full']
+    ];
+    links.forEach(([href, text]) => {
+      if (!explore.querySelector(`a[href="${href}"]`)) {
+        const link = document.createElement('a');
+        link.href = href;
+        link.textContent = text;
+        explore.appendChild(link);
+      }
+    });
+  }
+});
 
 // Memories is not a front-of-house category.
 document.querySelectorAll('a[href="memories.html"]').forEach(link => link.remove());
