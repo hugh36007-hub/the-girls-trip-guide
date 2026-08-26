@@ -48,6 +48,19 @@ h1 span{display:block;color:var(--pink);margin-top:5px}
 .benefit-rule{width:42px;height:3px;margin:16px 0 18px;border-radius:999px;background:var(--pink)}
 .benefit-copy p{margin:0;max-width:340px;color:rgba(255,255,255,.76);font-size:15px;line-height:1.5}
 
+.compare-section{padding:72px 0 78px;background:linear-gradient(180deg,#f6d4bf 0%,#f4ccb7 100%);color:#151018}
+.compare-grid{display:grid;grid-template-columns:.85fr 1fr 1fr;gap:22px;align-items:stretch}
+.compare-intro{display:flex;flex-direction:column;justify-content:center;padding:16px 30px 16px 6px}
+.compare-kicker{margin:0 0 10px;color:var(--pink);font-size:28px;font-weight:800;font-style:italic;line-height:1}
+.compare-title{margin:0;font-size:clamp(50px,4.4vw,72px);line-height:.88;letter-spacing:-.045em;text-transform:uppercase}
+.compare-intro p{margin:20px 0 0;max-width:330px;color:#745d66;font-size:17px;line-height:1.55}
+.plan-card{position:relative;display:flex;flex-direction:column;min-height:360px;padding:30px 30px 28px;border-radius:24px;background:rgba(255,255,255,.86);box-shadow:0 18px 36px rgba(112,63,79,.11)}
+.plan-card h2{margin:0;font-size:38px;line-height:1;text-transform:uppercase;letter-spacing:-.035em}
+.plan-badge{position:absolute;top:30px;right:28px;padding:8px 11px;background:#151018;color:#fff;font-size:11px;font-weight:900;text-transform:uppercase;transform:rotate(-2deg)}
+.plan-list{margin:22px 0 28px;padding-left:20px;color:#705963;font-size:16px;line-height:1.6}
+.plan-list li{margin:5px 0}
+.plan-card .plan-cta{margin-top:auto;align-self:flex-start;min-height:46px;display:inline-flex;align-items:center;justify-content:center;padding:0 20px;border-radius:10px;background:var(--pink);color:#fff;font-size:12px;font-weight:900;text-transform:uppercase;box-shadow:0 12px 24px rgba(255,79,163,.18)}
+
 @media(max-width:1000px){
   .hero-shell,.hero{min-height:560px}
   .hero-copy{width:min(390px,46vw);max-width:390px;padding-left:28px}
@@ -56,6 +69,7 @@ h1 span{display:block;color:var(--pink);margin-top:5px}
   .actions{flex-wrap:wrap}
   .benefit-grid{grid-template-columns:1fr}
   .benefit-card{min-height:0}
+  .compare-grid{grid-template-columns:1fr 1fr}.compare-intro{grid-column:1/-1;padding:0 4px 14px}.compare-intro p{max-width:520px}
 }
 @media(max-width:700px){
   .wrap{width:min(100% - 32px,1500px)}.site-header{height:auto;padding:16px 0}.nav-links{display:none}.nav-cta{padding:12px 14px}
@@ -63,6 +77,7 @@ h1 span{display:block;color:var(--pink);margin-top:5px}
   .hero-shell:after{background:linear-gradient(0deg,rgba(5,3,5,.98) 0%,rgba(5,3,5,.88) 34%,rgba(5,3,5,.18) 60%,rgba(5,3,5,0) 78%)}
   h1{font-size:50px}.lead{max-width:none}.actions{flex-wrap:wrap}.button{flex:1 1 150px}
   .benefits{padding:24px 0 30px}.benefit-grid{gap:14px}.benefit-card{grid-template-columns:68px 1fr;gap:16px;padding:20px}.benefit-icon{width:60px;height:60px}.benefit-icon svg{width:30px;height:30px}.benefit-copy h2{font-size:21px}.benefit-copy p{font-size:14px}
+  .compare-section{padding:50px 0 54px}.compare-grid{grid-template-columns:1fr}.compare-title{font-size:48px}.compare-kicker{font-size:24px}.plan-card{min-height:0;padding:26px 22px}.plan-card h2{font-size:32px}.plan-badge{top:24px;right:20px}
 }
 </style>
 </head>
@@ -88,7 +103,7 @@ h1 span{display:block;color:var(--pink);margin-top:5px}
         <p class="lead">Flights, stays, money, reminders and the photos afterwards. One private place for the whole group.</p>
         <div class="actions">
           <a class="button primary" href="#">Create a free trip</a>
-          <a class="button" href="#">See free vs full</a>
+          <a class="button" href="#free-vs-full">See free vs full</a>
         </div>
       </div>
     </div>
@@ -127,6 +142,42 @@ h1 span{display:block;color:var(--pink);margin-top:5px}
           <div class="benefit-rule"></div>
           <p>You run the trip. Add, edit or decide what the group sees.</p>
         </div>
+      </article>
+    </div>
+  </section>
+
+  <section class="compare-section" id="free-vs-full" aria-label="Free versus Full Trip">
+    <div class="wrap compare-grid">
+      <div class="compare-intro">
+        <div class="compare-kicker">Free</div>
+        <h2 class="compare-title">VS<br>Full Trip</h2>
+        <p>Start free. Upgrade when you want the GALS properly involved.</p>
+      </div>
+
+      <article class="plan-card">
+        <h2>Free</h2>
+        <span class="plan-badge">Always free</span>
+        <ul class="plan-list">
+          <li>Create and organise the trip</li>
+          <li>Keep dates, flights and stays together</li>
+          <li>Track costs and the per-person split</li>
+          <li>Useful trip reminders</li>
+          <li>A light touch during the trip</li>
+        </ul>
+        <a class="plan-cta" href="#">Create a free trip</a>
+      </article>
+
+      <article class="plan-card">
+        <h2>Full Trip</h2>
+        <span class="plan-badge">The whole team</span>
+        <ul class="plan-list">
+          <li>Everything in Free</li>
+          <li>Grace, Ava, Lila and Seb</li>
+          <li>Richer reminders and character messages</li>
+          <li>Full trip photo and video experience</li>
+          <li>Hidden post-trip gallery</li>
+        </ul>
+        <a class="plan-cta" href="#">£24.99 one-off</a>
       </article>
     </div>
   </section>
