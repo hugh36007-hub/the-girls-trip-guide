@@ -7,6 +7,7 @@ if (navLinks) {
   navLinks.innerHTML = `
     <a href="situation.html">So… what’s the plan?</a>
     <a href="the-gals.html#how-it-works">How It Works</a>
+    <a href="free-vs-full.html">Free vs Full</a>
     <a href="briefing.html">The Briefing</a>
   `;
 
@@ -14,6 +15,7 @@ if (navLinks) {
   navLinks.querySelectorAll('a').forEach(link => {
     const href = link.getAttribute('href');
     if ((/situation\.html$/.test(path) && href === 'situation.html') ||
+        (/free-vs-full\.html$/.test(path) && href === 'free-vs-full.html') ||
         (/briefing\.html$/.test(path) && href === 'briefing.html') ||
         (/the-gals\.html$/.test(path) && href.startsWith('the-gals.html'))) {
       link.classList.add('active');
@@ -43,7 +45,8 @@ document.querySelectorAll('.nav-cta').forEach(link => {
 
 // Retire any stale internal links left in older markup.
 document.querySelectorAll('a[href="how-it-works.html"]').forEach(link => link.href = 'the-gals.html#how-it-works');
-document.querySelectorAll('a[href="plans.html"]').forEach(link => link.href = 'the-gals.html#free-vs-full');
+document.querySelectorAll('a[href="plans.html"]').forEach(link => link.href = 'free-vs-full.html');
+document.querySelectorAll('a[href="the-gals.html#free-vs-full"], a[href="#free-vs-full"]').forEach(link => link.href = 'free-vs-full.html');
 document.querySelectorAll('a[href="arrangement.html"]').forEach(link => link.href = 'situation.html');
 
 const navStyle = document.createElement('style');
@@ -74,7 +77,7 @@ document.head.appendChild(navStyle);
 
 // Homepage: insert a clear How It Works link between the setup copy and the main actions.
 const heroActions = document.querySelector('.hero .hero-actions');
-if (heroActions && !document.querySelector('.hero-how-cta')) {
+if ((/\/$|\/index\.html$/.test(window.location.pathname)) && heroActions && !document.querySelector('.hero-how-cta')) {
   const link = document.createElement('a');
   link.className = 'hero-how-cta';
   link.href = 'the-gals.html#how-it-works';
@@ -102,8 +105,8 @@ if (header && button) {
     drawer.innerHTML = `
       <a href="situation.html">So… what’s the plan?</a>
       <a href="the-gals.html#how-it-works">How It Works</a>
+      <a href="free-vs-full.html">Free vs Full</a>
       <a href="briefing.html">The Briefing</a>
-      <a href="the-gals.html#free-vs-full">Free vs Full</a>
       <a href="create-trip.html">Create a Free Trip</a>
     `;
     header.appendChild(drawer);
@@ -135,8 +138,8 @@ document.querySelectorAll('.footer').forEach(footer => {
     [
       ['situation.html','So… what’s the plan?'],
       ['the-gals.html#how-it-works','How It Works'],
-      ['briefing.html','The Briefing'],
-      ['the-gals.html#free-vs-full','Free vs Full']
+      ['free-vs-full.html','Free vs Full'],
+      ['briefing.html','The Briefing']
     ].forEach(([href,text]) => {
       const a = document.createElement('a');
       a.href = href;
