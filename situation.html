@@ -22,6 +22,33 @@
 @media(max-width:700px){
 .plan-hero{min-height:475px;align-items:flex-start;background-size:auto 230px;background-position:right top;background-color:#080508}.plan-hero:after{background:linear-gradient(0deg,#080508 0%,#080508 46%,rgba(8,5,7,.68) 58%,rgba(8,5,7,0) 76%)}.plan-hero-copy{padding:245px 0 42px 4px}
 }
+
+/* Scrapbook object pass — deliberately scoped to this one section only. */
+.arrangement .scrap-card:before{display:none!important}
+.arrangement .scrap-photo{aspect-ratio:auto!important;overflow:visible!important;background:transparent!important;filter:none!important;transform:none!important}
+.arrangement .scrap-photo img{display:block;width:100%;height:auto!important;object-fit:contain!important;transform-origin:50% 50%;filter:drop-shadow(0 22px 28px rgba(0,0,0,.42))}
+.arrangement .scrap-card:nth-child(1) .scrap-photo img{transform:rotate(-1.35deg)}
+.arrangement .scrap-card:nth-child(2) .scrap-photo img{transform:rotate(.9deg)}
+.arrangement .scrap-card:nth-child(3) .scrap-photo img{transform:rotate(-.65deg)}
+.arrangement .scrap-card h3{margin-top:16px}
+.arrangement .receipts-stage img{max-width:100%;filter:drop-shadow(0 24px 32px rgba(0,0,0,.42))}
+@media(max-width:700px){
+.arrangement .scrapbook-row{gap:42px}
+.arrangement .scrapbook-three{max-width:none;margin:0;gap:48px;padding:2px 0 4px}
+.arrangement .scrap-card{width:88%;max-width:360px}
+.arrangement .scrap-card:nth-child(1){margin-left:3%;margin-right:auto}
+.arrangement .scrap-card:nth-child(2){margin-left:auto;margin-right:1%}
+.arrangement .scrap-card:nth-child(3){margin-left:2%;margin-right:auto}
+.arrangement .scrap-photo img{filter:drop-shadow(0 18px 24px rgba(0,0,0,.45))}
+.arrangement .scrap-card:nth-child(1) .scrap-photo img{transform:rotate(-1.15deg)}
+.arrangement .scrap-card:nth-child(2) .scrap-photo img{transform:rotate(.85deg)}
+.arrangement .scrap-card:nth-child(3) .scrap-photo img{transform:rotate(-.55deg)}
+.arrangement .scrap-card h3{margin:13px 0 4px;font-size:30px}
+.arrangement .scrap-card p{margin:0;color:rgba(255,255,255,.84);font-size:15px;line-height:1.45}
+.arrangement .receipts-stage{width:88%;max-width:360px;margin:4px 3% 0 auto;display:block}
+.arrangement .receipts-stage img{width:100%!important;max-width:100%!important;margin:0!important;transform:rotate(1.05deg)!important;filter:drop-shadow(0 20px 28px rgba(0,0,0,.44))!important}
+.arrangement .fun-note{margin-top:30px}
+}
 </style>
 </head>
 <body>
