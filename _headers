@@ -4,6 +4,24 @@
   X-Frame-Options: SAMEORIGIN
   Permissions-Policy: camera=(), microphone=(), geolocation=()
 
+/
+  Link: </assets/images/hero.png>; rel=preload; as=image
+
+/situation.html
+  Link: </assets/images/girls-trip-plan-hero.png>; rel=preload; as=image
+
+/the-gals.html
+  Link: </assets/images/how-it-works-hero.png>; rel=preload; as=image
+
+/briefing.html
+  Link: </assets/images/briefing-hero.png>; rel=preload; as=image
+
+/contact.html
+  Link: </assets/images/ava.png>; rel=preload; as=image
+
+/gals.html
+  Link: </assets/images/group-drinks.png>; rel=preload; as=image
+
 /assets/*
   Cache-Control: public, max-age=2592000
 
