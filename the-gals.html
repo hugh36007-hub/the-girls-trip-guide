@@ -11,9 +11,9 @@
 <link rel="stylesheet" href="styles-images.css">
 <style>
 .product-hero{position:relative;height:clamp(500px,34vw,560px);background:#080508;overflow:hidden;border-bottom:1px solid rgba(255,79,163,.18);isolation:isolate}
-.product-hero-bg{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;object-position:center center;z-index:-3}
-.product-hero:before{content:"";position:absolute;inset:0;background:linear-gradient(90deg,rgba(5,3,5,.96) 0%,rgba(5,3,5,.76) 18%,rgba(5,3,5,.18) 33%,rgba(5,3,5,.03) 43%,rgba(5,3,5,.03) 64%,rgba(5,3,5,.26) 77%,rgba(5,3,5,.88) 100%);z-index:-2}
-.product-hero:after{content:"";position:absolute;inset:0;background:radial-gradient(circle at 50% 50%,rgba(255,79,163,.055),transparent 28%),linear-gradient(0deg,rgba(8,5,8,.32) 0%,transparent 20%,transparent 82%,rgba(8,5,8,.10) 100%);z-index:-1;pointer-events:none}
+.product-hero-bg{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center 50%;z-index:-3;transform:scale(1.015)}
+.product-hero:before{content:"";position:absolute;inset:0;background:linear-gradient(90deg,rgba(5,3,5,.78) 0%,rgba(5,3,5,.48) 14%,rgba(5,3,5,.16) 27%,rgba(5,3,5,.02) 40%,rgba(5,3,5,.02) 72%,rgba(5,3,5,.12) 86%,rgba(5,3,5,.28) 100%);z-index:-2}
+.product-hero:after{content:"";position:absolute;inset:0;background:radial-gradient(circle at 50% 50%,rgba(255,79,163,.055),transparent 28%),linear-gradient(0deg,rgba(8,5,8,.24) 0%,transparent 18%,transparent 84%,rgba(8,5,8,.08) 100%);z-index:-1;pointer-events:none}
 .product-hero-inner{position:relative;max-width:1600px;height:100%;margin:0 auto;padding:0 40px;display:block}
 .product-copy{position:absolute;left:40px;top:50%;transform:translateY(-50%);width:305px;max-width:305px;text-shadow:0 2px 18px rgba(0,0,0,.4)}
 .product-copy .eyebrow{margin:0 0 10px;color:#ff5cae;font:800 12px/1 Inter,sans-serif;letter-spacing:.19em;text-transform:uppercase}
@@ -35,10 +35,10 @@
 .hero-benefit-strip .benefit-inner{max-width:1180px;margin:auto;padding:23px 24px 26px;display:grid;grid-template-columns:1.1fr repeat(3,1fr);gap:16px;align-items:center}
 .benefit-intro .scribble{margin:0;color:#ff5cae;font-size:27px}.benefit-intro h2{margin:0;color:#fff;font:900 34px/.92 'Barlow Condensed',sans-serif;text-transform:uppercase}.benefit-item{padding-left:16px;border-left:1px solid rgba(255,255,255,.12)}.benefit-item strong{display:block;color:#fff;font-size:13px}.benefit-item span{display:block;margin-top:4px;color:rgba(255,255,255,.54);font-size:12px;line-height:1.32}
 main{display:flex;flex-direction:column}.product-hero{order:1}.hero-benefit-strip{order:2}.plans-section{order:3}.gals-section{order:4}
-@media(max-width:1200px){.product-hero{height:520px}.product-hero-inner{display:grid;grid-template-columns:minmax(280px,350px) 1fr;padding:34px 30px}.product-copy{position:static;transform:none;width:auto;max-width:350px;align-self:center}.feature-column,.phone-space{display:none}.product-hero:before{background:linear-gradient(90deg,rgba(5,3,5,.95) 0%,rgba(5,3,5,.73) 30%,rgba(5,3,5,.08) 60%,rgba(5,3,5,.34) 100%)}.hero-benefit-strip .benefit-inner{grid-template-columns:1fr 1fr}.benefit-intro{grid-column:1/-1}}
+@media(max-width:1200px){.product-hero{height:520px}.product-hero-inner{display:grid;grid-template-columns:minmax(280px,350px) 1fr;padding:34px 30px}.product-copy{position:static;transform:none;width:auto;max-width:350px;align-self:center}.feature-column,.phone-space{display:none}.product-hero:before{background:linear-gradient(90deg,rgba(5,3,5,.82) 0%,rgba(5,3,5,.56) 26%,rgba(5,3,5,.09) 57%,rgba(5,3,5,.16) 100%)}.hero-benefit-strip .benefit-inner{grid-template-columns:1fr 1fr}.benefit-intro{grid-column:1/-1}}
 @media(max-width:700px){
   .product-hero{height:auto;background:#080508}
-  .product-hero-bg{position:relative;display:block;height:280px;object-fit:cover;object-position:52% 46%}
+  .product-hero-bg{position:relative;display:block;height:280px;object-fit:cover;object-position:52% 46%;transform:none}
   .product-hero:before,.product-hero:after{display:none}
   .product-hero-inner{display:block;height:auto;padding:0}
   .product-copy{position:static;transform:none;width:auto;max-width:none;padding:30px 24px 36px;background:#080508}
