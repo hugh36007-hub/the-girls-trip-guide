@@ -11,20 +11,20 @@
 <link rel="stylesheet" href="styles-images.css">
 <style>
 .master-product-hero{position:relative;background:#080508;color:#fff;overflow:hidden;border-bottom:1px solid rgba(255,79,163,.2)}
-.master-scene{position:relative;width:100%;height:clamp(500px,38vw,620px);overflow:hidden;background:radial-gradient(circle at 50% 50%,#241018,#080508 70%)}
-.master-canvas{position:absolute;left:50%;top:50%;height:100%;width:auto;aspect-ratio:1672/941;transform:translate(-50%,-50%);overflow:hidden}
-.master-foreground{position:absolute;inset:0;width:100%;height:100%;object-fit:fill;z-index:10;pointer-events:none}
-.hero-slot{position:absolute;z-index:2;overflow:hidden;background:#2b111d}
-.hero-slot img{position:absolute;left:-10%;top:-10%;width:120%;height:120%;object-fit:cover;filter:saturate(1.03) contrast(1.02)}
-.slot-airport{left:18.45%;top:73.2%;width:17.25%;height:22.9%}.slot-airport img{transform:rotate(7deg) scale(1.06)}
-.slot-pool{left:30.4%;top:46.6%;width:17.7%;height:29.1%}.slot-pool img{transform:rotate(-11deg) scale(1.08)}
-.slot-sunset{left:66.8%;top:1.8%;width:16.8%;height:18.9%}.slot-sunset img{transform:rotate(3deg) scale(1.06)}
-.slot-beach{left:70.4%;top:25.6%;width:19.2%;height:27.5%}.slot-beach img{transform:rotate(8deg) scale(1.08)}
-.slot-road{left:69.0%;top:63.5%;width:14.2%;height:20.8%}.slot-road img{transform:rotate(-6deg) scale(1.08)}
+.master-scene{position:relative;width:100%;height:clamp(500px,35vw,590px);overflow:hidden;background:#080508}
+.master-canvas{position:absolute;inset:0;width:100%;height:100%;overflow:hidden}
+.master-foreground{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center center;z-index:10;pointer-events:none}
+.hero-slot{position:absolute;z-index:11;overflow:hidden;background:#2b111d;box-shadow:0 0 0 1px rgba(0,0,0,.06)}
+.hero-slot img{position:absolute;inset:-8%;width:116%;height:116%;object-fit:cover;filter:saturate(1.03) contrast(1.02)}
+.slot-airport{left:23.0%;top:64.2%;width:10.8%;height:20.4%;transform:rotate(6deg)}
+.slot-pool{left:31.0%;top:42.8%;width:10.9%;height:20.4%;transform:rotate(-9deg)}
+.slot-sunset{left:64.6%;top:4.5%;width:9.8%;height:16.8%;transform:rotate(4deg)}
+.slot-beach{left:65.5%;top:28.0%;width:11.8%;height:20.2%;transform:rotate(7deg)}
+.slot-road{left:61.5%;top:62.2%;width:9.8%;height:17.2%;transform:rotate(-6deg)}
 .master-fallback .hero-slot{display:none}.master-fallback .master-foreground{object-fit:cover}
 .how-product-summary{background:#0e0a0d;color:#fff;padding:54px 0 62px}.how-product-summary .summary-inner{max-width:880px;margin:auto;text-align:center}.how-product-summary .scribble{font-size:34px}.how-product-summary h2{margin:4px 0 0;font:900 clamp(44px,5vw,68px)/.9 'Barlow Condensed',sans-serif;text-transform:uppercase}.how-product-summary h2 span{color:#ff70b7}.how-product-summary p{max-width:680px;margin:20px auto 0;color:rgba(255,255,255,.7);line-height:1.65}.summary-actions{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin-top:25px}
-@media(max-width:900px){.master-scene{height:520px}.master-canvas{height:100%;width:auto}.how-product-summary{padding:46px 0 54px}}
-@media(max-width:600px){.master-scene{height:430px}.master-canvas{height:100%;width:auto}.how-product-summary{padding:42px 0 48px}.how-product-summary .scribble{font-size:30px}.how-product-summary h2{font-size:44px}.how-product-summary p{font-size:14px}.summary-actions .pill{flex:1 1 0;min-width:0;font-size:10px;padding:12px 10px}}
+@media(max-width:900px){.master-scene{height:500px}.master-foreground{object-position:center center}.how-product-summary{padding:46px 0 54px}}
+@media(max-width:600px){.master-scene{height:420px}.master-foreground{object-position:54% center}.hero-slot{display:none}.how-product-summary{padding:42px 0 48px}.how-product-summary .scribble{font-size:30px}.how-product-summary h2{font-size:44px}.how-product-summary p{font-size:14px}.summary-actions .pill{flex:1 1 0;min-width:0;font-size:10px;padding:12px 10px}}
 </style>
 </head>
 <body>
