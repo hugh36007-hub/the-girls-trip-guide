@@ -18,6 +18,8 @@ logoStyle.textContent = `
   .brand.site-logo img{display:block;width:120px;height:auto;max-width:none}
   .paper-rip{display:none!important}
   .mobile-plan-link,.mobile-drawer{display:none}
+  .hero-how-cta{display:inline-flex;align-items:center;justify-content:center;min-height:42px;margin:28px 0 2px;padding:0 18px;border:1px solid rgba(255,79,163,.62);border-radius:999px;background:rgba(255,79,163,.05);color:#ff70b7;font-size:11px;font-weight:900;letter-spacing:.08em;text-transform:uppercase;transition:background .2s ease,border-color .2s ease,transform .2s ease}
+  .hero-how-cta:hover{background:rgba(255,79,163,.11);border-color:#ff70b7;transform:translateY(-1px)}
   .footer .brand.site-logo{width:150px;height:112px;justify-content:flex-start;margin:0 0 6px;background:#0f0b0e}
   .footer .brand.site-logo img{width:150px;height:auto}
 
@@ -43,6 +45,11 @@ logoStyle.textContent = `
     .mobile-drawer a::after{content:'→';color:#ff70b7;font-size:14px}
     .mobile-drawer a.mobile-sign-in{color:#ff70b7!important}
 
+    .hero-how-cta{min-height:40px;margin:30px 0 0;padding:0 17px;font-size:10px;letter-spacing:.07em}
+    .hero-actions{margin-top:24px!important}
+    .hero-note{margin-top:22px!important}
+    .hero-join{margin-top:24px!important}
+
     .footer{padding:32px 0 18px}
     .footer .brand.site-logo{width:138px;height:100px;margin-bottom:2px}.footer .brand.site-logo img{width:138px}
     .footer-grid{gap:24px}.footer p{margin:4px 0 0}.footer h3{margin-bottom:8px}.footer a:not(.brand){margin:5px 0}.footer-bottom{margin-top:18px;padding-top:14px}
@@ -63,6 +70,16 @@ document.querySelectorAll('.brand').forEach(brand => {
   img.alt = 'The Girls Trip Guide — Good Plans. Better Stories.';
   brand.appendChild(img);
 });
+
+// Homepage: a clear How It Works step between the explanation and the two main actions.
+const heroActions = document.querySelector('.hero .hero-actions');
+if (heroActions && !document.querySelector('.hero-how-cta')) {
+  const howItWorks = document.createElement('a');
+  howItWorks.className = 'hero-how-cta';
+  howItWorks.href = 'the-gals.html#how-it-works';
+  howItWorks.textContent = 'HOW IT WORKS →';
+  heroActions.parentElement.insertBefore(howItWorks, heroActions);
+}
 
 // Mobile header: keep the planning button visible and place the rest inside the hamburger menu.
 if (header && button) {
