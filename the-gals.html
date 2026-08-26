@@ -10,11 +10,29 @@
 <link rel="stylesheet" href="styles.css">
 <link rel="stylesheet" href="styles-images.css">
 <style>
-.product-hero{position:relative;width:100%;background:#080508;overflow:hidden;border-bottom:1px solid rgba(255,79,163,.2)}
-.product-hero img{display:block;width:100%;height:clamp(500px,38vw,640px);object-fit:cover;object-position:center center}
-.how-product-summary{background:#0e0a0d;color:#fff;padding:54px 0 62px}.how-product-summary .summary-inner{max-width:880px;margin:auto;text-align:center}.how-product-summary .scribble{font-size:34px}.how-product-summary h2{margin:4px 0 0;font:900 clamp(44px,5vw,68px)/.9 'Barlow Condensed',sans-serif;text-transform:uppercase}.how-product-summary h2 span{color:#ff70b7}.how-product-summary p{max-width:680px;margin:20px auto 0;color:rgba(255,255,255,.7);line-height:1.65}.summary-actions{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin-top:25px}
-@media(max-width:900px){.product-hero img{height:520px;object-position:center center}.how-product-summary{padding:46px 0 54px}}
-@media(max-width:600px){.product-hero img{height:430px;object-position:52% center}.how-product-summary{padding:42px 0 48px}.how-product-summary .scribble{font-size:30px}.how-product-summary h2{font-size:44px}.how-product-summary p{font-size:14px}.summary-actions .pill{flex:1 1 0;min-width:0;font-size:10px;padding:12px 10px}}
+.product-hero{position:relative;min-height:clamp(560px,43vw,720px);background:#080508;overflow:hidden;border-bottom:1px solid rgba(255,79,163,.22);isolation:isolate}
+.product-hero-bg{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center center;z-index:-3}
+.product-hero:before{content:"";position:absolute;inset:0;background:linear-gradient(90deg,rgba(5,3,5,.94) 0%,rgba(5,3,5,.72) 26%,rgba(5,3,5,.10) 49%,rgba(5,3,5,.22) 67%,rgba(5,3,5,.80) 100%);z-index:-2}
+.product-hero:after{content:"";position:absolute;inset:0;background:linear-gradient(0deg,rgba(8,5,8,.58) 0%,transparent 22%,transparent 78%,rgba(8,5,8,.18) 100%);z-index:-1;pointer-events:none}
+.product-hero-inner{position:relative;max-width:1500px;min-height:inherit;margin:0 auto;padding:58px 42px;display:grid;grid-template-columns:minmax(300px,410px) 1fr minmax(220px,300px);align-items:center;gap:26px}
+.product-copy{align-self:center;max-width:390px;text-shadow:0 2px 18px rgba(0,0,0,.35)}
+.product-copy .eyebrow{margin:0 0 14px;color:#ff5cae;font:800 13px/1 Inter,sans-serif;letter-spacing:.18em;text-transform:uppercase}
+.product-copy h1{margin:0;font:900 clamp(58px,6vw,92px)/.82 'Barlow Condensed',sans-serif;text-transform:uppercase;letter-spacing:-.03em}
+.product-copy h1 span{display:block;color:#ff4fa3}
+.product-copy .lead{margin:24px 0 0;max-width:370px;color:rgba(255,255,255,.82);font-size:18px;line-height:1.55}
+.product-copy .lead strong{color:#fff}
+.product-actions{display:flex;gap:12px;flex-wrap:wrap;margin-top:28px}.product-actions .pill{font-size:12px}
+.feature-column{display:flex;flex-direction:column;gap:18px;align-self:center}
+.feature-column.left{justify-self:end;margin-right:6px}.feature-column.right{justify-self:start;margin-left:6px}
+.feature-card{width:230px;padding:20px 20px 19px;border:1px solid rgba(255,85,166,.35);border-radius:20px;background:linear-gradient(180deg,rgba(37,16,29,.82),rgba(17,10,15,.88));box-shadow:0 20px 40px rgba(0,0,0,.26),inset 0 1px rgba(255,255,255,.04);backdrop-filter:blur(10px)}
+.feature-card .icon{width:38px;height:38px;border-radius:50%;display:grid;place-items:center;margin-bottom:13px;background:rgba(255,79,163,.14);border:1px solid rgba(255,79,163,.35);color:#ff63b3;font-size:18px}
+.feature-card h3{margin:0;color:#fff;font:800 17px/1.05 'Barlow Condensed',sans-serif;letter-spacing:.04em;text-transform:uppercase}.feature-card p{margin:8px 0 0;color:rgba(255,255,255,.74);font-size:14px;line-height:1.42}
+.feature-card strong{color:#fff}
+.hero-benefit-strip{background:#0e0a0d;border-bottom:1px solid rgba(255,79,163,.14)}
+.hero-benefit-strip .benefit-inner{max-width:1180px;margin:auto;padding:28px 24px 32px;display:grid;grid-template-columns:1.25fr repeat(3,1fr);gap:18px;align-items:center}
+.benefit-intro .scribble{margin:0;color:#ff5cae;font-size:30px}.benefit-intro h2{margin:0;font:900 38px/.92 'Barlow Condensed',sans-serif;text-transform:uppercase}.benefit-item{padding-left:18px;border-left:1px solid rgba(255,255,255,.12)}.benefit-item strong{display:block;color:#fff;font-size:14px}.benefit-item span{display:block;margin-top:5px;color:rgba(255,255,255,.56);font-size:13px;line-height:1.35}
+@media(max-width:1120px){.product-hero-inner{grid-template-columns:minmax(280px,380px) 1fr;padding:48px 28px}.feature-column{display:none}.product-hero:before{background:linear-gradient(90deg,rgba(5,3,5,.94) 0%,rgba(5,3,5,.74) 30%,rgba(5,3,5,.10) 62%,rgba(5,3,5,.28) 100%)}.hero-benefit-strip .benefit-inner{grid-template-columns:1fr 1fr}.benefit-intro{grid-column:1/-1}}
+@media(max-width:700px){.product-hero{min-height:auto;background:#080508}.product-hero-bg{position:relative;display:block;height:360px;object-position:54% center}.product-hero:before,.product-hero:after{display:none}.product-hero-inner{display:block;min-height:0;padding:0}.product-copy{max-width:none;padding:30px 22px 34px;background:#080508}.product-copy .eyebrow{margin-bottom:10px}.product-copy h1{font-size:54px}.product-copy .lead{font-size:15px;margin-top:18px;max-width:none}.product-actions{margin-top:22px}.product-actions .pill{flex:1 1 0;text-align:center;padding:13px 10px;font-size:10px}.hero-benefit-strip .benefit-inner{grid-template-columns:1fr;padding:30px 22px 34px;gap:16px}.benefit-intro{grid-column:auto}.benefit-item{padding:14px 0 0;border-left:0;border-top:1px solid rgba(255,255,255,.1)}}
 </style>
 </head>
 <body>
@@ -27,17 +45,37 @@
   </div>
 </header>
 <main>
-<section class="product-hero" id="how-it-works" aria-label="The Girls Trip Guide product preview">
-  <img src="assets/images/how-it-works-hero.png" alt="The Girls Trip Guide dashboard on a phone in an Ibiza nightlife setting">
-</section>
-<section class="how-product-summary">
-  <div class="wrap summary-inner">
-    <p class="scribble">How it works</p>
-    <h2>THE WHOLE TRIP. <span>ONE PLACE.</span></h2>
-    <p>Flights, stays, costs, who’s paid, reminders and the photos afterwards. One private place for the whole group.</p>
-    <div class="summary-actions"><a class="pill pill-pink" href="#free-vs-full">CREATE A FREE TRIP</a><a class="pill pill-outline" href="#free-vs-full">SEE FREE VS FULL</a></div>
+<section class="product-hero" id="how-it-works" aria-label="How The Girls Trip Guide works">
+  <img class="product-hero-bg" src="assets/images/how-it-works-hero.png" alt="The Girls Trip Guide dashboard on a phone in an Ibiza nightlife setting">
+  <div class="product-hero-inner">
+    <div class="product-copy">
+      <p class="eyebrow">HOW IT WORKS</p>
+      <h1>THE WHOLE TRIP.<span>ONE PLACE.</span></h1>
+      <p class="lead">Flights, stays, money, reminders and the photos afterwards. <strong>One private place for the whole group.</strong></p>
+      <div class="product-actions"><a class="pill pill-pink" href="#free-vs-full">CREATE A FREE TRIP</a><a class="pill pill-outline" href="#free-vs-full">SEE FREE VS FULL</a></div>
+    </div>
+
+    <div class="feature-column left" aria-label="Planning features">
+      <article class="feature-card"><div class="icon">▣</div><h3>The Plan</h3><p>Flights, stays, dates and bookings <strong>together.</strong></p></article>
+      <article class="feature-card"><div class="icon">£</div><h3>The Money</h3><p>See who’s paid, who hasn’t and <strong>what’s left.</strong></p></article>
+    </div>
+
+    <div class="feature-column right" aria-label="Trip experience features">
+      <article class="feature-card"><div class="icon">⌁</div><h3>The Nudges</h3><p>Friendly reminders that keep the girls <strong>moving.</strong></p></article>
+      <article class="feature-card"><div class="icon">□</div><h3>The Receipts</h3><p>Photos, videos and the <strong>official version</strong> of events.</p></article>
+    </div>
   </div>
 </section>
+
+<section class="hero-benefit-strip" aria-label="Product benefits">
+  <div class="benefit-inner">
+    <div class="benefit-intro"><p class="scribble">Less chasing.</p><h2>MORE TRIP.</h2></div>
+    <div class="benefit-item"><strong>Everyone knows what’s happening.</strong><span>No archaeology through the group chat.</span></div>
+    <div class="benefit-item"><strong>You stay in control.</strong><span>Without becoming the full-time trip secretary.</span></div>
+    <div class="benefit-item"><strong>The memories stay together.</strong><span>From the first booking to the final receipt.</span></div>
+  </div>
+</section>
+
 <section class="section gals-section">
   <div class="wrap">
     <div class="section-heading gals-heading"><div><p class="scribble">Meet</p><h2>THE GALS</h2></div><p>Four personalities. One job: keep the trip moving without making it feel like admin.</p></div>
