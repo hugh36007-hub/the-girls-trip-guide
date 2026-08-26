@@ -8,198 +8,24 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700;800;900&family=Caveat:wght@600;700&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
-:root{
-  --bg:#080508;
-  --panel:#120d12;
-  --line:rgba(255,255,255,.12);
-  --pink:#ff4fa3;
-  --text:#ffffff;
-  --muted:rgba(255,255,255,.66);
-}
-*{box-sizing:border-box}
-html{scroll-behavior:smooth}
-body{margin:0;background:var(--bg);color:var(--text);font-family:Arial,Helvetica,sans-serif}
-a{color:inherit;text-decoration:none}
-.wrap{width:min(1500px,calc(100% - 48px));margin:0 auto}
-.site-header{height:82px;border-bottom:1px solid rgba(255,79,163,.18);background:#050405;display:flex;align-items:center}
-.nav{display:flex;align-items:center;gap:28px;height:100%}
-.brand{display:flex;align-items:center;margin-right:auto;height:70px}
-.brand-logo{display:block;width:auto;height:66px;object-fit:contain}
-.nav-links{display:flex;gap:26px;font-size:13px;font-weight:800;text-transform:uppercase}
-.nav-cta{background:var(--pink);padding:14px 20px;border-radius:10px;font-size:13px;font-weight:800}
-
-.hero-shell{position:relative;min-height:610px;overflow:hidden;border-bottom:1px solid rgba(255,79,163,.16);background:#090509}
-.hero-image{position:absolute;top:0;bottom:0;left:clamp(355px,29vw,520px);height:100%;width:auto;max-width:none;object-fit:contain;z-index:0}
-.hero-shell:after{content:"";position:absolute;inset:0;z-index:1;pointer-events:none;background:linear-gradient(90deg,rgba(5,3,5,.95) 0%,rgba(5,3,5,.78) 20%,rgba(5,3,5,.30) 35%,rgba(5,3,5,.08) 47%,rgba(5,3,5,0) 58%)}
-.hero{position:relative;z-index:2;min-height:610px;display:flex;align-items:center;padding:36px 0 30px}
-.hero-copy{width:410px;max-width:410px;padding-left:54px;transform:translateY(8px)}
-.eyebrow{margin:0 0 15px;color:var(--pink);font-size:12px;letter-spacing:.2em;font-weight:900;text-transform:uppercase}
-h1{margin:0;max-width:400px;font-size:clamp(50px,4vw,64px);line-height:.89;letter-spacing:-.04em;text-transform:uppercase}
-h1 span{display:block;color:var(--pink);margin-top:5px}
-.lead{max-width:385px;margin:19px 0 0;color:rgba(255,255,255,.84);font-size:16px;line-height:1.46}
-.actions{display:flex;gap:10px;flex-wrap:nowrap;margin-top:20px;align-items:stretch}
-.button{min-height:46px;display:inline-flex;align-items:center;justify-content:center;padding:0 17px;border-radius:10px;border:1px solid rgba(255,255,255,.7);font-size:11px;font-weight:900;text-transform:uppercase;background:rgba(5,3,5,.42);backdrop-filter:blur(5px);white-space:nowrap}
-.button.primary{background:var(--pink);border-color:var(--pink);min-width:176px}
-.button:not(.primary){min-width:158px}
-
-.benefits{padding:34px 0 42px;border-bottom:1px solid rgba(255,79,163,.14);background:linear-gradient(180deg,#0b070b 0%,#080508 100%)}
-.benefit-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:22px}
-.benefit-card{min-height:220px;display:grid;grid-template-columns:92px 1fr;gap:24px;align-items:start;padding:28px;border:1px solid rgba(255,255,255,.28);border-radius:14px;background:linear-gradient(145deg,rgba(255,255,255,.025),rgba(255,79,163,.018));box-shadow:0 18px 50px rgba(0,0,0,.22)}
-.benefit-icon{width:78px;height:78px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:linear-gradient(145deg,#ff4fa3,#e83b8d);box-shadow:0 10px 28px rgba(255,79,163,.18)}
-.benefit-icon svg{width:38px;height:38px;fill:none;stroke:#fff;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
-.benefit-copy h2{margin:5px 0 0;font-size:25px;line-height:1.08;letter-spacing:-.025em}
-.benefit-copy h2 span{display:block;color:var(--pink)}
-.benefit-rule{width:42px;height:3px;margin:16px 0 18px;border-radius:999px;background:var(--pink)}
-.benefit-copy p{margin:0;max-width:340px;color:rgba(255,255,255,.76);font-size:15px;line-height:1.5}
-
-.compare-section{position:relative;overflow:hidden;padding:58px 0 66px;background:#080508;color:#fff;border-top:1px solid rgba(255,79,163,.16);border-bottom:1px solid rgba(255,79,163,.16)}
-.compare-section:before{content:"";position:absolute;inset:0;background:radial-gradient(circle at 92% 12%,rgba(255,36,135,.28),transparent 25%),radial-gradient(circle at 8% 88%,rgba(255,36,135,.18),transparent 26%),linear-gradient(180deg,rgba(255,255,255,.015),transparent 24%);pointer-events:none}
-.compare-section:after{content:"";position:absolute;left:0;right:0;bottom:0;height:180px;background:linear-gradient(180deg,transparent,rgba(255,30,128,.08));pointer-events:none}
-.compare-shell{position:relative;z-index:1;border:1px solid rgba(255,255,255,.08);border-radius:0 0 62px 62px;background:linear-gradient(135deg,rgba(23,15,22,.94),rgba(7,5,8,.96));box-shadow:0 30px 90px rgba(0,0,0,.38);overflow:hidden;padding:44px 48px 52px}
-.compare-shell:before{content:"";position:absolute;left:-90px;bottom:-120px;width:360px;height:360px;border-radius:50%;background:radial-gradient(circle,rgba(255,79,163,.18),rgba(255,79,163,0) 68%);filter:blur(5px);pointer-events:none}
-.compare-shell:after{content:"";position:absolute;right:-110px;top:-150px;width:410px;height:410px;border-radius:50%;background:radial-gradient(circle,rgba(255,79,163,.22),rgba(255,79,163,0) 66%);pointer-events:none}
-.compare-grid{position:relative;z-index:1;display:grid;grid-template-columns:.66fr 1fr 1fr;gap:28px;align-items:stretch}
-.compare-intro{display:flex;flex-direction:column;justify-content:center;padding:18px 22px 18px 12px}
-.compare-kicker{margin:0 0 3px;color:var(--pink);font:700 42px/.9 'Caveat',cursive;transform:rotate(-3deg);width:max-content}
-.compare-kicker:after{content:"";display:block;width:82px;height:3px;margin-top:6px;border-radius:999px;background:var(--pink);box-shadow:0 0 16px rgba(255,79,163,.45)}
-.compare-title{margin:18px 0 0;font:800 clamp(62px,5.2vw,84px)/.82 'Barlow Condensed',sans-serif;letter-spacing:-.025em;text-transform:uppercase}
-.compare-intro p{margin:24px 0 0;max-width:300px;color:rgba(255,255,255,.69);font:400 15px/1.6 'Inter',sans-serif}
-.plan-card{position:relative;display:flex;flex-direction:column;min-height:470px;padding:34px 36px 32px;border:1px solid rgba(255,79,163,.68);border-radius:18px;background:linear-gradient(145deg,rgba(24,15,23,.96),rgba(8,6,9,.98));box-shadow:0 18px 42px rgba(0,0,0,.26),inset 0 1px 0 rgba(255,255,255,.025)}
-.plan-card h2{margin:0;color:#fff;font:800 46px/.95 'Barlow Condensed',sans-serif;text-transform:uppercase;letter-spacing:-.018em}
-.plan-card h2:after{content:"";display:block;width:48px;height:3px;margin-top:16px;border-radius:999px;background:var(--pink)}
-.plan-badge{position:absolute;top:34px;right:32px;padding:10px 15px;border:1px solid rgba(255,79,163,.26);border-radius:8px;background:rgba(24,6,17,.82);color:#ff83bf;font:800 12px/1 'Inter',sans-serif;text-transform:uppercase;box-shadow:0 0 24px rgba(255,79,163,.10)}
-.plan-list{list-style:none;margin:26px 0 30px;padding:0;color:rgba(255,255,255,.9);font:400 16px/1.55 'Inter',sans-serif}
-.plan-list li{position:relative;margin:14px 0;padding-left:34px}
-.plan-list li:before{content:"✓";position:absolute;left:0;top:1px;width:22px;height:22px;border:1.6px solid var(--pink);border-radius:50%;display:flex;align-items:center;justify-content:center;color:var(--pink);font:800 13px/1 'Inter',sans-serif}
-.plan-cta{margin-top:auto;min-height:58px;display:flex;align-items:center;justify-content:center;border-radius:10px;background:linear-gradient(180deg,#ff5aab,#ff3d98);color:#0d070b;font:900 16px/1 'Inter',sans-serif;text-transform:uppercase;box-shadow:0 14px 34px rgba(255,79,163,.26),0 0 22px rgba(255,79,163,.12);transition:transform .18s ease,box-shadow .18s ease}
-.plan-cta:hover{transform:translateY(-1px);box-shadow:0 17px 38px rgba(255,79,163,.32),0 0 28px rgba(255,79,163,.16)}
-
-@media(max-width:1000px){
-  .hero-shell,.hero{min-height:560px}
-  .hero-copy{width:min(390px,46vw);max-width:390px;padding-left:28px}
-  .hero-image{left:32vw;height:100%}
-  h1{font-size:clamp(46px,5.8vw,60px)}
-  .actions{flex-wrap:wrap}
-  .benefit-grid{grid-template-columns:1fr}
-  .benefit-card{min-height:0}
-  .compare-shell{padding:36px 30px 42px;border-radius:0 0 42px 42px}
-  .compare-grid{grid-template-columns:1fr 1fr}.compare-intro{grid-column:1/-1;padding:0 4px 12px}.compare-intro p{max-width:520px}.compare-title{font-size:64px}
-}
-@media(max-width:700px){
-  .wrap{width:min(100% - 32px,1500px)}.site-header{height:auto;padding:10px 0}.brand{height:58px}.brand-logo{height:54px}.nav-links{display:none}.nav-cta{padding:12px 14px}
-  .hero-shell{min-height:760px}.hero{min-height:760px;align-items:flex-end;padding:0 0 38px}.hero-copy{width:100%;max-width:none;padding:0 4px;transform:none}.hero-image{top:0;left:50%;bottom:auto;height:430px;width:auto;transform:translateX(-50%)}
-  .hero-shell:after{background:linear-gradient(0deg,rgba(5,3,5,.98) 0%,rgba(5,3,5,.88) 34%,rgba(5,3,5,.18) 60%,rgba(5,3,5,0) 78%)}
-  h1{font-size:50px}.lead{max-width:none}.actions{flex-wrap:wrap}.button{flex:1 1 150px}
-  .benefits{padding:24px 0 30px}.benefit-grid{gap:14px}.benefit-card{grid-template-columns:68px 1fr;gap:16px;padding:20px}.benefit-icon{width:60px;height:60px}.benefit-icon svg{width:30px;height:30px}.benefit-copy h2{font-size:21px}.benefit-copy p{font-size:14px}
-  .compare-section{padding:36px 0 42px}.compare-shell{padding:28px 18px 32px;border-radius:0 0 30px 30px}.compare-grid{grid-template-columns:1fr;gap:16px}.compare-kicker{font-size:34px}.compare-title{font-size:56px}.plan-card{min-height:0;padding:28px 22px 24px}.plan-card h2{font-size:38px}.plan-badge{top:28px;right:20px;font-size:10px;padding:8px 10px}.plan-list{font-size:14px}.plan-cta{min-height:52px;font-size:14px}
-}
+:root{--bg:#080508;--panel:#120d12;--line:rgba(255,255,255,.12);--pink:#ff4fa3;--text:#fff;--muted:rgba(255,255,255,.66)}
+*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;background:var(--bg);color:var(--text);font-family:Arial,Helvetica,sans-serif}a{color:inherit;text-decoration:none}.wrap{width:min(1500px,calc(100% - 48px));margin:0 auto}
+.site-header{height:82px;border-bottom:1px solid rgba(255,79,163,.18);background:#050405;display:flex;align-items:center}.nav{display:flex;align-items:center;gap:28px;height:100%}.brand{display:flex;align-items:center;margin-right:auto;height:70px}.brand-logo{display:block;width:auto;height:66px;object-fit:contain}.nav-links{display:flex;gap:26px;font-size:13px;font-weight:800;text-transform:uppercase}.nav-cta{background:var(--pink);padding:14px 20px;border-radius:10px;font-size:13px;font-weight:800}
+.hero-shell{position:relative;min-height:610px;overflow:hidden;border-bottom:1px solid rgba(255,79,163,.16);background:#090509}.hero-image{position:absolute;top:0;bottom:0;left:clamp(355px,29vw,520px);height:100%;width:auto;max-width:none;object-fit:contain;z-index:0}.hero-shell:after{content:"";position:absolute;inset:0;z-index:1;pointer-events:none;background:linear-gradient(90deg,rgba(5,3,5,.95) 0%,rgba(5,3,5,.78) 20%,rgba(5,3,5,.30) 35%,rgba(5,3,5,.08) 47%,rgba(5,3,5,0) 58%)}.hero{position:relative;z-index:2;min-height:610px;display:flex;align-items:center;padding:36px 0 30px}.hero-copy{width:410px;max-width:410px;padding-left:54px;transform:translateY(8px)}.eyebrow{margin:0 0 15px;color:var(--pink);font-size:12px;letter-spacing:.2em;font-weight:900;text-transform:uppercase}h1{margin:0;max-width:400px;font-size:clamp(50px,4vw,64px);line-height:.89;letter-spacing:-.04em;text-transform:uppercase}h1 span{display:block;color:var(--pink);margin-top:5px}.lead{max-width:385px;margin:19px 0 0;color:rgba(255,255,255,.84);font-size:16px;line-height:1.46}.actions{display:flex;gap:10px;flex-wrap:nowrap;margin-top:20px;align-items:stretch}.button{min-height:46px;display:inline-flex;align-items:center;justify-content:center;padding:0 17px;border-radius:10px;border:1px solid rgba(255,255,255,.7);font-size:11px;font-weight:900;text-transform:uppercase;background:rgba(5,3,5,.42);backdrop-filter:blur(5px);white-space:nowrap}.button.primary{background:var(--pink);border-color:var(--pink);min-width:176px}.button:not(.primary){min-width:158px}
+.benefits{padding:34px 0 42px;border-bottom:1px solid rgba(255,79,163,.14);background:linear-gradient(180deg,#0b070b 0%,#080508 100%)}.benefit-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:22px}.benefit-card{min-height:220px;display:grid;grid-template-columns:92px 1fr;gap:24px;align-items:start;padding:28px;border:1px solid rgba(255,255,255,.28);border-radius:14px;background:linear-gradient(145deg,rgba(255,255,255,.025),rgba(255,79,163,.018));box-shadow:0 18px 50px rgba(0,0,0,.22)}.benefit-icon{width:78px;height:78px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:linear-gradient(145deg,#ff4fa3,#e83b8d);box-shadow:0 10px 28px rgba(255,79,163,.18)}.benefit-icon svg{width:38px;height:38px;fill:none;stroke:#fff;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}.benefit-copy h2{margin:5px 0 0;font-size:25px;line-height:1.08;letter-spacing:-.025em}.benefit-copy h2 span{display:block;color:var(--pink)}.benefit-rule{width:42px;height:3px;margin:16px 0 18px;border-radius:999px;background:var(--pink)}.benefit-copy p{margin:0;max-width:340px;color:rgba(255,255,255,.76);font-size:15px;line-height:1.5}
+.compare-section{position:relative;overflow:hidden;padding:58px 0 66px;background:#080508;color:#fff;border-top:1px solid rgba(255,79,163,.16);border-bottom:1px solid rgba(255,79,163,.16)}.compare-section:before{content:"";position:absolute;inset:0;background:radial-gradient(circle at 92% 12%,rgba(255,36,135,.28),transparent 25%),radial-gradient(circle at 8% 88%,rgba(255,36,135,.18),transparent 26%),linear-gradient(180deg,rgba(255,255,255,.015),transparent 24%);pointer-events:none}.compare-section:after{content:"";position:absolute;left:0;right:0;bottom:0;height:180px;background:linear-gradient(180deg,transparent,rgba(255,30,128,.08));pointer-events:none}.compare-shell{position:relative;z-index:1;border:1px solid rgba(255,255,255,.08);border-radius:0 0 62px 62px;background:linear-gradient(135deg,rgba(23,15,22,.94),rgba(7,5,8,.96));box-shadow:0 30px 90px rgba(0,0,0,.38);overflow:hidden;padding:44px 48px 52px}.compare-shell:before{content:"";position:absolute;left:-90px;bottom:-120px;width:360px;height:360px;border-radius:50%;background:radial-gradient(circle,rgba(255,79,163,.18),rgba(255,79,163,0) 68%);filter:blur(5px);pointer-events:none}.compare-shell:after{content:"";position:absolute;right:-110px;top:-150px;width:410px;height:410px;border-radius:50%;background:radial-gradient(circle,rgba(255,79,163,.22),rgba(255,79,163,0) 66%);pointer-events:none}.compare-grid{position:relative;z-index:1;display:grid;grid-template-columns:.66fr 1fr 1fr;gap:28px;align-items:stretch}.compare-intro{display:flex;flex-direction:column;justify-content:center;padding:18px 22px 18px 12px}.compare-kicker{margin:0 0 3px;color:var(--pink);font:700 42px/.9 'Caveat',cursive;transform:rotate(-3deg);width:max-content}.compare-kicker:after{content:"";display:block;width:82px;height:3px;margin-top:6px;border-radius:999px;background:var(--pink);box-shadow:0 0 16px rgba(255,79,163,.45)}.compare-title{margin:18px 0 0;font:800 clamp(62px,5.2vw,84px)/.82 'Barlow Condensed',sans-serif;letter-spacing:-.025em;text-transform:uppercase}.compare-intro p{margin:24px 0 0;max-width:300px;color:rgba(255,255,255,.69);font:400 15px/1.6 'Inter',sans-serif}.plan-card{position:relative;display:flex;flex-direction:column;min-height:470px;padding:34px 36px 32px;border:1px solid rgba(255,79,163,.68);border-radius:18px;background:linear-gradient(145deg,rgba(24,15,23,.96),rgba(8,6,9,.98));box-shadow:0 18px 42px rgba(0,0,0,.26),inset 0 1px 0 rgba(255,255,255,.025)}.plan-card h2{margin:0;color:#fff;font:800 46px/.95 'Barlow Condensed',sans-serif;text-transform:uppercase;letter-spacing:-.018em}.plan-card h2:after{content:"";display:block;width:48px;height:3px;margin-top:16px;border-radius:999px;background:var(--pink)}.plan-badge{position:absolute;top:34px;right:32px;padding:10px 15px;border:1px solid rgba(255,79,163,.26);border-radius:8px;background:rgba(24,6,17,.82);color:#ff83bf;font:800 12px/1 'Inter',sans-serif;text-transform:uppercase;box-shadow:0 0 24px rgba(255,79,163,.10)}.plan-list{list-style:none;margin:26px 0 30px;padding:0;color:rgba(255,255,255,.9);font:400 16px/1.55 'Inter',sans-serif}.plan-list li{position:relative;margin:14px 0;padding-left:34px}.plan-list li:before{content:"✓";position:absolute;left:0;top:1px;width:22px;height:22px;border:1.6px solid var(--pink);border-radius:50%;display:flex;align-items:center;justify-content:center;color:var(--pink);font:800 13px/1 'Inter',sans-serif}.plan-cta{margin-top:auto;min-height:58px;display:flex;align-items:center;justify-content:center;border-radius:10px;background:linear-gradient(180deg,#ff5aab,#ff3d98);color:#0d070b;font:900 16px/1 'Inter',sans-serif;text-transform:uppercase;box-shadow:0 14px 34px rgba(255,79,163,.26),0 0 22px rgba(255,79,163,.12)}
+.how-section{position:relative;padding:76px 0 84px;background:linear-gradient(180deg,#090609 0%,#050405 100%);overflow:hidden;border-bottom:1px solid rgba(255,79,163,.16)}.how-section:before{content:"";position:absolute;inset:0;background:radial-gradient(circle at 85% 5%,rgba(255,79,163,.12),transparent 28%),radial-gradient(circle at 15% 95%,rgba(255,79,163,.09),transparent 25%);pointer-events:none}.how-head{position:relative;z-index:1;text-align:center;max-width:980px;margin:0 auto 44px}.how-head:before{content:"";display:block;width:72px;height:3px;margin:0 auto 24px;background:var(--pink);border-radius:999px;box-shadow:0 0 18px rgba(255,79,163,.35)}.how-head h2{margin:0;font:800 clamp(48px,5.4vw,78px)/.92 'Barlow Condensed',sans-serif;text-transform:uppercase;letter-spacing:-.02em}.how-head h2 span{color:var(--pink)}.how-head p{margin:18px 0 0;color:rgba(255,255,255,.72);font:400 18px/1.5 'Inter',sans-serif}.how-grid{position:relative;z-index:1;display:grid;grid-template-columns:repeat(4,1fr);gap:18px}.how-card{position:relative;min-height:470px;padding:28px 28px 30px;border:1px solid rgba(255,79,163,.58);border-radius:18px;background:linear-gradient(145deg,rgba(22,14,21,.98),rgba(8,6,9,.98));box-shadow:0 18px 45px rgba(0,0,0,.26),inset 0 1px 0 rgba(255,255,255,.025)}.how-top{display:flex;align-items:center;justify-content:space-between;gap:20px}.how-number{font:700 64px/.9 'Barlow Condensed',sans-serif;color:transparent;-webkit-text-stroke:1.4px var(--pink)}.how-icon{width:66px;height:66px;border:1px solid rgba(255,79,163,.72);border-radius:50%;display:flex;align-items:center;justify-content:center;box-shadow:0 0 24px rgba(255,79,163,.2)}.how-icon svg{width:31px;height:31px;fill:none;stroke:var(--pink);stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}.how-card h3{margin:22px 0 18px;font:800 31px/1 'Barlow Condensed',sans-serif}.how-label{margin-top:16px;color:var(--pink);font:800 12px/1 'Inter',sans-serif;letter-spacing:.08em;text-transform:uppercase}.how-card p{margin:7px 0 0;color:rgba(255,255,255,.78);font:400 15px/1.55 'Inter',sans-serif}.how-footer{position:relative;z-index:1;margin:38px auto 0;max-width:920px;text-align:center;color:rgba(255,255,255,.66);font:400 15px/1.6 'Inter',sans-serif}.how-footer:before{content:"♡";display:block;margin:0 auto 10px;color:var(--pink);font-size:30px}.how-footer:after{content:"";display:block;width:min(520px,70vw);height:1px;margin:18px auto 0;background:linear-gradient(90deg,transparent,rgba(255,79,163,.6),transparent)}
+@media(max-width:1000px){.hero-shell,.hero{min-height:560px}.hero-copy{width:min(390px,46vw);max-width:390px;padding-left:28px}.hero-image{left:32vw;height:100%}h1{font-size:clamp(46px,5.8vw,60px)}.actions{flex-wrap:wrap}.benefit-grid{grid-template-columns:1fr}.benefit-card{min-height:0}.compare-shell{padding:36px 30px 42px;border-radius:0 0 42px 42px}.compare-grid{grid-template-columns:1fr 1fr}.compare-intro{grid-column:1/-1;padding:0 4px 12px}.compare-intro p{max-width:520px}.compare-title{font-size:64px}.how-grid{grid-template-columns:1fr 1fr}.how-card{min-height:0}}
+@media(max-width:700px){.wrap{width:min(100% - 32px,1500px)}.site-header{height:auto;padding:10px 0}.brand{height:58px}.brand-logo{height:54px}.nav-links{display:none}.nav-cta{padding:12px 14px}.hero-shell{min-height:760px}.hero{min-height:760px;align-items:flex-end;padding:0 0 38px}.hero-copy{width:100%;max-width:none;padding:0 4px;transform:none}.hero-image{top:0;left:50%;bottom:auto;height:430px;width:auto;transform:translateX(-50%)}.hero-shell:after{background:linear-gradient(0deg,rgba(5,3,5,.98) 0%,rgba(5,3,5,.88) 34%,rgba(5,3,5,.18) 60%,rgba(5,3,5,0) 78%)}h1{font-size:50px}.lead{max-width:none}.actions{flex-wrap:wrap}.button{flex:1 1 150px}.benefits{padding:24px 0 30px}.benefit-grid{gap:14px}.benefit-card{grid-template-columns:68px 1fr;gap:16px;padding:20px}.benefit-icon{width:60px;height:60px}.benefit-icon svg{width:30px;height:30px}.benefit-copy h2{font-size:21px}.benefit-copy p{font-size:14px}.compare-section{padding:36px 0 42px}.compare-shell{padding:28px 18px 32px;border-radius:0 0 30px 30px}.compare-grid{grid-template-columns:1fr;gap:16px}.compare-kicker{font-size:34px}.compare-title{font-size:56px}.plan-card{min-height:0;padding:28px 22px 24px}.plan-card h2{font-size:38px}.plan-badge{top:28px;right:20px;font-size:10px;padding:8px 10px}.plan-list{font-size:14px}.plan-cta{min-height:52px;font-size:14px}.how-section{padding:52px 0 58px}.how-head{margin-bottom:28px}.how-head p{font-size:15px}.how-grid{grid-template-columns:1fr}.how-card{padding:24px}.how-number{font-size:54px}.how-card h3{font-size:28px}}
 </style>
 </head>
 <body>
-<header class="site-header">
-  <div class="wrap nav">
-    <a class="brand" href="index.html" aria-label="The Girls Trip Guide home">
-      <img class="brand-logo" src="assets/images/girls-trip-guide-logo.png" alt="The Girls Trip Guide">
-    </a>
-    <nav class="nav-links" aria-label="Primary navigation">
-      <a href="situation.html">So... what's the plan?</a>
-      <a href="#how-it-works">How It Works</a>
-      <a href="briefing.html">The Briefing</a>
-    </nav>
-    <a class="nav-cta" href="#free-vs-full">Plan your trip</a>
-  </div>
-</header>
-
+<header class="site-header"><div class="wrap nav"><a class="brand" href="index.html" aria-label="The Girls Trip Guide home"><img class="brand-logo" src="assets/images/girls-trip-guide-logo.png" alt="The Girls Trip Guide"></a><nav class="nav-links" aria-label="Primary navigation"><a href="situation.html">So... what's the plan?</a><a href="#how-it-works">How It Works</a><a href="briefing.html">The Briefing</a></nav><a class="nav-cta" href="#free-vs-full">Plan your trip</a></div></header>
 <main>
-  <section class="hero-shell" id="how-it-works">
-    <img class="hero-image" src="assets/images/how-it-works-hero.png" alt="The Girls Trip Guide product dashboard on a phone in a neon nightlife setting">
-    <div class="wrap hero">
-      <div class="hero-copy">
-        <p class="eyebrow">How it works</p>
-        <h1>The whole trip.<span>One place.</span></h1>
-        <p class="lead">Flights, stays, money, reminders and the photos afterwards. One private place for the whole group.</p>
-        <div class="actions">
-          <a class="button primary" href="#free-vs-full">Create a free trip</a>
-          <a class="button" href="#free-vs-full">See free vs full</a>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <section class="benefits" aria-label="Trip benefits">
-    <div class="wrap benefit-grid">
-      <article class="benefit-card">
-        <div class="benefit-icon" aria-hidden="true">
-          <svg viewBox="0 0 48 48"><circle cx="17" cy="18" r="7"/><circle cx="31" cy="18" r="7"/><path d="M7 38c1.8-7 6.1-10 12-10s10.2 3 12 10"/><path d="M22 38c1.5-5.5 5-8 10.2-8 4.7 0 7.6 2.2 8.8 6.8"/></svg>
-        </div>
-        <div class="benefit-copy">
-          <h2>Less chasing.<span>More trip.</span></h2>
-          <div class="benefit-rule"></div>
-          <p>Plans, payments and reminders in one place. Everyone gets the nudge.</p>
-        </div>
-      </article>
-
-      <article class="benefit-card">
-        <div class="benefit-icon" aria-hidden="true">
-          <svg viewBox="0 0 48 48"><rect x="8" y="11" width="32" height="28" rx="3"/><path d="M15 7v8M33 7v8M8 19h32M15 26h4M24 26h4M33 26h1M15 33h4M24 33h4"/></svg>
-        </div>
-        <div class="benefit-copy">
-          <h2>Everyone knows<span>what’s happening.</span></h2>
-          <div class="benefit-rule"></div>
-          <p>Itineraries, updates and changes. No more guessing or group chat chaos.</p>
-        </div>
-      </article>
-
-      <article class="benefit-card">
-        <div class="benefit-icon" aria-hidden="true">
-          <svg viewBox="0 0 48 48"><path d="M24 6l14 5v10c0 9-5.6 16.5-14 21-8.4-4.5-14-12-14-21V11l14-5z"/><path d="M17 24l5 5 10-11"/></svg>
-        </div>
-        <div class="benefit-copy">
-          <h2>You stay<span>in control.</span></h2>
-          <div class="benefit-rule"></div>
-          <p>You run the trip. Add, edit or decide what the group sees.</p>
-        </div>
-      </article>
-    </div>
-  </section>
-
-  <section class="compare-section" id="free-vs-full" aria-label="Free versus Full Trip">
-    <div class="wrap compare-shell">
-      <div class="compare-grid">
-        <div class="compare-intro">
-          <div class="compare-kicker">Free</div>
-          <h2 class="compare-title">VS<br>Full Trip</h2>
-          <p>Start free. Upgrade when you want the GALS properly involved.</p>
-        </div>
-
-        <article class="plan-card">
-          <h2>Free</h2>
-          <span class="plan-badge">Always free</span>
-          <ul class="plan-list">
-            <li>Create and organise the trip</li>
-            <li>Keep dates, flights and stays together</li>
-            <li>Track costs and the per-person split</li>
-            <li>Useful trip reminders</li>
-            <li>A light touch during the trip</li>
-          </ul>
-          <a class="plan-cta" href="#">Create a free trip</a>
-        </article>
-
-        <article class="plan-card">
-          <h2>Full Trip</h2>
-          <span class="plan-badge">The whole team</span>
-          <ul class="plan-list">
-            <li>Everything in Free</li>
-            <li>Grace, Ava, Lola and Seb</li>
-            <li>Richer reminders and character messages</li>
-            <li>Full trip photo and video experience</li>
-            <li>Hidden post-trip gallery</li>
-          </ul>
-          <a class="plan-cta" href="#">£24.99 one-off</a>
-        </article>
-      </div>
-    </div>
-  </section>
+<section class="hero-shell" id="how-it-works"><img class="hero-image" src="assets/images/how-it-works-hero.png" alt="The Girls Trip Guide product dashboard on a phone in a neon nightlife setting"><div class="wrap hero"><div class="hero-copy"><p class="eyebrow">How it works</p><h1>The whole trip.<span>One place.</span></h1><p class="lead">Flights, stays, money, reminders and the photos afterwards. One private place for the whole group.</p><div class="actions"><a class="button primary" href="#free-vs-full">Create a free trip</a><a class="button" href="#free-vs-full">See free vs full</a></div></div></div></section>
+<section class="benefits" aria-label="Trip benefits"><div class="wrap benefit-grid"><article class="benefit-card"><div class="benefit-icon" aria-hidden="true"><svg viewBox="0 0 48 48"><circle cx="17" cy="18" r="7"/><circle cx="31" cy="18" r="7"/><path d="M7 38c1.8-7 6.1-10 12-10s10.2 3 12 10"/><path d="M22 38c1.5-5.5 5-8 10.2-8 4.7 0 7.6 2.2 8.8 6.8"/></svg></div><div class="benefit-copy"><h2>Less chasing.<span>More trip.</span></h2><div class="benefit-rule"></div><p>Plans, payments and reminders in one place. Everyone gets the nudge.</p></div></article><article class="benefit-card"><div class="benefit-icon" aria-hidden="true"><svg viewBox="0 0 48 48"><rect x="8" y="11" width="32" height="28" rx="3"/><path d="M15 7v8M33 7v8M8 19h32M15 26h4M24 26h4M33 26h1M15 33h4M24 33h4"/></svg></div><div class="benefit-copy"><h2>Everyone knows<span>what’s happening.</span></h2><div class="benefit-rule"></div><p>Itineraries, updates and changes. No more guessing or group chat chaos.</p></div></article><article class="benefit-card"><div class="benefit-icon" aria-hidden="true"><svg viewBox="0 0 48 48"><path d="M24 6l14 5v10c0 9-5.6 16.5-14 21-8.4-4.5-14-12-14-21V11l14-5z"/><path d="M17 24l5 5 10-11"/></svg></div><div class="benefit-copy"><h2>You stay<span>in control.</span></h2><div class="benefit-rule"></div><p>You run the trip. Add, edit or decide what the group sees.</p></div></article></div></section>
+<section class="compare-section" id="free-vs-full" aria-label="Free versus Full Trip"><div class="wrap compare-shell"><div class="compare-grid"><div class="compare-intro"><div class="compare-kicker">Free</div><h2 class="compare-title">VS<br>Full Trip</h2><p>Start free. Upgrade when you want the GALS properly involved.</p></div><article class="plan-card"><h2>Free</h2><span class="plan-badge">Always free</span><ul class="plan-list"><li>Create and organise the trip</li><li>Keep dates, flights and stays together</li><li>Track costs and the per-person split</li><li>Useful trip reminders</li><li>A light touch during the trip</li></ul><a class="plan-cta" href="#">Create a free trip</a></article><article class="plan-card"><h2>Full Trip</h2><span class="plan-badge">The whole team</span><ul class="plan-list"><li>Everything in Free</li><li>Grace, Ava, Lola and Seb</li><li>Richer reminders and character messages</li><li>Full trip photo and video experience</li><li>Hidden post-trip gallery</li></ul><a class="plan-cta" href="#">£24.99 one-off</a></article></div></div></section>
+<section class="how-section" aria-labelledby="howTitle"><div class="wrap"><div class="how-head"><h2 id="howTitle">So... how does this <span>actually work?</span></h2><p>What happens, why it helps, and what you get from it.</p></div><div class="how-grid"><article class="how-card"><div class="how-top"><div class="how-number">01</div><div class="how-icon" aria-hidden="true"><svg viewBox="0 0 48 48"><rect x="8" y="11" width="32" height="28" rx="3"/><path d="M15 7v8M33 7v8M8 19h32"/></svg></div></div><h3>Create the trip</h3><div class="how-label">How</div><p>Add the destination, dates, flights, stays and who’s coming.</p><div class="how-label">Why</div><p>It gives everyone one clear plan from the start.</p><div class="how-label">Benefit</div><p>Less confusion, fewer repeated questions.</p></article><article class="how-card"><div class="how-top"><div class="how-number">02</div><div class="how-icon" aria-hidden="true"><svg viewBox="0 0 48 48"><circle cx="17" cy="18" r="7"/><circle cx="31" cy="18" r="7"/><path d="M7 38c1.8-7 6.1-10 12-10s10.2 3 12 10"/><path d="M23 38c1.8-5.5 5-8 10-8 4.4 0 7 2 8 6"/></svg></div></div><h3>Invite the girls</h3><div class="how-label">How</div><p>Send one private invite so everyone joins the same trip.</p><div class="how-label">Why</div><p>The details stop living across five different chats.</p><div class="how-label">Benefit</div><p>No chasing screenshots, links or updates.</p></article><article class="how-card"><div class="how-top"><div class="how-number">03</div><div class="how-icon" aria-hidden="true"><svg viewBox="0 0 48 48"><rect x="11" y="9" width="26" height="32" rx="3"/><path d="M17 7h14v6H17zM17 21l3 3 5-6M17 31l3 3 5-6M29 22h4M29 32h4"/></svg></div></div><h3>Keep everything together</h3><div class="how-label">How</div><p>Track money, bookings, reminders, receipts and updates in one place.</p><div class="how-label">Why</div><p>Everyone can see what’s booked, what’s paid and what’s next.</p><div class="how-label">Benefit</div><p>You stay organised without becoming the trip secretary.</p></article><article class="how-card"><div class="how-top"><div class="how-number">04</div><div class="how-icon" aria-hidden="true"><svg viewBox="0 0 48 48"><path d="M10 14h28L24 30zM24 30v9M17 39h14M15 14l6-7"/></svg></div></div><h3>Enjoy the trip</h3><div class="how-label">How</div><p>Full Trip adds the GALS, richer nudges, shared photos/videos and the hidden post-trip gallery.</p><div class="how-label">Why</div><p>The trip keeps moving without you carrying all the admin.</p><div class="how-label">Benefit</div><p>Less stress, better memories, more actual trip.</p></article></div><div class="how-footer">Built to answer the big questions: what do I do, why should I use it, and what does it make easier for me?</div></div></section>
 </main>
 </body>
 </html>
