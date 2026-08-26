@@ -5,25 +5,25 @@
   Permissions-Policy: camera=(), microphone=(), geolocation=()
 
 /
-  Link: <https://thegirlstripguide.com/>; rel="canonical", </assets/images/hero.png>; rel=preload; as=image
+  Link: <https://thegirlstripguide.com/>; rel="canonical", </assets/images/hero.webp>; rel=preload; as=image; type=image/webp
 
 /situation
-  Link: <https://thegirlstripguide.com/situation>; rel="canonical", </assets/images/girls-trip-plan-hero.png>; rel=preload; as=image
+  Link: <https://thegirlstripguide.com/situation>; rel="canonical", </assets/images/girls-trip-plan-hero.webp>; rel=preload; as=image; type=image/webp
 
 /the-gals
-  Link: <https://thegirlstripguide.com/the-gals>; rel="canonical", </assets/images/how-it-works-hero.png>; rel=preload; as=image
+  Link: <https://thegirlstripguide.com/the-gals>; rel="canonical", </assets/images/how-it-works-hero.webp>; rel=preload; as=image; type=image/webp
 
 /free-vs-full
   Link: <https://thegirlstripguide.com/free-vs-full>; rel="canonical"
 
 /gals
-  Link: <https://thegirlstripguide.com/gals>; rel="canonical", </assets/images/group-drinks.png>; rel=preload; as=image
+  Link: <https://thegirlstripguide.com/gals>; rel="canonical", </assets/images/group-drinks.webp>; rel=preload; as=image; type=image/webp
 
 /briefing
-  Link: <https://thegirlstripguide.com/briefing>; rel="canonical", </assets/images/briefing-hero.png>; rel=preload; as=image
+  Link: <https://thegirlstripguide.com/briefing>; rel="canonical", </assets/images/briefing-hero.webp>; rel=preload; as=image; type=image/webp
 
 /contact
-  Link: <https://thegirlstripguide.com/contact>; rel="canonical", </assets/images/ava.png>; rel=preload; as=image
+  Link: <https://thegirlstripguide.com/contact>; rel="canonical", </assets/images/ava.webp>; rel=preload; as=image; type=image/webp
 
 /terms
   Link: <https://thegirlstripguide.com/terms>; rel="canonical"
