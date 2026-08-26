@@ -1,6 +1,13 @@
 const header = document.getElementById('siteHeader');
 const button = document.getElementById('menuButton');
-if (header && button) button.addEventListener('click', () => header.classList.toggle('open'));
+
+if (header && button) {
+  button.setAttribute('aria-expanded', 'false');
+  button.addEventListener('click', () => {
+    const isOpen = header.classList.toggle('open');
+    button.setAttribute('aria-expanded', String(isOpen));
+  });
+}
 
 // Apply the approved Girls Trip Guide logo and the darker brand header across the site.
 const logoStyle = document.createElement('style');
@@ -10,21 +17,40 @@ logoStyle.textContent = `
   .brand.site-logo{display:inline-flex;align-items:center;justify-content:center;width:120px;height:72px;overflow:hidden;flex:0 0 auto;background:#050406}
   .brand.site-logo img{display:block;width:120px;height:auto;max-width:none}
   .paper-rip{display:none!important}
+  .mobile-plan-link,.mobile-drawer{display:none}
   .footer .brand.site-logo{width:150px;height:112px;justify-content:flex-start;margin:0 0 6px;background:#0f0b0e}
   .footer .brand.site-logo img{width:150px;height:auto}
+
   @media(max-width:600px){
-    .nav{min-height:76px!important;gap:10px!important;flex-wrap:nowrap!important;align-items:center!important}
-    .brand.site-logo{width:108px;height:66px;flex:0 0 108px}.brand.site-logo img{width:108px}
-    .nav-links{display:grid!important;grid-template-columns:1fr!important;gap:5px!important;margin-left:auto!important;width:min(170px,46vw)!important;order:initial!important;padding:0!important;align-items:stretch!important}
-    .nav-links a{display:flex!important;align-items:center!important;justify-content:center!important;margin:0!important;padding:6px 9px!important;border:1px solid rgba(255,79,163,.48)!important;border-radius:999px!important;background:rgba(255,79,163,.06)!important;color:#fff!important;font-size:9px!important;line-height:1.05!important;letter-spacing:.035em!important;text-align:center!important;white-space:nowrap!important}
-    .nav-links a:first-child{border-color:rgba(255,79,163,.78)!important;color:#ff70b7!important}
-    .site-header.open .nav{flex-wrap:nowrap!important}
-    .site-header.open .nav-links{display:grid!important;order:initial!important;width:min(170px,46vw)!important;padding:0!important;align-items:stretch!important}
-    .menu-button{display:none!important}
+    .site-header{position:sticky!important;top:0!important}
+    .nav{min-height:76px!important;gap:8px!important;flex-wrap:nowrap!important;align-items:center!important;position:relative!important}
+    .brand.site-logo{width:96px;height:66px;flex:0 0 96px}.brand.site-logo img{width:96px}
+
+    /* Desktop nav stays out of the mobile header. */
+    .nav-links,.site-header.open .nav-links{display:none!important}
     .nav-cta{display:none!important}
+
+    /* Keep only the planning CTA visible beside the hamburger. */
+    .mobile-plan-link{display:inline-flex!important;align-items:center!important;justify-content:center!important;margin-left:auto!important;min-height:34px!important;padding:0 12px!important;border:1px solid rgba(255,79,163,.78)!important;border-radius:999px!important;background:rgba(255,79,163,.06)!important;color:#ff70b7!important;font-size:9px!important;font-weight:900!important;line-height:1!important;letter-spacing:.045em!important;text-transform:uppercase!important;white-space:nowrap!important}
+
+    .menu-button{display:flex!important;align-items:center!important;justify-content:center!important;width:36px!important;height:36px!important;flex:0 0 36px!important;margin-left:0!important;padding:0!important;border:0!important;background:transparent!important;color:#fff!important;font-size:27px!important;line-height:1!important;cursor:pointer!important}
+
+    /* Full mobile navigation drawer opened by the hamburger. */
+    .mobile-drawer{position:absolute!important;left:0!important;right:0!important;top:100%!important;z-index:100!important;display:none!important;padding:14px 18px 18px!important;background:#070608!important;border-top:1px solid rgba(255,79,163,.16)!important;border-bottom:1px solid rgba(255,79,163,.28)!important;box-shadow:0 18px 34px rgba(0,0,0,.38)!important}
+    .site-header.open .mobile-drawer{display:grid!important;gap:3px!important}
+    .mobile-drawer a{display:flex!important;align-items:center!important;justify-content:space-between!important;min-height:43px!important;padding:0 8px!important;border-bottom:1px solid rgba(255,255,255,.07)!important;color:rgba(255,255,255,.9)!important;font-size:12px!important;font-weight:800!important;letter-spacing:.06em!important;text-transform:uppercase!important}
+    .mobile-drawer a:last-child{border-bottom:0!important}
+    .mobile-drawer a::after{content:'→';color:#ff70b7;font-size:14px}
+    .mobile-drawer a.mobile-sign-in{color:#ff70b7!important}
+
     .footer{padding:32px 0 18px}
     .footer .brand.site-logo{width:138px;height:100px;margin-bottom:2px}.footer .brand.site-logo img{width:138px}
     .footer-grid{gap:24px}.footer p{margin:4px 0 0}.footer h3{margin-bottom:8px}.footer a:not(.brand){margin:5px 0}.footer-bottom{margin-top:18px;padding-top:14px}
+  }
+
+  @media(max-width:370px){
+    .brand.site-logo{width:88px;flex-basis:88px}.brand.site-logo img{width:88px}
+    .mobile-plan-link{padding:0 9px!important;font-size:8px!important;letter-spacing:.025em!important}
   }
 `;
 document.head.appendChild(logoStyle);
@@ -38,13 +64,53 @@ document.querySelectorAll('.brand').forEach(brand => {
   brand.appendChild(img);
 });
 
+// Mobile header: keep the planning button visible and place the rest inside the hamburger menu.
+if (header && button) {
+  const nav = button.parentElement;
+  if (nav && !nav.querySelector('.mobile-plan-link')) {
+    const planLink = document.createElement('a');
+    planLink.className = 'mobile-plan-link';
+    planLink.href = 'situation.html';
+    planLink.textContent = 'So… what’s the plan?';
+    nav.insertBefore(planLink, button);
+  }
+
+  if (!header.querySelector('.mobile-drawer')) {
+    const drawer = document.createElement('nav');
+    drawer.className = 'mobile-drawer';
+    drawer.setAttribute('aria-label', 'Mobile navigation');
+    drawer.innerHTML = `
+      <a class="mobile-sign-in" href="index.html#sign-in">Sign In</a>
+      <a href="the-gals.html#how-it-works">How It Works</a>
+      <a href="the-gals.html">The GALS</a>
+      <a href="the-gals.html#free-vs-full">Free vs Full</a>
+      <a href="contact.html">Contact</a>
+    `;
+    header.appendChild(drawer);
+
+    drawer.querySelectorAll('a').forEach(link => {
+      link.addEventListener('click', () => {
+        header.classList.remove('open');
+        button.setAttribute('aria-expanded', 'false');
+      });
+    });
+  }
+
+  document.addEventListener('keydown', event => {
+    if (event.key === 'Escape' && header.classList.contains('open')) {
+      header.classList.remove('open');
+      button.setAttribute('aria-expanded', 'false');
+    }
+  });
+}
+
 document.querySelectorAll('.footer p').forEach(p => {
   if (p.textContent.trim() === 'Good times. Great people. No stress.') p.textContent = 'Good Plans. Better Stories.';
 });
 
 // One front-of-house story for the planning setup.
 document.querySelectorAll('a[href="situation.html"]').forEach(link => {
-  link.textContent = 'So… what’s the plan?';
+  if (!link.classList.contains('mobile-plan-link')) link.textContent = 'So… what’s the plan?';
 });
 document.querySelectorAll('a[href="arrangement.html"]').forEach(link => link.remove());
 
@@ -55,7 +121,7 @@ document.querySelectorAll('.footer a[href="how-it-works.html"], .footer a[href="
 // Memories is not a front-of-house category.
 document.querySelectorAll('a[href="memories.html"]').forEach(link => link.remove());
 
-// Contact belongs with the legal/support links in the footer, not the main navigation.
+// Contact belongs with the legal/support links in the footer, not the desktop navigation.
 document.querySelectorAll('.nav-links a[href="contact.html"]').forEach(link => link.remove());
 
 // Ensure Sitemap sits with Contact, Terms, Privacy and Cookies in the footer.
