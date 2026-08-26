@@ -1,0 +1,6 @@
+User-agent: *
+Allow: /
+Disallow: /create-trip.html
+Disallow: /full-trip.html
+
+Sitemap: https://thegirlstripguide.com/sitemap.xml
