@@ -10,21 +10,11 @@
 <link rel="stylesheet" href="styles.css">
 <link rel="stylesheet" href="styles-images.css">
 <style>
-.master-product-hero{position:relative;background:#080508;color:#fff;overflow:hidden;border-bottom:1px solid rgba(255,79,163,.2)}
-.master-scene{position:relative;width:100%;height:clamp(500px,35vw,590px);overflow:hidden;background:#080508}
-.master-canvas{position:absolute;left:0;top:50%;width:100%;height:auto;aspect-ratio:1916/821;transform:translateY(-50%);overflow:hidden}
-.master-foreground{position:absolute;inset:0;width:100%;height:100%;object-fit:fill;z-index:10;pointer-events:none}
-.hero-slot{position:absolute;z-index:11;overflow:hidden;background:#2b111d}
-.hero-slot img{position:absolute;inset:-4%;width:108%;height:108%;object-fit:cover;filter:saturate(1.03) contrast(1.02)}
-.slot-airport{left:22.60%;top:66.75%;width:11.74%;height:20.95%;clip-path:polygon(16% 0,100% 23%,87.6% 100%,0 77.3%)}
-.slot-pool{left:31.00%;top:42.14%;width:12.94%;height:29.96%;clip-path:polygon(0 20.7%,81.9% 0,100% 80.5%,15.3% 100%)}
-.slot-sunset{left:63.41%;top:3.65%;width:10.91%;height:18.27%;clip-path:polygon(0 0,94.3% .7%,100% 96%,0 100%)}
-.slot-beach{left:64.41%;top:28.99%;width:13.15%;height:22.53%;clip-path:polygon(13.9% 0,100% 11.4%,88.5% 100%,0 85.9%)}
-.slot-road{left:61.53%;top:59.32%;width:10.07%;height:21.07%;clip-path:polygon(0 8.1%,86% 0,100% 89.6%,10.9% 100%)}
-.master-fallback .hero-slot{display:none}.master-fallback .master-foreground{object-fit:cover}
+.product-hero{position:relative;width:100%;background:#080508;overflow:hidden;border-bottom:1px solid rgba(255,79,163,.2)}
+.product-hero img{display:block;width:100%;height:clamp(500px,38vw,640px);object-fit:cover;object-position:center center}
 .how-product-summary{background:#0e0a0d;color:#fff;padding:54px 0 62px}.how-product-summary .summary-inner{max-width:880px;margin:auto;text-align:center}.how-product-summary .scribble{font-size:34px}.how-product-summary h2{margin:4px 0 0;font:900 clamp(44px,5vw,68px)/.9 'Barlow Condensed',sans-serif;text-transform:uppercase}.how-product-summary h2 span{color:#ff70b7}.how-product-summary p{max-width:680px;margin:20px auto 0;color:rgba(255,255,255,.7);line-height:1.65}.summary-actions{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin-top:25px}
-@media(max-width:900px){.master-scene{height:500px}.master-canvas{width:118%;left:-9%}.how-product-summary{padding:46px 0 54px}}
-@media(max-width:600px){.master-scene{height:420px}.master-canvas{width:155%;left:-27.5%}.hero-slot{display:none}.how-product-summary{padding:42px 0 48px}.how-product-summary .scribble{font-size:30px}.how-product-summary h2{font-size:44px}.how-product-summary p{font-size:14px}.summary-actions .pill{flex:1 1 0;min-width:0;font-size:10px;padding:12px 10px}}
+@media(max-width:900px){.product-hero img{height:520px;object-position:center center}.how-product-summary{padding:46px 0 54px}}
+@media(max-width:600px){.product-hero img{height:430px;object-position:52% center}.how-product-summary{padding:42px 0 48px}.how-product-summary .scribble{font-size:30px}.how-product-summary h2{font-size:44px}.how-product-summary p{font-size:14px}.summary-actions .pill{flex:1 1 0;min-width:0;font-size:10px;padding:12px 10px}}
 </style>
 </head>
 <body>
@@ -37,17 +27,8 @@
   </div>
 </header>
 <main>
-<section class="master-product-hero" id="how-it-works" aria-label="The Girls Trip Guide product preview">
-  <div class="master-scene" id="masterScene">
-    <div class="master-canvas">
-      <div class="hero-slot slot-airport" data-slot="airport"><img alt="Girls trip airport memory"></div>
-      <div class="hero-slot slot-pool" data-slot="pool"><img alt="Girls trip pool memory"></div>
-      <div class="hero-slot slot-sunset" data-slot="sunset"><img alt="Girls trip sunset memory"></div>
-      <div class="hero-slot slot-beach" data-slot="beach"><img alt="Girls trip beach club memory"></div>
-      <div class="hero-slot slot-road" data-slot="road"><img alt="Girls trip road trip memory"></div>
-      <img class="master-foreground" id="masterForeground" src="assets/images/how-it-works-master-foreground.png" alt="The Girls Trip Guide dashboard surrounded by trip memories" onerror="this.onerror=null;this.src='assets/images/girls-trip-plan-hero.png';document.getElementById('masterScene').classList.add('master-fallback')">
-    </div>
-  </div>
+<section class="product-hero" id="how-it-works" aria-label="The Girls Trip Guide product preview">
+  <img src="assets/images/how-it-works-hero.png" alt="The Girls Trip Guide dashboard on a phone in an Ibiza nightlife setting">
 </section>
 <section class="how-product-summary">
   <div class="wrap summary-inner">
@@ -76,21 +57,6 @@
   </div>
 </section>
 </main>
-<script>
-window.GTG_HERO_POLAROIDS={
-  airport:{src:'assets/images/how-it-worksairport.png',alt:'Girls trip airport memory'},
-  pool:{src:'assets/images/how-it-workspool.png',alt:'Girls trip pool memory'},
-  sunset:{src:'assets/images/how-it-workssunset.png',alt:'Girls trip sunset memory'},
-  beach:{src:'assets/images/how-it-worksbeach.png',alt:'Girls trip beach club memory'},
-  road:{src:'assets/images/how-it-worksroad.png',alt:'Girls trip road trip memory'}
-};
-Object.entries(window.GTG_HERO_POLAROIDS).forEach(([key,item])=>{
-  const img=document.querySelector(`[data-slot="${key}"] img`);
-  if(!img)return;
-  img.src=item.src;
-  img.alt=item.alt||'';
-});
-</script>
 <script src="script.js"></script>
 </body>
 </html>
