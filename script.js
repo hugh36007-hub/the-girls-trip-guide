@@ -49,4 +49,23 @@ const style=document.createElement('style');style.textContent=`[id]{scroll-margi
 const heroActions=document.querySelector('.hero .hero-actions');if(path==='/'&&heroActions&&!document.querySelector('.hero-how-cta')){const a=document.createElement('a');a.className='hero-how-cta';a.href='/the-gals#how-it-works';a.textContent='HOW IT WORKS →';heroActions.parentElement.insertBefore(a,heroActions)}
 if(header&&button){button.setAttribute('aria-expanded','false');button.setAttribute('aria-controls','mobileNavigation');const nav=button.parentElement;if(nav&&!nav.querySelector('.mobile-plan-link')){const a=document.createElement('a');a.className='mobile-plan-link';a.href='/create-trip';a.textContent='Plan your trip';nav.insertBefore(a,button)}if(!header.querySelector('.mobile-drawer')){const d=document.createElement('nav');d.className='mobile-drawer';d.id='mobileNavigation';d.setAttribute('aria-label','Mobile navigation');d.innerHTML='<a href="/situation">So… what’s the plan?</a><a href="/the-gals#how-it-works">How It Works</a><a href="/free-vs-full">Free vs Full</a><a href="/gals">The GALS</a><a href="/briefing">The Briefing</a><a href="/create-trip">Create a Free Trip</a>';header.appendChild(d);d.querySelectorAll('a').forEach(a=>a.addEventListener('click',()=>{header.classList.remove('open');button.setAttribute('aria-expanded','false')}))}button.addEventListener('click',()=>{const o=header.classList.toggle('open');button.setAttribute('aria-expanded',String(o))});document.addEventListener('keydown',e=>{if(e.key==='Escape'&&header.classList.contains('open')){header.classList.remove('open');button.setAttribute('aria-expanded','false');button.focus()}})}
 
-document.querySelectorAll('.footer').forEach(f=>{const h=[...f.querySelectorAll('h3')].find(x=>x.textContent.trim().toUpperCase()==='EXPLORE');const box=h?.parentElement;if(box){box.querySelectorAll('a').forEach(a=>a.remove());[['/situation','So… what’s the plan?'],['/the-gals#how-it-works','How It Works'],['/free-vs-full','Free vs Full'],['/gals','The GALS'],['/briefing','The Briefing']].forEach(([href,text])=>{const a=document.createElement('a');a.href=href;a.textContent=text;box.appendChild(a)})}});
+document.querySelectorAll('footer.footer').forEach(f=>{f.innerHTML='<div class="wrap footer-grid"><div class="footer-branding"><a class="brand site-logo" href="/" aria-label="The Girls Trip Guide home"><img src="assets/images/girls-trip-guide-logo.webp" alt="The Girls Trip Guide — Good Plans. Better Stories." loading="lazy" decoding="async"></a><p>Good Plans. Better Stories.</p></div><div><h3>EXPLORE</h3><a href="/situation">So… what’s the plan?</a><a href="/the-gals#how-it-works">How It Works</a><a href="/free-vs-full">Free vs Full</a><a href="/gals">The GALS</a><a href="/briefing">The Briefing</a></div><div><h3>ABOUT</h3><a href="/contact">Contact</a><a href="/terms">Terms &amp; Conditions</a><a href="/privacy">Privacy Policy</a><a href="/cookie-policy">Cookie Policy</a><a href="/sitemap.xml">Sitemap</a></div></div><div class="wrap footer-bottom">© 2026 The Girls Trip Guide. All rights reserved.</div>'});
+
+const footerStyle=document.createElement('style');footerStyle.textContent=`
+.footer{background:#000!important;color:#fff!important;padding:42px 0 20px!important}
+.footer-grid{display:grid!important;grid-template-columns:1.25fr .8fr .8fr!important;gap:40px!important}
+.footer h3{margin:0 0 12px!important;font:900 22px/1 'Barlow Condensed',sans-serif!important}
+.footer a:not(.brand){display:flex!important;align-items:center!important;color:rgba(255,255,255,.72)!important;margin:4px 0!important;min-height:30px!important;font-size:14px!important}
+.footer .footer-branding p{color:rgba(255,255,255,.65)!important}
+.footer-bottom{border-top:1px solid rgba(255,255,255,.08)!important;margin-top:28px!important;padding-top:16px!important;color:rgba(255,255,255,.48)!important;font-size:12px!important}
+@media(max-width:700px){
+  .footer{padding:34px 0 18px!important}
+  .footer-grid{grid-template-columns:minmax(0,1fr) minmax(0,1fr)!important;column-gap:34px!important;row-gap:28px!important}
+  .footer-branding{grid-column:1/-1!important;text-align:center!important}
+  .footer .footer-branding .brand.site-logo{justify-content:center!important;margin:0 auto 8px!important;width:150px!important;height:112px!important}
+  .footer .footer-branding p{margin:0!important;text-align:center!important;font-size:14px!important}
+  .footer h3{margin-bottom:10px!important;font-size:21px!important}
+  .footer a:not(.brand){min-height:42px!important;margin:0!important;font-size:14px!important;line-height:1.25!important}
+  .footer-bottom{text-align:center!important;margin-top:28px!important;padding-top:16px!important;font-size:11.5px!important}
+}
+`;document.head.appendChild(footerStyle);
