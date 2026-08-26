@@ -7,34 +7,40 @@
 /
   Link: <https://thegirlstripguide.com/>; rel="canonical", </assets/images/hero.png>; rel=preload; as=image
 
-/situation.html
-  Link: <https://thegirlstripguide.com/situation.html>; rel="canonical", </assets/images/girls-trip-plan-hero.png>; rel=preload; as=image
+/situation
+  Link: <https://thegirlstripguide.com/situation>; rel="canonical", </assets/images/girls-trip-plan-hero.png>; rel=preload; as=image
 
-/the-gals.html
-  Link: <https://thegirlstripguide.com/the-gals.html>; rel="canonical", </assets/images/how-it-works-hero.png>; rel=preload; as=image
+/the-gals
+  Link: <https://thegirlstripguide.com/the-gals>; rel="canonical", </assets/images/how-it-works-hero.png>; rel=preload; as=image
 
-/free-vs-full.html
-  Link: <https://thegirlstripguide.com/free-vs-full.html>; rel="canonical"
+/free-vs-full
+  Link: <https://thegirlstripguide.com/free-vs-full>; rel="canonical"
 
-/gals.html
-  Link: <https://thegirlstripguide.com/gals.html>; rel="canonical", </assets/images/group-drinks.png>; rel=preload; as=image
+/gals
+  Link: <https://thegirlstripguide.com/gals>; rel="canonical", </assets/images/group-drinks.png>; rel=preload; as=image
 
-/briefing.html
-  Link: <https://thegirlstripguide.com/briefing.html>; rel="canonical", </assets/images/briefing-hero.png>; rel=preload; as=image
+/briefing
+  Link: <https://thegirlstripguide.com/briefing>; rel="canonical", </assets/images/briefing-hero.png>; rel=preload; as=image
 
-/contact.html
-  Link: <https://thegirlstripguide.com/contact.html>; rel="canonical", </assets/images/ava.png>; rel=preload; as=image
+/contact
+  Link: <https://thegirlstripguide.com/contact>; rel="canonical", </assets/images/ava.png>; rel=preload; as=image
 
-/terms.html
-  Link: <https://thegirlstripguide.com/terms.html>; rel="canonical"
+/terms
+  Link: <https://thegirlstripguide.com/terms>; rel="canonical"
 
-/privacy.html
-  Link: <https://thegirlstripguide.com/privacy.html>; rel="canonical"
+/privacy
+  Link: <https://thegirlstripguide.com/privacy>; rel="canonical"
 
-/cookie-policy.html
-  Link: <https://thegirlstripguide.com/cookie-policy.html>; rel="canonical"
+/cookie-policy
+  Link: <https://thegirlstripguide.com/cookie-policy>; rel="canonical"
+
+/create-trip
+  X-Robots-Tag: noindex, follow
 
 /create-trip.html
+  X-Robots-Tag: noindex, follow
+
+/full-trip
   X-Robots-Tag: noindex, follow
 
 /full-trip.html
