@@ -10,16 +10,16 @@
 <link rel="stylesheet" href="styles.css">
 <link rel="stylesheet" href="styles-images.css">
 <style>
-.product-hero{position:relative;height:clamp(540px,37vw,620px);background:#080508;overflow:hidden;border-bottom:1px solid rgba(255,79,163,.18);isolation:isolate}
-.product-hero-bg{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:68% center;z-index:-3;transform:scale(1.10)}
-.product-hero:before{content:"";position:absolute;inset:0;background:linear-gradient(90deg,rgba(5,3,5,.88) 0%,rgba(5,3,5,.62) 13%,rgba(5,3,5,.20) 26%,rgba(5,3,5,.04) 39%,rgba(5,3,5,.01) 70%,rgba(5,3,5,.03) 86%,rgba(5,3,5,.07) 100%);z-index:-2}
+.product-hero{position:relative;height:clamp(520px,35vw,580px);background:#080508;overflow:hidden;border-bottom:1px solid rgba(255,79,163,.18);isolation:isolate}
+.product-hero-bg{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:50% 50%;z-index:-3;transform:none}
+.product-hero:before{content:"";position:absolute;inset:0;background:linear-gradient(90deg,rgba(5,3,5,.84) 0%,rgba(5,3,5,.58) 14%,rgba(5,3,5,.22) 28%,rgba(5,3,5,.04) 43%,rgba(5,3,5,.00) 67%,rgba(5,3,5,.05) 84%,rgba(5,3,5,.14) 100%);z-index:-2}
 .product-hero:after{content:"";position:absolute;inset:0;background:radial-gradient(circle at 50% 50%,rgba(255,79,163,.055),transparent 28%),linear-gradient(0deg,rgba(8,5,8,.24) 0%,transparent 18%,transparent 84%,rgba(8,5,8,.08) 100%);z-index:-1;pointer-events:none}
 .product-hero-inner{position:relative;max-width:1600px;height:100%;margin:0 auto;padding:0 40px;display:block}
-.product-copy{position:absolute;left:42px;top:50%;transform:translateY(-50%);width:292px;max-width:292px;text-shadow:0 2px 18px rgba(0,0,0,.4)}
+.product-copy{position:absolute;left:44px;top:50%;transform:translateY(-50%);width:300px;max-width:300px;text-shadow:0 2px 18px rgba(0,0,0,.4)}
 .product-copy .eyebrow{margin:0 0 10px;color:#ff5cae;font:800 12px/1 Inter,sans-serif;letter-spacing:.19em;text-transform:uppercase}
 .product-copy h1{margin:0;color:#fff;font:900 clamp(48px,4.1vw,64px)/.85 'Barlow Condensed',sans-serif;text-transform:uppercase;letter-spacing:-.025em}
 .product-copy h1 span{display:block;color:#ff4fa3}
-.product-copy .lead{margin:17px 0 0;max-width:292px;color:rgba(255,255,255,.78);font-size:16px;line-height:1.48}
+.product-copy .lead{margin:17px 0 0;max-width:300px;color:rgba(255,255,255,.78);font-size:16px;line-height:1.48}
 .product-copy .lead strong{color:#fff}
 .product-actions{display:flex;gap:9px;flex-wrap:wrap;margin-top:18px}.product-actions .pill{font-size:10px;padding:12px 15px}
 .phone-space{display:none}
@@ -35,7 +35,7 @@
 .hero-benefit-strip .benefit-inner{max-width:1180px;margin:auto;padding:23px 24px 26px;display:grid;grid-template-columns:1.1fr repeat(3,1fr);gap:16px;align-items:center}
 .benefit-intro .scribble{margin:0;color:#ff5cae;font-size:27px}.benefit-intro h2{margin:0;color:#fff;font:900 34px/.92 'Barlow Condensed',sans-serif;text-transform:uppercase}.benefit-item{padding-left:16px;border-left:1px solid rgba(255,255,255,.12)}.benefit-item strong{display:block;color:#fff;font-size:13px}.benefit-item span{display:block;margin-top:4px;color:rgba(255,255,255,.54);font-size:12px;line-height:1.32}
 main{display:flex;flex-direction:column}.product-hero{order:1}.hero-benefit-strip{order:2}.plans-section{order:3}.gals-section{order:4}
-@media(max-width:1200px){.product-hero{height:560px}.product-hero-inner{display:grid;grid-template-columns:minmax(280px,350px) 1fr;padding:34px 30px}.product-copy{position:static;transform:none;width:auto;max-width:350px;align-self:center}.feature-column,.phone-space{display:none}.product-hero:before{background:linear-gradient(90deg,rgba(5,3,5,.82) 0%,rgba(5,3,5,.56) 26%,rgba(5,3,5,.09) 57%,rgba(5,3,5,.16) 100%)}.hero-benefit-strip .benefit-inner{grid-template-columns:1fr 1fr}.benefit-intro{grid-column:1/-1}}
+@media(max-width:1200px){.product-hero{height:520px}.product-hero-inner{display:grid;grid-template-columns:minmax(280px,350px) 1fr;padding:34px 30px}.product-copy{position:static;transform:none;width:auto;max-width:350px;align-self:center}.feature-column,.phone-space{display:none}.product-hero:before{background:linear-gradient(90deg,rgba(5,3,5,.82) 0%,rgba(5,3,5,.56) 26%,rgba(5,3,5,.09) 57%,rgba(5,3,5,.16) 100%)}.hero-benefit-strip .benefit-inner{grid-template-columns:1fr 1fr}.benefit-intro{grid-column:1/-1}}
 @media(max-width:700px){
   .product-hero{height:auto;background:#080508}
   .product-hero-bg{position:relative;display:block;height:280px;object-fit:cover;object-position:52% 46%;transform:none}
