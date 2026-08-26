@@ -38,12 +38,15 @@ h1 span{display:block;color:var(--pink);margin-top:5px}
 .button.primary{background:var(--pink);border-color:var(--pink);min-width:176px}
 .button:not(.primary){min-width:158px}
 
-.benefits{border-bottom:1px solid rgba(255,79,163,.14);background:#0d090d}
-.benefit-grid{display:grid;grid-template-columns:1.05fr repeat(3,1fr);gap:0;padding:18px 0 20px;align-items:center}
-.benefit-intro{padding-right:28px}.benefit-intro em{display:block;color:var(--pink);font-size:20px;font-weight:700;line-height:1.05}.benefit-intro strong{display:block;margin-top:2px;font-size:24px;line-height:1;text-transform:uppercase}
-.benefit{padding:0 22px;border-left:1px solid var(--line)}.benefit strong{display:block;font-size:13px}.benefit span{display:block;margin-top:5px;color:var(--muted);font-size:12px;line-height:1.35}
-
-.reset-note{padding:44px 0 70px}.reset-box{border:1px dashed rgba(255,255,255,.18);border-radius:18px;padding:30px;color:var(--muted);background:#0d090d}.reset-box strong{color:#fff}
+.benefits{padding:34px 0 42px;border-bottom:1px solid rgba(255,79,163,.14);background:linear-gradient(180deg,#0b070b 0%,#080508 100%)}
+.benefit-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:22px}
+.benefit-card{min-height:220px;display:grid;grid-template-columns:92px 1fr;gap:24px;align-items:start;padding:28px;border:1px solid rgba(255,255,255,.28);border-radius:14px;background:linear-gradient(145deg,rgba(255,255,255,.025),rgba(255,79,163,.018));box-shadow:0 18px 50px rgba(0,0,0,.22)}
+.benefit-icon{width:78px;height:78px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:linear-gradient(145deg,#ff4fa3,#e83b8d);box-shadow:0 10px 28px rgba(255,79,163,.18)}
+.benefit-icon svg{width:38px;height:38px;fill:none;stroke:#fff;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.benefit-copy h2{margin:5px 0 0;font-size:25px;line-height:1.08;letter-spacing:-.025em}
+.benefit-copy h2 span{display:block;color:var(--pink)}
+.benefit-rule{width:42px;height:3px;margin:16px 0 18px;border-radius:999px;background:var(--pink)}
+.benefit-copy p{margin:0;max-width:340px;color:rgba(255,255,255,.76);font-size:15px;line-height:1.5}
 
 @media(max-width:1000px){
   .hero-shell,.hero{min-height:560px}
@@ -51,13 +54,15 @@ h1 span{display:block;color:var(--pink);margin-top:5px}
   .hero-image{left:32vw;height:100%}
   h1{font-size:clamp(46px,5.8vw,60px)}
   .actions{flex-wrap:wrap}
-  .benefit-grid{grid-template-columns:1fr 1fr}.benefit-intro{grid-column:1/-1;margin-bottom:18px}.benefit:nth-child(2){border-left:0}
+  .benefit-grid{grid-template-columns:1fr}
+  .benefit-card{min-height:0}
 }
 @media(max-width:700px){
   .wrap{width:min(100% - 32px,1500px)}.site-header{height:auto;padding:16px 0}.nav-links{display:none}.nav-cta{padding:12px 14px}
   .hero-shell{min-height:760px}.hero{min-height:760px;align-items:flex-end;padding:0 0 38px}.hero-copy{width:100%;max-width:none;padding:0 4px;transform:none}.hero-image{top:0;left:50%;bottom:auto;height:430px;width:auto;transform:translateX(-50%)}
   .hero-shell:after{background:linear-gradient(0deg,rgba(5,3,5,.98) 0%,rgba(5,3,5,.88) 34%,rgba(5,3,5,.18) 60%,rgba(5,3,5,0) 78%)}
-  h1{font-size:50px}.lead{max-width:none}.actions{flex-wrap:wrap}.button{flex:1 1 150px}.benefit-grid{grid-template-columns:1fr}.benefit-intro{grid-column:auto}.benefit{border-left:0;border-top:1px solid var(--line);padding:16px 0}
+  h1{font-size:50px}.lead{max-width:none}.actions{flex-wrap:wrap}.button{flex:1 1 150px}
+  .benefits{padding:24px 0 30px}.benefit-grid{gap:14px}.benefit-card{grid-template-columns:68px 1fr;gap:16px;padding:20px}.benefit-icon{width:60px;height:60px}.benefit-icon svg{width:30px;height:30px}.benefit-copy h2{font-size:21px}.benefit-copy p{font-size:14px}
 }
 </style>
 </head>
@@ -89,17 +94,41 @@ h1 span{display:block;color:var(--pink);margin-top:5px}
     </div>
   </section>
 
-  <section class="benefits">
+  <section class="benefits" aria-label="Trip benefits">
     <div class="wrap benefit-grid">
-      <div class="benefit-intro"><em>Less chasing.</em><strong>More trip.</strong></div>
-      <div class="benefit"><strong>Everyone knows what's happening.</strong><span>No archaeology through the group chat.</span></div>
-      <div class="benefit"><strong>You stay in control.</strong><span>Without becoming the full-time trip secretary.</span></div>
-      <div class="benefit"><strong>The memories stay together.</strong><span>From the first booking to the final receipt.</span></div>
-    </div>
-  </section>
+      <article class="benefit-card">
+        <div class="benefit-icon" aria-hidden="true">
+          <svg viewBox="0 0 48 48"><circle cx="17" cy="18" r="7"/><circle cx="31" cy="18" r="7"/><path d="M7 38c1.8-7 6.1-10 12-10s10.2 3 12 10"/><path d="M22 38c1.5-5.5 5-8 10.2-8 4.7 0 7.6 2.2 8.8 6.8"/></svg>
+        </div>
+        <div class="benefit-copy">
+          <h2>Less chasing.<span>More trip.</span></h2>
+          <div class="benefit-rule"></div>
+          <p>Plans, payments and reminders in one place. Everyone gets the nudge.</p>
+        </div>
+      </article>
 
-  <section class="wrap reset-note">
-    <div class="reset-box"><strong>Rebuild step 1:</strong> the new hero product image is connected. No feature-card image assets or character assets have been added yet.</div>
+      <article class="benefit-card">
+        <div class="benefit-icon" aria-hidden="true">
+          <svg viewBox="0 0 48 48"><rect x="8" y="11" width="32" height="28" rx="3"/><path d="M15 7v8M33 7v8M8 19h32M15 26h4M24 26h4M33 26h1M15 33h4M24 33h4"/></svg>
+        </div>
+        <div class="benefit-copy">
+          <h2>Everyone knows<span>what’s happening.</span></h2>
+          <div class="benefit-rule"></div>
+          <p>Itineraries, updates and changes. No more guessing or group chat chaos.</p>
+        </div>
+      </article>
+
+      <article class="benefit-card">
+        <div class="benefit-icon" aria-hidden="true">
+          <svg viewBox="0 0 48 48"><path d="M24 6l14 5v10c0 9-5.6 16.5-14 21-8.4-4.5-14-12-14-21V11l14-5z"/><path d="M17 24l5 5 10-11"/></svg>
+        </div>
+        <div class="benefit-copy">
+          <h2>You stay<span>in control.</span></h2>
+          <div class="benefit-rule"></div>
+          <p>You run the trip. Add, edit or decide what the group sees.</p>
+        </div>
+      </article>
+    </div>
   </section>
 </main>
 </body>
