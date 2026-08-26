@@ -5,22 +5,40 @@
   Permissions-Policy: camera=(), microphone=(), geolocation=()
 
 /
-  Link: </assets/images/hero.png>; rel=preload; as=image
+  Link: <https://thegirlstripguide.com/>; rel="canonical", </assets/images/hero.png>; rel=preload; as=image
 
 /situation.html
-  Link: </assets/images/girls-trip-plan-hero.png>; rel=preload; as=image
+  Link: <https://thegirlstripguide.com/situation.html>; rel="canonical", </assets/images/girls-trip-plan-hero.png>; rel=preload; as=image
 
 /the-gals.html
-  Link: </assets/images/how-it-works-hero.png>; rel=preload; as=image
+  Link: <https://thegirlstripguide.com/the-gals.html>; rel="canonical", </assets/images/how-it-works-hero.png>; rel=preload; as=image
 
-/briefing.html
-  Link: </assets/images/briefing-hero.png>; rel=preload; as=image
-
-/contact.html
-  Link: </assets/images/ava.png>; rel=preload; as=image
+/free-vs-full.html
+  Link: <https://thegirlstripguide.com/free-vs-full.html>; rel="canonical"
 
 /gals.html
-  Link: </assets/images/group-drinks.png>; rel=preload; as=image
+  Link: <https://thegirlstripguide.com/gals.html>; rel="canonical", </assets/images/group-drinks.png>; rel=preload; as=image
+
+/briefing.html
+  Link: <https://thegirlstripguide.com/briefing.html>; rel="canonical", </assets/images/briefing-hero.png>; rel=preload; as=image
+
+/contact.html
+  Link: <https://thegirlstripguide.com/contact.html>; rel="canonical", </assets/images/ava.png>; rel=preload; as=image
+
+/terms.html
+  Link: <https://thegirlstripguide.com/terms.html>; rel="canonical"
+
+/privacy.html
+  Link: <https://thegirlstripguide.com/privacy.html>; rel="canonical"
+
+/cookie-policy.html
+  Link: <https://thegirlstripguide.com/cookie-policy.html>; rel="canonical"
+
+/create-trip.html
+  X-Robots-Tag: noindex, follow
+
+/full-trip.html
+  X-Robots-Tag: noindex, follow
 
 /assets/*
   Cache-Control: public, max-age=2592000
