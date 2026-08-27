@@ -1,0 +1,17 @@
+{
+  "site":"https://thegirlstripguide.com",
+  "organisation":{"name":"The Girls Trip Guide","operator":"Storystone Ltd","companyNumber":"16922351"},
+  "pages":{
+    "/":{"title":"Girls Trip Planner for Group Holidays | The Girls Trip Guide","description":"Plan a girls trip in one private place for dates, flights, stays, costs, reminders and memories. Start free and upgrade only if you want the GALS involved.","image":"/assets/images/hero.webp"},
+    "/situation":{"title":"Girls Trip Planning Without Group Chat Chaos | The Girls Trip Guide","description":"Turn ‘we should go away’ into an actual girls trip. Keep dates, flights, hotels, money and reminders together instead of buried in the group chat.","image":"/assets/images/girls-trip-plan-hero.webp"},
+    "/the-gals":{"title":"How The Girls Trip Guide Works | Group Trip Planner","description":"See how The Girls Trip Guide keeps flights, stays, money, reminders and trip memories together in one private place for the whole group.","image":"/assets/images/how-it-works-hero.webp"},
+    "/free-vs-full":{"title":"Free vs Full Trip | Girls Trip Planner Pricing","description":"Compare Free and Full Trip. Free handles the real planning. Full Trip adds the GALS, richer nudges, trip media and hidden gallery for £24.99 one-off.","image":"/assets/images/group-drinks.webp"},
+    "/gals":{"title":"Meet the GALS | The Girls Trip Guide","description":"Meet Grace, Ava, Lola and Seb — the four personalities behind Full Trip.","image":"/assets/images/group-drinks.webp"},
+    "/briefing":{"title":"The Briefing | Girls Trip Planning Rules & Setup","description":"The Girls Trip Guide briefing: the situation, the arrangement, the rules and why one private place beats another 247-message group-chat excavation.","image":"/assets/images/briefing-hero.webp"},
+    "/contact":{"title":"Contact & Support | The Girls Trip Guide","description":"Need help with a trip, invite, account, payment or privacy question? Contact The Girls Trip Guide.","image":"/assets/images/ava.webp"},
+    "/terms":{"title":"Terms & Conditions | The Girls Trip Guide","description":"Terms and Conditions for The Girls Trip Guide Free and Full Trip services.","image":"/assets/images/girls-trip-guide-logo.webp"},
+    "/privacy":{"title":"Privacy Policy | The Girls Trip Guide","description":"How The Girls Trip Guide handles account, trip, invitation, payment, media and support data.","image":"/assets/images/girls-trip-guide-logo.webp"},
+    "/cookie-policy":{"title":"Cookie Policy | The Girls Trip Guide","description":"Cookie Policy for The Girls Trip Guide website and trip-planning service.","image":"/assets/images/girls-trip-guide-logo.webp"}
+  },
+  "instruction":"Use this manifest during the backend/build migration to render title, description, canonical, Open Graph, Twitter and JSON-LD into HTML at build/server time rather than relying on client-side script injection."
+}
