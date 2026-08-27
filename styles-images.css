@@ -11,7 +11,7 @@
 @media(max-width:600px){
 .hero{padding-top:clamp(190px,45.82vw,250px)!important}
 .hero-scene{height:clamp(190px,45.82vw,250px)!important;background-size:100% auto!important;background-position:center top!important;background-color:#09080a!important}
-.hero-shade{height:clamp(190px,45.82vw,250px)!important;background:linear-gradient(180deg,rgba(9,8,10,0) 54%,rgba(9,8,10,.9) 100%)!important}
+.hero-shade{height:clamp(190px,45.82vw,250px)!important;background:linear-gradient(180deg,rgba(9,8,10,0) 80%,rgba(9,8,10,.34) 94%,rgba(9,8,10,.82) 100%)!important}
 .hero .mini-label,.hero h1{position:static!important;max-width:none!important}
 .hero .mini-label{margin-bottom:10px!important}.hero h1{font-size:43px!important;margin-bottom:24px!important}
 .hero-copy{padding:24px 0 48px!important}
