@@ -49,6 +49,13 @@
 .arrangement .receipts-stage img{width:100%!important;max-width:100%!important;margin:0!important;transform:rotate(1.05deg)!important;filter:drop-shadow(0 20px 28px rgba(0,0,0,.44))!important}
 .arrangement .fun-note{margin-top:30px}
 }
+
+/* Desktop receipts alignment — keep the playful hands, but restore the four-card rhythm. */
+@media(min-width:1101px){
+.arrangement .scrapbook-row{grid-template-columns:minmax(0,2.15fr) minmax(430px,1.25fr);gap:24px;align-items:start}
+.arrangement .receipts-stage{min-height:0;height:520px;align-items:flex-start;justify-content:flex-end;margin-top:-8px;overflow:visible}
+.arrangement .receipts-stage img{width:auto!important;max-width:none!important;height:100%!important;margin:0!important;transform:rotate(1.4deg) translateX(7%)!important;filter:drop-shadow(0 22px 30px rgba(0,0,0,.4))!important}
+}
 </style>
 </head>
 <body>
