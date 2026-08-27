@@ -6,7 +6,7 @@
   Strict-Transport-Security: max-age=31536000; includeSubDomains
 
 /
-  Link: <https://thegirlstripguide.com/>; rel="canonical", </assets/images/hero.webp>; rel=preload; as=image; type=image/webp
+  Link: <https://thegirlstripguide.com/>; rel="canonical", </assets/images/hero.webp>; rel=preload; as=image; type=image/webp; fetchpriority=high
 
 /situation
   Link: <https://thegirlstripguide.com/situation>; rel="canonical", </assets/images/girls-trip-plan-hero.webp>; rel=preload; as=image; type=image/webp
