@@ -1,0 +1,22 @@
+{
+  "endpoint": "/api/support",
+  "method": "POST",
+  "status": "backend-not-connected",
+  "request": {
+    "name": "string|required|max:120",
+    "email": "email|required|max:254",
+    "tripName": "string|optional|max:160",
+    "topic": "enum:trip-help,invite,payment,account,privacy,other|required",
+    "message": "string|required|max:5000",
+    "screenshot": "optional-file|max:10MB|image-only"
+  },
+  "serverRules": [
+    "rate limit by IP/account",
+    "validate and sanitise all fields server-side",
+    "do not accept passwords, full card details or passport data",
+    "store only what is needed for support",
+    "send acknowledgement only after a successful server-side submission",
+    "never expose email-provider API keys in browser code"
+  ],
+  "currentFrontend": "Contact page opens the user's email client and is not a server submission form."
+}
