@@ -1,0 +1,9 @@
+.env
+.env.*
+!.env.example
+backend-ready/.env
+backend-ready/.env.*
+!backend-ready/.env.example
+node_modules/
+.DS_Store
+Thumbs.db
