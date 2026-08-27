@@ -57,6 +57,8 @@ const footerStyle=document.createElement('style');footerStyle.textContent=`
 .footer h3{margin:0 0 12px!important;font:900 22px/1 'Barlow Condensed',sans-serif!important}
 .footer a:not(.brand){display:flex!important;align-items:center!important;color:rgba(255,255,255,.72)!important;margin:4px 0!important;min-height:30px!important;font-size:14px!important}
 .footer .footer-branding p{color:rgba(255,255,255,.65)!important}
+.footer .footer-branding .brand.site-logo{background:transparent!important;overflow:visible!important;box-shadow:none!important}
+.footer .footer-branding .brand.site-logo img{background:transparent!important}
 .footer-bottom{border-top:1px solid rgba(255,255,255,.08)!important;margin-top:28px!important;padding-top:16px!important;color:rgba(255,255,255,.48)!important;font-size:12px!important}
 @media(max-width:700px){
   .footer{padding:34px 0 18px!important}
