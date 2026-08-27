@@ -35,16 +35,13 @@
 /cookie-policy
   Link: <https://thegirlstripguide.com/cookie-policy>; rel="canonical"
 
+/full-trip
+  Link: <https://thegirlstripguide.com/full-trip>; rel="canonical"
+
 /create-trip
   X-Robots-Tag: noindex, follow
 
 /create-trip.html
-  X-Robots-Tag: noindex, follow
-
-/full-trip
-  X-Robots-Tag: noindex, follow
-
-/full-trip.html
   X-Robots-Tag: noindex, follow
 
 /assets/*
