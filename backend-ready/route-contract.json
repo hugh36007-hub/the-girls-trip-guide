@@ -1,0 +1,34 @@
+{
+  "version": 1,
+  "site": "https://thegirlstripguide.com",
+  "publicMarketingRoutes": [
+    "/",
+    "/situation",
+    "/the-gals",
+    "/free-vs-full",
+    "/gals",
+    "/briefing",
+    "/contact",
+    "/terms",
+    "/privacy",
+    "/cookie-policy"
+  ],
+  "applicationRoutes": [
+    {"path":"/create-trip","purpose":"organiser creates a Free Trip","auth":"anonymous-to-authenticated"},
+    {"path":"/login","purpose":"organiser/member authentication","auth":"anonymous"},
+    {"path":"/join-trip","purpose":"invited member joins the intended trip","auth":"invitation-context"},
+    {"path":"/auth/callback","purpose":"authentication/invitation callback","auth":"provider-callback"},
+    {"path":"/trip/:tripId","purpose":"authenticated trip dashboard","auth":"trip-member"},
+    {"path":"/full-trip","purpose":"Full Trip purchase/upgrade entry","auth":"organiser"},
+    {"path":"/payment/return","purpose":"display Stripe return state only; webhook is authoritative","auth":"organiser"}
+  ],
+  "securityInvariants": [
+    "RLS is enabled and migration-defined for all user/trip/media tables",
+    "organiser-only mutations are enforced server-side and by RLS",
+    "crew cannot modify organiser profile or privileged trip settings",
+    "Stripe activation is webhook-driven",
+    "duplicate active or pending Full Trip purchases are rejected",
+    "service-role and secret keys never reach the browser",
+    "media access is scoped to authorised trip membership"
+  ]
+}
