@@ -17,11 +17,11 @@ function esc(value: unknown) {
 }
 
 const PEOPLE = {
-  grace: { name: 'Grace', mailbox: 'grace', banner: 'grace-email-banner-v2.webp' },
-  ava: { name: 'Ava', mailbox: 'ava', banner: 'ava-email-banner-v2.webp' },
-  lola: { name: 'Lola', mailbox: 'lola', banner: 'lola-email-banner-v2.webp' },
-  seb: { name: 'Seb', mailbox: 'seb', banner: 'seb-email-banner-v2.webp' },
-  system: { name: 'The Girls Trip Guide', mailbox: 'trips', banner: 'system-email-banner-v2.webp' },
+  grace: { name: 'Grace', mailbox: 'grace', banner: 'grace-email-banner-v3.webp' },
+  ava: { name: 'Ava', mailbox: 'ava', banner: 'ava-email-banner-v3.webp' },
+  lola: { name: 'Lola', mailbox: 'lola', banner: 'lola-email-banner-v3.webp' },
+  seb: { name: 'Seb', mailbox: 'seb', banner: 'seb-email-banner-v3.webp' },
+  system: { name: 'The Girls Trip Guide', mailbox: 'trips', banner: 'system-email-banner-v3.webp' },
 } as const
 
 type Character = keyof typeof PEOPLE
@@ -60,7 +60,7 @@ function render(input: any) {
         <table role="presentation" width="560" cellpadding="0" cellspacing="0" border="0" bgcolor="#fffafd" style="width:100%;max-width:560px;background-color:#fffafd;border:1px solid #e6bfd3;border-radius:18px;overflow:hidden">
           <tr>
             <td bgcolor="#150a12" style="padding:0;background-color:#150a12;border-top-left-radius:17px;border-top-right-radius:17px;overflow:hidden">
-              <img src="${banner}" width="560" height="420" alt="${esc(selected.name)} · The Girls Trip Guide" style="display:block;width:100%;max-width:560px;height:auto;border:0;outline:none;text-decoration:none">
+              <img src="${banner}" width="560" height="747" alt="${esc(selected.name)} · The Girls Trip Guide" style="display:block;width:100%;max-width:560px;height:auto;border:0;outline:none;text-decoration:none">
             </td>
           </tr>
           <tr>
