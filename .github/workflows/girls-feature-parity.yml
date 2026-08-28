@@ -26,6 +26,7 @@ jobs:
           node --check girls-app-v2.js
           node --check girls-product-parity.js
           node --check girls-document-audience.js
+          node --check girls-hero-vault-ux.js
       - name: Existing release contract
         run: node tests/release-contract.test.cjs
       - name: Girls feature parity contract
@@ -34,3 +35,5 @@ jobs:
         run: node tests/girls-product-parity-ui.test.cjs
       - name: Girls document audience contract
         run: node tests/girls-document-audience.test.cjs
+      - name: Girls hero and vault UX contract
+        run: node scripts/hero-vault-ux-contract.mjs
