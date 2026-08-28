@@ -28,10 +28,9 @@ if(window.supabase?.createClient){
     const client=originalCreateClient(...args);
     client.auth.signInWithOtp=async({email})=>{
       try{
-        const key='sb_publishable_qBQzJjFxSToEGxPJEcmskg_GNd4M4cP';
         const res=await fetch('https://vtcmvwixfqyxqghibsla.supabase.co/functions/v1/girls-auth-otp',{
           method:'POST',
-          headers:{'Content-Type':'application/json','apikey':key,'Authorization':`Bearer ${key}`},
+          headers:{'Content-Type':'application/json'},
           body:JSON.stringify({email})
         });
         const out=await res.json().catch(()=>({}));
@@ -45,6 +44,6 @@ if(window.supabase?.createClient){
   };
 }
 </script>
-<script defer src="/girls-app.js?v=2"></script>
+<script defer src="/girls-app.js?v=3"></script>
 </body>
 </html>
