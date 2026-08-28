@@ -30,7 +30,6 @@ if(window.supabase?.createClient){
       try{
         const res=await fetch('https://vtcmvwixfqyxqghibsla.supabase.co/functions/v1/girls-auth-otp',{
           method:'POST',
-          headers:{'Content-Type':'application/json'},
           body:JSON.stringify({email})
         });
         const out=await res.json().catch(()=>({}));
@@ -44,6 +43,6 @@ if(window.supabase?.createClient){
   };
 }
 </script>
-<script defer src="/girls-app.js?v=3"></script>
+<script defer src="/girls-app.js?v=4"></script>
 </body>
 </html>
