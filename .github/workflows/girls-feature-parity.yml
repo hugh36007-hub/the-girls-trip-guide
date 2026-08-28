@@ -5,6 +5,7 @@ on:
     branches:
       - release/girls-feature-parity-20260828
       - release/girls-product-parity-completion-20260828
+      - feature/girls-document-audience-20260828
   pull_request:
     branches:
       - main
@@ -24,9 +25,12 @@ jobs:
         run: |
           node --check girls-app-v2.js
           node --check girls-product-parity.js
+          node --check girls-document-audience.js
       - name: Existing release contract
         run: node tests/release-contract.test.cjs
       - name: Girls feature parity contract
         run: node tests/girls-feature-parity.test.cjs
       - name: Girls product parity UI contract
         run: node tests/girls-product-parity-ui.test.cjs
+      - name: Girls document audience contract
+        run: node tests/girls-document-audience.test.cjs
