@@ -37,3 +37,5 @@ jobs:
         run: node tests/girls-document-audience.test.cjs
       - name: Girls hero and vault UX contract
         run: node scripts/hero-vault-ux-contract.mjs
+      - name: Hidden Gallery separation contract
+        run: node tests/hidden-gallery-separation.test.cjs
