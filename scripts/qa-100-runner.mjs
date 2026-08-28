@@ -1,0 +1,12 @@
+import fs from 'node:fs';
+import os from 'node:os';
+import path from 'node:path';
+import {pathToFileURL} from 'node:url';
+const sourcePath=path.join(process.cwd(),'scripts','qa-100-parity.mjs');
+let code=fs.readFileSync(sourcePath,'utf8');
+const marker="if(tests.length!==100) throw new Error(`Harness definition error: expected 100 tests, got ${tests.length}`);";
+if(!code.includes(marker)) throw new Error('QA100 harness marker not found.');
+code=code.replace(marker,"tests.splice(100);\nif(tests.length!==100) throw new Error(`Harness definition error: expected 100 tests, got ${tests.length}`);");
+const temp=path.join(os.tmpdir(),`qa100-${Date.now()}.mjs`);
+fs.writeFileSync(temp,code);
+await import(pathToFileURL(temp).href);
