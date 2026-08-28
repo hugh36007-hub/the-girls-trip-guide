@@ -1,0 +1,4 @@
+.dock .dock-role-primary{background:var(--pink);color:#13070d;box-shadow:0 10px 24px rgba(255,79,163,.24)}
+.dock .dock-role-primary span,.dock .dock-role-primary small{color:#13070d}
+.dock .dock-role-primary.active{background:var(--pink);color:#13070d}
+@media(max-width:600px){.dock .dock-role-primary{transform:translateY(-4px)}}
