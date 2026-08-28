@@ -1,6 +1,10 @@
 # The Girls Trip Guide — Backend-ready handoff
 
-This folder prepares the current static frontend for backend wiring without pretending that Supabase, Stripe or email delivery are already connected.
+This folder contains the original backend handoff contracts. The production Girls
+app is now wired to the shared Supabase architecture with product-key isolation,
+Girls-only Edge Functions and separate communication queue states. See
+`../GIRLS-BACKEND-RELEASE-STATUS.md` for the current deployment status and the
+deliberate Resend-domain hold.
 
 ## Rollback baseline
 
@@ -10,7 +14,9 @@ If integration work causes regressions, compare or roll back to that branch rath
 
 ## Current frontend state
 
-The public marketing routes are complete. `/create-trip` and `/full-trip` remain noindex frontend endpoints awaiting real backend actions. Do not present either page as functionally live until persistence, authentication and payment flows are connected and tested.
+The public marketing routes are complete. `/create-trip` is the authenticated Girls
+application and remains `noindex`; `/full-trip` is the product/checkout route. Email
+delivery must remain held until `thegirlstripguide.com` is verified in Resend.
 
 ## Backend route contract
 

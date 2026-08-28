@@ -26,7 +26,6 @@ if(window.supabase?.createClient){
   const originalCreateClient=window.supabase.createClient.bind(window.supabase);
   window.supabase.createClient=(...args)=>{
     const client=originalCreateClient(...args);
-    const originalVerifyOtp=client.auth.verifyOtp.bind(client.auth);
     client.auth.signInWithOtp=async({email})=>{
       try{
         const res=await fetch('https://vtcmvwixfqyxqghibsla.supabase.co/functions/v1/girls-auth-otp',{
@@ -35,18 +34,10 @@ if(window.supabase?.createClient){
         });
         const out=await res.json().catch(()=>({}));
         if(!res.ok)return {data:{user:null,session:null},error:{message:out.error||'Could not send sign-in code.'}};
-        sessionStorage.setItem('gtg_otp_type',out.verificationType||'magiclink');
         return {data:{user:null,session:null},error:null};
       }catch(error){
         return {data:{user:null,session:null},error:{message:error?.message||'Could not send sign-in code.'}};
       }
-    };
-    client.auth.verifyOtp=async(params)=>{
-      const next={...params};
-      if(next.email&&next.type==='email')next.type=sessionStorage.getItem('gtg_otp_type')||'magiclink';
-      const result=await originalVerifyOtp(next);
-      if(!result.error)sessionStorage.removeItem('gtg_otp_type');
-      return result;
     };
     return client;
   };
