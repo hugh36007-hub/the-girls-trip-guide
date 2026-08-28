@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - release/girls-feature-parity-20260828
+      - release/girls-product-parity-completion-20260828
   pull_request:
     branches:
       - main
@@ -20,8 +21,12 @@ jobs:
         with:
           node-version: '22'
       - name: JavaScript syntax
-        run: node --check girls-app-v2.js
+        run: |
+          node --check girls-app-v2.js
+          node --check girls-product-parity.js
       - name: Existing release contract
         run: node tests/release-contract.test.cjs
       - name: Girls feature parity contract
         run: node tests/girls-feature-parity.test.cjs
+      - name: Girls product parity UI contract
+        run: node tests/girls-product-parity-ui.test.cjs
