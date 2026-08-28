@@ -17,8 +17,9 @@ jobs:
         run: |
           if [ -f girls-app-v2.js ]; then node --check girls-app-v2.js; else node --check clean-core.js && node --check clean-views.js && node --check clean-actions.js; fi
       - name: Run identical 100-test matrix
-        run: node scripts/qa-100-parity.mjs
+        run: node scripts/qa-100-runner.mjs
       - uses: actions/upload-artifact@v4
+        if: always()
         with:
           name: qa-100-parity-report
           path: qa-results/100-parity-report.json
