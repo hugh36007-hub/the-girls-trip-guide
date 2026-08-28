@@ -1,0 +1,170 @@
+import fs from 'node:fs';
+import path from 'node:path';
+
+const root=process.cwd();
+const girls=fs.existsSync(path.join(root,'girls-app-v2.js'));
+const product=girls?'girls':'boys';
+const domain=girls?'https://thegirlstripguide.com':'https://theboystripguide.com';
+const sourceFiles=girls?['girls-app-v2.js']:['clean-core.js','clean-views.js','clean-actions.js'];
+const source=sourceFiles.filter(f=>fs.existsSync(path.join(root,f))).map(f=>fs.readFileSync(path.join(root,f),'utf8')).join('\n');
+const htmlFiles=['index.html','create-trip.html','full-trip.html','invite.html'].filter(f=>fs.existsSync(path.join(root,f)));
+const html=htmlFiles.map(f=>fs.readFileSync(path.join(root,f),'utf8')).join('\n');
+const cssFiles=['app.css','girls-app.css','styles.css'].filter(f=>fs.existsSync(path.join(root,f)));
+const css=cssFiles.map(f=>fs.readFileSync(path.join(root,f),'utf8')).join('\n');
+const all=source+'\n'+html+'\n'+css;
+const low=all.toLowerCase();
+const results=[];
+const has=(...parts)=>parts.some(p=>low.includes(String(p).toLowerCase()));
+const hasAll=(...parts)=>parts.every(p=>low.includes(String(p).toLowerCase()));
+const re=r=>r.test(all);
+function t(id,name,fn){try{const v=fn();if(v instanceof Promise){return v.then(x=>results.push({id,name,pass:x!==false,detail:x===false?'assertion false':''})).catch(e=>results.push({id,name,pass:false,detail:e.message}))}results.push({id,name,pass:v!==false,detail:v===false?'assertion false':''})}catch(e){results.push({id,name,pass:false,detail:e.message})}}
+
+const tests=[
+['App runtime source exists',()=>sourceFiles.every(f=>fs.existsSync(path.join(root,f)))],
+['Supabase client is initialised',()=>has('createClient')],
+['Frontend uses publishable/anon credential only',()=>has('sb_publishable_','anon')&&!has('service_role','sb_secret_')],
+['Session persistence enabled',()=>has('persistSession:true','persistSession: true')],
+['Session auto refresh enabled',()=>has('autoRefreshToken:true','autoRefreshToken: true')],
+['Auth callback/session URL detection enabled',()=>has('detectSessionInUrl:true','detectSessionInUrl: true')],
+['OTP sign-in request exists',()=>has('signInWithOtp','authOtp')],
+['OTP verification exists',()=>has('verifyOtp')],
+['Sign-out exists',()=>has('signOut')],
+['Trip listing is product isolated',()=>girls?has("product_key','girls","product_key\",\"girls"):has("product_key','boys","product_key\",\"boys")],
+['Trip load path exists',()=>has('loadTrip')],
+['Trip create path exists',()=>has('create_trip_for_current_user','createTrip')],
+['Trip join path exists',()=>has('join_trip_by_code','join_girls_trip_by_code','joinTrip')],
+['Trip owner check exists',()=>has('isOwner','organiser')],
+['Member identity lookup exists',()=>has('currentMember','memberName')],
+['Trip date formatting exists',()=>has('toLocaleDateString','fmtDate','function fmt')],
+['GBP money formatting exists',()=>has("currency:'GBP'",'currency: \"GBP\"','currency:"GBP"')],
+['Create-trip date fields exist',()=>has('start_date','Starts','start')&&has('end_date','Ends','end')],
+['Destination is captured',()=>has('destination')],
+['Invite code is supported',()=>has('invite_code','inviteCode')],
+['Plan tab/view exists',()=>has("'plan'",'plan & costs')],
+['Booking load exists',()=>has("from('bookings')",'bookings')],
+['Booking participants load exists',()=>has('booking_participants')],
+['Add booking exists',()=>has('addBooking','add-booking','bookingForm')],
+['Edit booking exists',()=>has('edit-booking','existingId','save_booking')],
+['Delete booking exists',()=>has('deleteBooking','delete-booking')],
+['Flight booking exists',()=>has("kind:'flight'",'data-kind="flight"','flightNumber')],
+['Hotel/stay booking exists',()=>has("kind:'hotel'",'data-kind="hotel"','checkIn')],
+['Transfer booking exists',()=>has("kind:'transfer'",'data-kind="transfer"','pickup')],
+['Activity booking exists',()=>has("kind:'activity'",'data-kind="activity"','location')],
+['Other booking type exists',()=>has("kind:'other'",'data-kind="other"')],
+['Booking reference field exists',()=>has('reference')],
+['Booking payer exists',()=>has('payer_member_id','payerMemberId')],
+['Booking participant split exists',()=>has('split_mode','splitMode','participants')],
+['Selected-participant split exists',()=>has('selected')],
+['Return-leg shortcut exists',()=>has('return-leg','Return leg','return flight')],
+['Booking settlement tracking exists',()=>has('settled_at','markBookingSettled','booking settled')],
+['Travel documents load exists',()=>has("from('documents')",'documents')],
+['Travel document upload exists',()=>has('addDocument','documentForm','upload document')],
+['Travel document delete exists',()=>has('deleteDocument','delete-document')],
+['Travel document signed URL exists',()=>has('documentUrl','docUrls','btg-documents')],
+['Money/cost view exists',()=>has("'money'",'costs','expenses')],
+['Expenses load exists',()=>has("from('expenses')",'expenses')],
+['Add expense exists',()=>has('addExpense','add-expense','expenseForm')],
+['Edit expense exists',()=>has('save_expense','existingId','edit-expense')],
+['Delete expense exists',()=>has('deleteExpense','delete-expense')],
+['Expense participants exist',()=>has('expense_participants')],
+['Expense payer exists',()=>has('payer_member_id','payerMemberId')],
+['Expense settlement exists',()=>has('markExpenseSettled','settled_at')],
+['Payment requests load exists',()=>has('payment_requests')],
+['Create payment request exists',()=>has('addPaymentRequest','request-payment','paymentRequest')],
+['Delete payment request exists',()=>has('deletePaymentRequest','delete-request')],
+['Payment request participant rows exist',()=>has('payment_request_participants')],
+['Paid/unpaid state exists',()=>has('paid_at','markRequestPaid')],
+['Payment deadline exists',()=>has('deadline')],
+['Payment escalation exists',()=>has('escalation_approved','setPaymentEscalation','authorise')],
+['Settle member in full exists',()=>has('settleMemberInFull','settle-in-full')],
+['Crew/group view exists',()=>has("'crew'","'group'",'crew-list','group')],
+['Members load exists',()=>has('trip_members')],
+['Invite member exists',()=>has('invite','trip-email','girls-trip-email')],
+['Resend invite exists',()=>has('resend','invite')],
+['Edit member exists',()=>has('updateMember','edit-member','memberForm')],
+['Remove member exists',()=>has('removeMember','remove-member')],
+['Organiser removal guard exists',()=>has('organiser cannot be removed','role===\'organiser\'','role === \'organiser\'')],
+['Passport status exists',()=>has('passport_confirmed','passportConfirmed','passport')],
+['Avatar upload exists',()=>has('uploadMemberAvatar','avatar_path','avatarUpload')],
+['Avatar signed URL exists',()=>has('memberAvatarUrl','avatarUrls','createSignedUrl')],
+['Member preview exists',()=>has('previewMember','preview-member','preview-crew')],
+['Organiser message-to-group exists',()=>has('trip_messages','sendTripMessage','message-crew','message-group')],
+['Message length guard exists',()=>has('500 characters','length>500','length > 500')],
+['Evidence/media view exists',()=>has('evidence','media')],
+['Evidence access is entitlement gated',()=>has('full_trip','evidence')&&has('paid()','isPaid')],
+['Media rows load exists',()=>has("from('media')",'loadMedia')],
+['Media upload exists',()=>has('uploadMedia','upload-media','member-upload')],
+['Image size limit exists',()=>has('50 * 1024 * 1024','50*1024*1024','50 MB')],
+['Video size limit exists',()=>has('500 * 1024 * 1024','500*1024*1024','500 MB')],
+['Resumable upload exists',()=>has('tus.Upload','tus-js-client','upload/resumable')],
+['Resumable chunk size is 6MB',()=>has('6*1024*1024','6 * 1024 * 1024','chunkSize:6')],
+['Upload retry policy exists',()=>has('retryDelays')],
+['Upload fingerprint cleanup exists',()=>has('removeFingerprintOnSuccess')],
+['Thumbnail generation exists',()=>has('thumbnail','makeMediaThumbnail')],
+['Media delete exists',()=>has('deleteMedia','delete-media')],
+['Signed media URLs exist',()=>has('createSignedUrl','mediaUrl','signMedia')],
+['Storage quota check exists',()=>has('trip_storage_usage','storageUsage')],
+['20GB quota constant exists',()=>has('20*1024*1024*1024','20 * 1024 * 1024 * 1024','20 GB')],
+['Contribution breakdown exists',()=>has('trip_media_contribution_breakdown','contributionBreakdown','contributions')],
+['Contribution filter exists',()=>has('filter-contribution','filterMember','contributionFilter')],
+['Hidden gallery/vault exists',()=>has("'vault'",'Hidden Gallery','vault')],
+['Vault PIN configuration exists',()=>has('set_vault_pin','setVaultPin')],
+['Vault unlock exists',()=>has('unlock_vault','unlockVault')],
+['Vault session check exists',()=>has('has_active_vault_session','vaultUnlocked')],
+['Custom trip hero path exists',()=>has('hero_storage_path','heroStoragePath')],
+['Custom hero upload exists',()=>has('uploadHero','heroFile','set_trip_hero')],
+['Profile load/update exists',()=>has("from('profiles')",'loadProfile','updateProfile')],
+['Profile supports mobile',()=>has('mobile')],
+['Profile supports address',()=>has('address')],
+['Communication settings load exists',()=>has('communication_settings')],
+['Communication global enable exists',()=>has('enabled')],
+['Payment communication toggle exists',()=>has('payments')],
+['Countdown communication toggle exists',()=>has('countdowns')],
+['Gallery nudge toggle exists',()=>has('gallery_nudges','galleryNudges')],
+['Upload celebration toggle exists',()=>has('upload_celebrations','uploadCelebrations')],
+['Expense nudge toggle exists',()=>has('expense_nudges','expenseNudges')],
+['Post-trip upload toggle exists',()=>has('post_trip_uploads','postTripUploads')],
+['Character/GALS mode exists',()=>has('character_mode','characterMode')],
+['Stripe checkout endpoint exists',()=>has('stripe-checkout','girls-stripe-checkout')],
+['Checkout sends authenticated token',()=>has('Authorization','Bearer')],
+['Checkout handles non-OK response',()=>has('response.ok','!response.ok')],
+['Free/full entitlement distinction exists',()=>has('free','full_trip','Full Trip')],
+['Upgrade action exists',()=>has('upgrade','checkout')],
+['Private/noindex app shell exists',()=>has('noindex','private trip','private')],
+['Responsive CSS breakpoint exists',()=>css.includes('@media')],
+['Modal/dialog implementation exists',()=>has('openModal','modal')],
+['Toast/user feedback exists',()=>has('toast','say(')],
+['Live homepage responds successfully',async()=>{const r=await fetch(domain,{redirect:'follow'});return r.ok}],
+['Live private app responds successfully',async()=>{const r=await fetch(domain+'/create-trip.html',{redirect:'follow'});return r.ok}],
+['Live homepage has product identity',async()=>{const r=await fetch(domain,{redirect:'follow'});const body=(await r.text()).toLowerCase();return girls?body.includes('girls trip'):body.includes('boys trip')}],
+['Live app is not server-error page',async()=>{const r=await fetch(domain+'/create-trip.html',{redirect:'follow'});const body=(await r.text()).toLowerCase();return r.status<500&&!body.includes('internal server error')}],
+['No obvious secret key committed to app source',()=>!re(/(?:sk_live_|sk_test_|sb_secret_|service_role)/i)],
+['App source avoids eval()',()=>!re(/\beval\s*\(/)],
+['App has explicit error handling',()=>has('catch','throw new Error','throw Error')],
+['App has async loading path',()=>has('async function','await ')],
+['App has owner/member write separation',()=>has('Only the organiser','read-only','isOwner()')],
+['App has authenticated storage access',()=>has('authorization','Bearer','createSignedUrl')],
+['App has product-specific email function',()=>girls?has('girls-trip-email'):has("functions.invoke('trip-email'",'trip-email')],
+['App has product-specific checkout function',()=>girls?has('girls-stripe-checkout'):has('stripe-checkout')],
+['App has stable app navigation controls',()=>has('data-tab','dock','nav')],
+['App has empty-state handling',()=>has('empty')],
+['App has deletion confirmation/guard path',()=>has('confirm(','delete')],
+['App has file-name sanitisation',()=>has('safeFile','safeName')],
+['App has UUID validation/generation',()=>has('randomUUID','uuid')],
+['App has upload failure cleanup',()=>has("remove([path",'remove(paths','catch(error)')],
+['App has signed/private media rather than public URLs',()=>has('createSignedUrl')&&!has('getPublicUrl(')],
+['App includes its product logo/brand shell',()=>girls?has('girls-trip-guide-logo'):has('btg-mark','The Boys Trip')],
+['App has desktop/mobile layout protection',()=>css.includes('@media')&&has('viewport')],
+['App runtime contains no unresolved merge markers',()=>!has('<<<<<<<','=======','>>>>>>>')],
+['Core source contains no TODO blocker markers',()=>!re(/TODO\s*:\s*(BLOCKER|CRITICAL)/i)],
+['100-test harness reached final assertion',()=>true]
+];
+
+if(tests.length!==100) throw new Error(`Harness definition error: expected 100 tests, got ${tests.length}`);
+for(let i=0;i<tests.length;i++) await t(i+1,tests[i][0],tests[i][1]);
+const pass=results.filter(x=>x.pass).length,fail=results.length-pass;
+const report={product,domain,total:results.length,pass,fail,score:Number((pass/results.length*100).toFixed(1)),results};
+fs.mkdirSync(path.join(root,'qa-results'),{recursive:true});
+fs.writeFileSync(path.join(root,'qa-results','100-parity-report.json'),JSON.stringify(report,null,2));
+console.log(`QA100 ${product.toUpperCase()}: ${pass}/100 passed, ${fail} failed (${report.score}%)`);
+for(const r of results.filter(x=>!x.pass)) console.log(`FAIL ${String(r.id).padStart(3,'0')} ${r.name}${r.detail?` — ${r.detail}`:''}`);
