@@ -17,11 +17,11 @@ function esc(value: unknown) {
 }
 
 const PEOPLE = {
-  grace: { name: 'Grace', mailbox: 'grace', banner: 'grace-email-banner.webp' },
-  ava: { name: 'Ava', mailbox: 'ava', banner: 'ava-email-banner.webp' },
-  lola: { name: 'Lola', mailbox: 'lola', banner: 'lola-email-banner.webp' },
-  seb: { name: 'Seb', mailbox: 'seb', banner: 'seb-email-banner.webp' },
-  system: { name: 'The Girls Trip Guide', mailbox: 'trips', banner: 'system-email-banner.webp' },
+  grace: { name: 'Grace', mailbox: 'grace', banner: 'grace-email-banner-v2.webp' },
+  ava: { name: 'Ava', mailbox: 'ava', banner: 'ava-email-banner-v2.webp' },
+  lola: { name: 'Lola', mailbox: 'lola', banner: 'lola-email-banner-v2.webp' },
+  seb: { name: 'Seb', mailbox: 'seb', banner: 'seb-email-banner-v2.webp' },
+  system: { name: 'The Girls Trip Guide', mailbox: 'trips', banner: 'system-email-banner-v2.webp' },
 } as const
 
 type Character = keyof typeof PEOPLE
