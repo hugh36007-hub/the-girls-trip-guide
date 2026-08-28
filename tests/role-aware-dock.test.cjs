@@ -1,6 +1,8 @@
 const fs=require('fs');
-const js=fs.readFileSync('girls-hidden-upload-choice.js','utf8');
+const js=fs.readFileSync('girls-role-aware-dock.js','utf8');
+const html=fs.readFileSync('create-trip.html','utf8');
 const checks=[
+ ['role-aware dock is explicitly loaded',html.includes('girls-role-aware-dock.js')],
  ['shared five-position order',js.includes('const wanted=[overview,plan,centre,group,evidence]')],
  ['owner centre is Money',js.includes("centre=dockButton(dock,'money')")],
  ['member centre is Upload',js.includes("<small>Upload</small>")&&js.includes('data-role-upload')],
