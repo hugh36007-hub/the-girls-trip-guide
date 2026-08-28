@@ -20,7 +20,7 @@ const GALS={
  seb:{name:'Seb',role:'The Hammer',img:'seb.webp',sample:'Grace asked. Ava itemised. I’m the third reminder.'}
 };
 const state={client:null,user:null,trip:null,members:[],bookings:[],documents:[],expenses:[],expensePeople:[],requests:[],requestPeople:[],entitlements:[],settings:null,messages:[],media:[],paid:false,owner:false,ready:false,lastTripId:null};
-let refreshTimer=0,observerBusy=false;
+let refreshTimer=0;
 const esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]||c));
 const money=v=>new Intl.NumberFormat('en-GB',{style:'currency',currency:'GBP'}).format(Number(v||0));
 const fmt=v=>v?new Date(`${String(v).slice(0,10)}T12:00:00`).toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'}):'TBC';
@@ -158,10 +158,10 @@ function filterKind(kind){
  const cards=[...root.querySelectorAll('.booking')];if(!cards.length){toast('Use the category totals as the summary; all plan items remain below.');return}
  if(kind==='all'){cards.forEach(x=>x.hidden=false);return}
  const matchingIds=new Set(state.bookings.filter(b=>b.kind===kind).map(b=>b.id));
- cards.forEach(card=>{const id=card.dataset.id||card.querySelector('[data-id]')?.dataset?.id;card.hidden=id? !matchingIds.has(id):false})
+ cards.forEach(card=>{const id=card.dataset.id||card.querySelector('[data-id]')?.dataset?.id;card.hidden=id?!matchingIds.has(id):false})
 }
 
-async function sendMessage(form){if(!state.owner||!state.paid)return;const input=form.querySelector('[name="message"]'),message=String(input?.value||'').trim();if(!message)return;const {error}=await db().from('trip_messages').insert({trip_id:state.trip.id,sender_user_id:state.user.id,recipient_member_id:null,message});if(error){toast(error.message);return}input.value='';await load();schedule();toast('Message posted to the group.')}
+async function sendMessage(form){if(!state.owner||!state.paid)return;const input=form.querySelector('[name="message"]'),message=String(input?.value||'').trim();if(!message)return;const {error}=await db().from('trip_messages').insert({trip_id:state.trip.id,sender_user_id:state.user.id,recipient_member_id:null,message});if(error){toast(error.message);return}input.value='';await load();apply();toast('Message posted to the group.')}
 async function saveComms(form){if(!state.owner||!state.paid)return;const fd=new FormData(form),body={trip_id:state.trip.id,character_mode:String(fd.get('mode')||'grace-auto')};for(const key of ['enabled','payments','countdowns','gallery_nudges','upload_celebrations','expense_nudges','post_trip_uploads'])body[key]=fd.get(key)==='on';const {error}=await db().from('communication_settings').upsert(body,{onConflict:'trip_id'});if(error){toast(error.message);return}state.settings={...(state.settings||{}),...body};document.getElementById('modalRoot')?.classList.remove('open');toast('GALS communications saved.')}
 
 function restrictMemberControls(){
@@ -175,30 +175,30 @@ function apply(){
  removeOld();overview();planEnhance();moneyEnhance();groupEnhance();evidenceEnhance();dockBadges();drawerEntitlements();restrictMemberControls()
 }
 async function refreshAndApply(){if(await load())apply()}
-function schedule(){clearTimeout(refreshTimer);refreshTimer=setTimeout(()=>{load().then(ok=>{if(ok)apply()})},80)}
+function schedule(delay=80){clearTimeout(refreshTimer);refreshTimer=setTimeout(()=>{load().then(ok=>{if(ok)apply()})},delay)}
 
 // Capture entitlement-sensitive actions before the legacy handlers see them.
 document.addEventListener('click',e=>{
  const target=e.target.closest('button,[data-a],[data-action],[data-parity-go],[data-parity-existing]');if(!target)return;
  const a=String(target.dataset.a||target.dataset.action||'');
  if(!state.paid&&(a==='settings'||a==='tripAppearance')){e.preventDefault();e.stopImmediatePropagation();toast('That is included with Full Trip.');return}
- if(target.dataset.parityGo){e.preventDefault();goto(target.dataset.parityGo);setTimeout(schedule,0);return}
+ if(target.dataset.parityGo){e.preventDefault();goto(target.dataset.parityGo);setTimeout(()=>schedule(40),0);return}
  if(target.dataset.parityExisting){e.preventDefault();const action=target.dataset.parityExisting;if(action==='upgrade'){const legacy=document.querySelector('[data-a="upgrade"],[data-action="upgrade"]');if(legacy)legacy.click();else location.href='/full-trip.html';return}triggerExisting(action);return}
  if(target.dataset.parityReminders!==undefined){e.preventDefault();openReminders();return}
  if(target.dataset.parityComms!==undefined){e.preventDefault();openComms();return}
  if(target.dataset.parityClose!==undefined){e.preventDefault();document.getElementById('modalRoot')?.classList.remove('open');return}
  if(target.dataset.parityPreview){e.preventDefault();openPreview(target.dataset.parityPreview);return}
  if(target.dataset.parityFilterKind){e.preventDefault();filterKind(target.dataset.parityFilterKind);return}
- if(target.closest('.dock [data-tab]')||a==='drawer')setTimeout(schedule,0)
+ if(target.closest('.dock [data-tab]')||a==='drawer')setTimeout(()=>schedule(40),0);else if(a)setTimeout(()=>schedule(350),0)
 },true);
 
 document.addEventListener('submit',e=>{
  if(e.target.matches('[data-parity-message]')){e.preventDefault();e.stopImmediatePropagation();sendMessage(e.target);return}
  if(e.target.matches('[data-parity-comms-form]')){e.preventDefault();e.stopImmediatePropagation();saveComms(e.target);return}
+ setTimeout(()=>schedule(450),0)
 },true);
 
-window.addEventListener('popstate',schedule);
-const app=document.getElementById('app');if(app){new MutationObserver(()=>{if(observerBusy)return;observerBusy=true;requestAnimationFrame(()=>{observerBusy=false;if(state.ready)apply();else schedule()})}).observe(app,{childList:true,subtree:true})}
+window.addEventListener('popstate',()=>schedule(40));
 const drawer=document.getElementById('drawerRoot');if(drawer){new MutationObserver(()=>{if(state.ready)drawerEntitlements()}).observe(drawer,{childList:true,subtree:true,attributes:true,attributeFilter:['class']})}
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',refreshAndApply,{once:true});else refreshAndApply();
 })();
