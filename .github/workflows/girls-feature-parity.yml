@@ -44,3 +44,11 @@ jobs:
         run: node tests/hero-control-contract.test.cjs
       - name: Role-aware dock contract
         run: node tests/role-aware-dock.test.cjs
+      - name: 100 customer journey sweep
+        run: node tests/customer-100-sweep.cjs
+      - name: Upload customer sweep report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: girls-customer-100-sweep
+          path: customer-sweep-report.json
