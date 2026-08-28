@@ -28,25 +28,30 @@ workers from reading or processing Boys product rows.
   migration so production can be reproduced.
 - Revoked client execution of private Girls helpers.
 - Retained per-address OTP throttling and contained the Resend key in Supabase Vault.
+- Fixed duplicate invitation queueing so a directly delivered Girls invitation cannot
+  remain queued for a second worker delivery.
 
-## Deliberate email hold
+## Email release gate — passed
 
-`thegirlstripguide.com` must be verified in Resend before production email can be
-enabled. Until then, the `gtg-process-communications` cron job is deliberately
-inactive. This prevents failed sends from consuming the three-attempt retry budget.
+`thegirlstripguide.com` is verified in Resend and sending is enabled. The restricted
+Girls Resend key is present in Supabase Vault as `gtg_resend_api_key`.
 
-After the domain is verified and a restricted Girls Resend key is stored in the Vault
-secret `gtg_resend_api_key`, run:
+Live delivery verification completed successfully:
 
-```sql
-select cron.alter_job(
-  (select jobid from cron.job where jobname = 'gtg-process-communications'),
-  active := true
-);
-```
+- Girls OTP: delivered;
+- Girls invitation: delivered;
+- Girls scheduled-worker message: delivered through `girls-process-communications`.
 
-Then perform one real OTP, invitation and scheduled-message delivery test before
-opening customer testing.
+The Girls cron `gtg-process-communications` is now active every five minutes. The Boys
+cron `btg-process-communications` remains active and unchanged. A final enablement
+migration is source-controlled as `20260828153000_enable_girls_communications.sql`.
+
+## Payments
+
+Girls checkout is authenticated, owner-scoped and requires `product_key = 'girls'` in
+both the trip lookup and Stripe metadata. The shared Stripe webhook accepts only
+`boys` or `girls` product keys and verifies that the checkout trip, purchaser and
+stored trip product key all agree before granting entitlements.
 
 ## Rollback
 
@@ -54,5 +59,5 @@ The pre-wiring remote backup remains:
 
 `backup/pre-full-app-wire-20260828`
 
-The changes in this release do not alter Boys trip rows, Boys email statuses, Boys
-Edge Functions or Boys cron configuration.
+The release changes do not alter Boys trip rows, Boys email statuses, Boys Edge
+Functions or Boys cron configuration.
