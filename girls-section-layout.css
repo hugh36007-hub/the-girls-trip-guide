@@ -1,0 +1,11 @@
+/* Girls private trip workspace layout.
+   Overview keeps the immersive trip hero and summary cards.
+   Dedicated sections use the available vertical space for their own content. */
+.dashboard.section-workspace{padding-top:18px}
+.dashboard.section-workspace .hero-card,
+.dashboard.section-workspace .stat-row{display:none}
+.dashboard.section-workspace .panel.active{margin-top:0}
+.dashboard.section-workspace .section-head{margin-top:0}
+@media(max-width:600px){
+  .dashboard.section-workspace{padding-top:10px}
+}
