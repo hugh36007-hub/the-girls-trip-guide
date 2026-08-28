@@ -42,3 +42,5 @@ jobs:
         run: node tests/hidden-gallery-separation.test.cjs
       - name: Hero control contract
         run: node tests/hero-control-contract.test.cjs
+      - name: Role-aware dock contract
+        run: node tests/role-aware-dock.test.cjs
