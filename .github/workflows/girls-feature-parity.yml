@@ -3,6 +3,7 @@ name: Girls feature parity
 on:
   push:
     branches:
+      - main
       - release/girls-feature-parity-20260828
       - release/girls-product-parity-completion-20260828
       - feature/girls-document-audience-20260828
@@ -28,6 +29,7 @@ jobs:
           node --check girls-document-audience.js
           node --check girls-hero-vault-ux.js
           node --check girls-hidden-upload-choice.js
+          node --check girls-role-aware-dock.js
       - name: Existing release contract
         run: node tests/release-contract.test.cjs
       - name: Girls feature parity contract
@@ -44,3 +46,5 @@ jobs:
         run: node tests/hero-control-contract.test.cjs
       - name: Role-aware dock contract
         run: node tests/role-aware-dock.test.cjs
+      - name: 100 customer journey regression
+        run: node tests/retest-100.cjs
