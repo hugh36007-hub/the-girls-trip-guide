@@ -39,3 +39,5 @@ jobs:
         run: node scripts/hero-vault-ux-contract.mjs
       - name: Hidden Gallery separation contract
         run: node tests/hidden-gallery-separation.test.cjs
+      - name: Hero control contract
+        run: node tests/hero-control-contract.test.cjs
