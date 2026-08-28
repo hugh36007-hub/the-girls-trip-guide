@@ -27,6 +27,7 @@ jobs:
           node --check girls-product-parity.js
           node --check girls-document-audience.js
           node --check girls-hero-vault-ux.js
+          node --check girls-hidden-upload-choice.js
       - name: Existing release contract
         run: node tests/release-contract.test.cjs
       - name: Girls feature parity contract
