@@ -1,0 +1,24 @@
+name: QA 100 parity
+
+on:
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  qa100:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: JavaScript syntax
+        run: |
+          if [ -f girls-app-v2.js ]; then node --check girls-app-v2.js; else node --check clean-core.js && node --check clean-views.js && node --check clean-actions.js; fi
+      - name: Run identical 100-test matrix
+        run: node scripts/qa-100-parity.mjs
+      - uses: actions/upload-artifact@v4
+        with:
+          name: qa-100-parity-report
+          path: qa-results/100-parity-report.json
