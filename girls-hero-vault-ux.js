@@ -6,7 +6,6 @@ const SUPABASE_KEY='sb_publishable_qBQzJjFxSToEGxPJEcmskg_GNd4M4cP';
 let client=null;
 const db=()=>client||(client=window.supabase?.createClient(SUPABASE_URL,SUPABASE_KEY,{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true}}));
 const tripId=()=>new URL(location.href).searchParams.get('trip_id')||'';
-const esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]||c));
 const toast=msg=>{const el=document.getElementById('toast');if(!el)return;el.textContent=msg;el.classList.add('show');setTimeout(()=>el.classList.remove('show'),2800)};
 
 async function state(){
@@ -51,7 +50,7 @@ function hardenVaultButton(s){
    const note=document.createElement('div');
    note.dataset.vaultPrivacyNote='1';
    note.className='gtg-vault-privacy-note';
-   note.innerHTML='<b>Hidden Gallery is separate from Evidence.</b><span>Nothing stored there is shown on this page. A valid trip PIN is required before hidden media can be listed or opened.</span>';
+   note.innerHTML='<b>Hidden Gallery is separate from Evidence.</b><span>You can add photos or video without the PIN. The PIN is required to view, open or manage hidden media.</span>';
    gallery.insertAdjacentElement('beforebegin',note);
   }
  }
@@ -91,13 +90,15 @@ function interceptVaultRender(){
   },500);
  },true);
 
+ // Uploading into the Hidden Gallery deliberately does not require the PIN.
+ // Viewing, signing URLs and destructive management remain session-gated by RLS.
  document.addEventListener('click',async e=>{
-  const b=e.target.closest('[data-a="vaultUpload"],[data-a="deleteVaultMedia"]');
+  const b=e.target.closest('[data-a="deleteVaultMedia"]');
   if(!b)return;
   try{
    const s=await state();if(!s)return;
    if(!(await serverVaultUnlocked(s.q,s.trip.id))){
-    e.preventDefault();e.stopImmediatePropagation();toast('Hidden Gallery is locked. Enter the PIN first.');
+    e.preventDefault();e.stopImmediatePropagation();toast('Hidden Gallery is locked. Enter the PIN to manage hidden media.');
    }
   }catch(err){
    e.preventDefault();e.stopImmediatePropagation();toast('Hidden Gallery could not verify the secure session.');
