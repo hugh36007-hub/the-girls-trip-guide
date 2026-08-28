@@ -1,7 +1,11 @@
 # The Girls Trip Guide — Communications & Email Handover
 
 ## Purpose
-This document records the deep-dive conversion of The Boys Trip Guide communications system into the Girls Trip Guide voice and character system. It is an implementation specification, not a claim that the current static Girls site is already connected to Supabase/Resend.
+This document records the conversion of The Boys Trip Guide communications system
+into the Girls Trip Guide voice and character system. The Supabase queue and Girls
+worker are now connected with Girls-only statuses. Production delivery remains
+deliberately paused until `thegirlstripguide.com` is verified in Resend; see
+`GIRLS-BACKEND-RELEASE-STATUS.md`.
 
 ## What was reviewed on the Boys build
 The Boys implementation has four distinct layers:
