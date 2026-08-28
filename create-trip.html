@@ -21,6 +21,31 @@
 <div id="toast" class="toast" aria-live="polite"></div>
 <noscript><main class="auth-screen"><section class="auth-card"><h1>JavaScript required</h1><p>The private trip app needs JavaScript enabled.</p></section></main></noscript>
 <script defer src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.112.4"></script>
-<script defer src="/girls-app.js?v=1"></script>
+<script>
+window.addEventListener('DOMContentLoaded',()=>{
+  if(!window.supabase?.createClient)return;
+  const originalCreateClient=window.supabase.createClient.bind(window.supabase);
+  window.supabase.createClient=(...args)=>{
+    const client=originalCreateClient(...args);
+    client.auth.signInWithOtp=async({email})=>{
+      try{
+        const key='sb_publishable_qBQzJjFxSToEGxPJEcmskg_GNd4M4cP';
+        const res=await fetch('https://vtcmvwixfqyxqghibsla.supabase.co/functions/v1/girls-auth-otp',{
+          method:'POST',
+          headers:{'Content-Type':'application/json','apikey':key,'Authorization':`Bearer ${key}`},
+          body:JSON.stringify({email})
+        });
+        const out=await res.json().catch(()=>({}));
+        if(!res.ok)return {data:{user:null,session:null},error:{message:out.error||'Could not send sign-in code.'}};
+        return {data:{user:null,session:null},error:null};
+      }catch(error){
+        return {data:{user:null,session:null},error:{message:error?.message||'Could not send sign-in code.'}};
+      }
+    };
+    return client;
+  };
+});
+</script>
+<script defer src="/girls-app.js?v=2"></script>
 </body>
 </html>
