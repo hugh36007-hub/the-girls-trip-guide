@@ -20,10 +20,9 @@
 <div id="modalRoot" class="modal-wrap"></div>
 <div id="toast" class="toast" aria-live="polite"></div>
 <noscript><main class="auth-screen"><section class="auth-card"><h1>JavaScript required</h1><p>The private trip app needs JavaScript enabled.</p></section></main></noscript>
-<script defer src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.112.4"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.112.4"></script>
 <script>
-window.addEventListener('DOMContentLoaded',()=>{
-  if(!window.supabase?.createClient)return;
+if(window.supabase?.createClient){
   const originalCreateClient=window.supabase.createClient.bind(window.supabase);
   window.supabase.createClient=(...args)=>{
     const client=originalCreateClient(...args);
@@ -44,7 +43,7 @@ window.addEventListener('DOMContentLoaded',()=>{
     };
     return client;
   };
-});
+}
 </script>
 <script defer src="/girls-app.js?v=2"></script>
 </body>
