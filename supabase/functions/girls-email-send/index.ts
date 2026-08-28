@@ -60,7 +60,7 @@ function render(input: any) {
         <table role="presentation" width="560" cellpadding="0" cellspacing="0" border="0" bgcolor="#fffafd" style="width:100%;max-width:560px;background-color:#fffafd;border:1px solid #e6bfd3;border-radius:18px;overflow:hidden">
           <tr>
             <td bgcolor="#150a12" style="padding:0;background-color:#150a12;border-top-left-radius:17px;border-top-right-radius:17px;overflow:hidden">
-              <img src="${banner}" width="560" height="187" alt="${esc(selected.name)} · The Girls Trip Guide" style="display:block;width:100%;max-width:560px;height:auto;border:0;outline:none;text-decoration:none">
+              <img src="${banner}" width="560" height="420" alt="${esc(selected.name)} · The Girls Trip Guide" style="display:block;width:100%;max-width:560px;height:auto;border:0;outline:none;text-decoration:none">
             </td>
           </tr>
           <tr>
