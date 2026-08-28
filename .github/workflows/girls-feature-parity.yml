@@ -1,0 +1,27 @@
+name: Girls feature parity
+
+on:
+  push:
+    branches:
+      - release/girls-feature-parity-20260828
+  pull_request:
+    branches:
+      - main
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: JavaScript syntax
+        run: node --check girls-app-v2.js
+      - name: Existing release contract
+        run: node tests/release-contract.test.cjs
+      - name: Girls feature parity contract
+        run: node tests/girls-feature-parity.test.cjs
