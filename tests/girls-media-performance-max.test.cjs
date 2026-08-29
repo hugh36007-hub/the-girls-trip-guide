@@ -9,6 +9,7 @@ const checks=[
   ['lazy offscreen images',perf.includes("img.loading='lazy'")&&perf.includes("img.fetchPriority='low'")],
   ['gallery videos do not preload metadata',perf.includes("video.preload='none'")&&!perf.includes("video.preload='metadata'")],
   ['bounded explicit tuning',perf.includes('function scheduleTune()')&&!perf.includes('MutationObserver')],
+  ['durable Evidence upload refreshes app state',perf.includes('function syncEvidenceState(event)')&&perf.includes("event?.detail?.album!=='evidence'")&&perf.includes("window.dispatchEvent(new Event('popstate'))")],
   ['resume notice',perf.includes('gtg-upload-intent:')&&perf.includes('select the same file again')],
   ['performance layer loads before UX+',html.includes('/girls-media-performance-max.js?v=2')&&html.indexOf('girls-media-performance-max.js')<html.indexOf('girls-media-ux-plus.js')]
 ];
