@@ -34,6 +34,8 @@ jobs:
           node --check girls-hero-vault-ux.js
           node --check girls-hidden-upload-choice.js
           node --check girls-role-aware-dock.js
+          node --check girls-media-ux-plus.js
+          node --check tests/girls-media-ux-plus.test.cjs
       - name: Girls Edge Function type-check
         run: |
           deno check supabase/functions/girls-process-communications/index.ts
@@ -60,6 +62,8 @@ jobs:
         run: node tests/hero-control-contract.test.cjs
       - name: Role-aware dock contract
         run: node tests/role-aware-dock.test.cjs
+      - name: Premium media UX contract
+        run: node tests/girls-media-ux-plus.test.cjs
       - name: Girls action latency regression
         run: node tests/girls-action-latency.test.cjs
       - name: 100 customer journey regression
