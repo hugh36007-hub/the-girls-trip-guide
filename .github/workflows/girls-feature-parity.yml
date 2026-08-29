@@ -33,6 +33,7 @@ jobs:
           node --check girls-date-flow.js
           node --check girls-payment-nudge.js
           node --check girls-trip-social.js
+          node --check girls-chat-sheet.js
           node --check girls-product-parity.js
           node --check girls-document-audience.js
           node --check girls-hero-vault-ux.js
