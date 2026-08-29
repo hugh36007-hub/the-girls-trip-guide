@@ -1,0 +1,6 @@
+.btn.is-busy{position:relative;display:inline-flex;align-items:center;justify-content:center;gap:9px;cursor:wait;opacity:.92;pointer-events:none}
+.btn.is-busy .action-spinner{width:15px;height:15px;flex:0 0 15px;border:2px solid currentColor;border-right-color:transparent;border-radius:50%;animation:girls-action-spin .65s linear infinite}
+form[aria-busy="true"]{cursor:progress}
+form[aria-busy="true"] input,form[aria-busy="true"] select,form[aria-busy="true"] textarea{transition:opacity .15s ease}
+@keyframes girls-action-spin{to{transform:rotate(360deg)}}
+@media (prefers-reduced-motion:reduce){.btn.is-busy .action-spinner{animation-duration:1.2s}}
