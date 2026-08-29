@@ -32,7 +32,35 @@ async function storageUpload(bucket,path,file,onProgress=()=>{}){
   await new Promise((resolve,reject)=>{const up=new window.tus.Upload(file,{endpoint:`https://vtcmvwixfqyxqghibsla.storage.supabase.co/storage/v1/upload/resumable`,retryDelays:[0,1000,3000,5000,10000,20000],headers:{authorization:`Bearer ${session.access_token}`,apikey:KEY,'x-upsert':'false'},metadata:{bucketName:bucket,objectName:path,contentType:file.type||'application/octet-stream',cacheControl:'3600'},uploadDataDuringCreation:true,chunkSize:6*1024*1024,removeFingerprintOnSuccess:true,uploadSize:file.size,onProgress:(sent,total)=>onProgress(total?sent/total:0,sent,total),onError:reject,onSuccess:()=>{onProgress(1,file.size,file.size);resolve()}});up.findPreviousUploads().then(prev=>{const old=(prev||[]).find(x=>x?.metadata?.bucketName===bucket&&String(x?.metadata?.objectName||'').startsWith(prefix));if(old){finalPath=old.metadata.objectName;up.options.metadata={...up.options.metadata,objectName:finalPath};up.resumeFromPreviousUpload(old)}up.start()}).catch(()=>up.start())});return finalPath
 }
 
-async function makeThumb(file){if(!image(file))return null;const url=URL.createObjectURL(file);try{const img=new Image();img.decoding='async';img.src=url;await Promise.race([img.decode(),wait(2500).then(()=>{throw Error('decode timeout')})]);const max=360,scale=Math.min(1,max/Math.max(img.naturalWidth,img.naturalHeight)),c=document.createElement('canvas');c.width=Math.max(1,Math.round(img.naturalWidth*scale));c.height=Math.max(1,Math.round(img.naturalHeight*scale));c.getContext('2d',{alpha:false}).drawImage(img,0,0,c.width,c.height);return await new Promise(r=>c.toBlob(r,'image/webp',.62))}catch{return null}finally{URL.revokeObjectURL(url)}}
+function waitFor(target,event,ms){
+  return new Promise((resolve,reject)=>{
+    const timer=setTimeout(()=>{cleanup();reject(Error('Preview decode timed out.'))},ms);
+    const ok=()=>{cleanup();resolve()};
+    const bad=()=>{cleanup();reject(Error('Preview could not be decoded.'))};
+    const cleanup=()=>{clearTimeout(timer);target.removeEventListener(event,ok);target.removeEventListener('error',bad)};
+    target.addEventListener(event,ok,{once:true});target.addEventListener('error',bad,{once:true});
+  });
+}
+async function makeThumb(file){
+  const isVid=video(file),isImg=image(file);if(!isVid&&!isImg)return null;
+  const url=URL.createObjectURL(file);
+  try{
+    const source=isVid?document.createElement('video'):new Image();
+    if(isVid){source.muted=true;source.playsInline=true;source.preload='auto'}else source.decoding='async';
+    const ready=waitFor(source,isVid?'loadeddata':'load',isVid?2600:2200);
+    source.src=url;if(isVid)source.load();await ready;
+    if(isVid&&Number.isFinite(source.duration)&&source.duration>.2){
+      const seek=waitFor(source,'seeked',1200).catch(()=>null);
+      try{source.currentTime=Math.min(.35,source.duration/4)}catch{}
+      await seek;
+    }
+    const width=source.videoWidth||source.naturalWidth||source.width,height=source.videoHeight||source.naturalHeight||source.height;if(!width||!height)return null;
+    const max=360,scale=Math.min(1,max/Math.max(width,height)),canvas=document.createElement('canvas');
+    canvas.width=Math.max(1,Math.round(width*scale));canvas.height=Math.max(1,Math.round(height*scale));
+    canvas.getContext('2d',{alpha:false}).drawImage(source,0,0,canvas.width,canvas.height);
+    return await new Promise(resolve=>canvas.toBlob(resolve,'image/webp',.62));
+  }catch{return null}finally{URL.revokeObjectURL(url)}
+}
 function defer(fn){(window.requestIdleCallback?window.requestIdleCallback:cb=>setTimeout(cb,50))(()=>Promise.resolve().then(fn).catch(e=>console.warn('Deferred preview skipped.',e)),{timeout:2500})}
 
 function optimistic(row,file,album){if(album!=='evidence')return;const gallery=document.querySelector('[data-panel="evidence"] .gallery');if(!gallery)return;gallery.querySelector('.empty')?.remove();const box=document.createElement('div');box.className='media gtg-optimistic';box.dataset.optimisticMedia=row.id;if(video(file)){box.innerHTML='<div style="aspect-ratio:4/3;display:grid;place-items:center;background:#151116;color:var(--muted);font-weight:800">VIDEO · SAVED</div>'}else{const url=URL.createObjectURL(file);box.innerHTML=`<img src="${url}" alt="${esc(file.name)}" loading="eager" decoding="async">`;setTimeout(()=>URL.revokeObjectURL(url),300000)}gallery.prepend(box);const stat=document.querySelector('.stat[data-tab="evidence"] b');if(stat){const n=Number(stat.textContent)||0;stat.textContent=String(n+1)}}
@@ -42,7 +70,15 @@ async function persist(file,album,onProgress){
   const prepared=isVid?file:await compressPhoto(file),bucket=album==='vault'?'btg-vault':'btg-evidence';const {data:{session}}=await db().auth.getSession();if(!session?.user)throw Error('Your secure session expired. Sign in again.');const path=await storageUpload(bucket,`${tripId()}/${session.user.id}/${uid()}-${safe(prepared.name||file.name)}`,prepared,onProgress);
   let row;try{const {data,error}=await db().from('media').insert({trip_id:tripId(),album,storage_path:path,thumbnail_path:null,file_name:file.name,mime_type:file.type,size_bytes:prepared.size,created_by:session.user.id}).select('*').single();if(error)throw error;row=data}catch(e){await db().storage.from(bucket).remove([path]).catch(()=>{});throw e}
   optimistic(row,file,album);
-  if(!isVid)defer(async()=>{const blob=await makeThumb(prepared);if(!blob)return;const p=`${tripId()}/${session.user.id}/thumb-${uid()}.webp`;await storageUpload(bucket,p,new File([blob],'thumbnail.webp',{type:'image/webp'}));const {error}=await db().from('media').update({thumbnail_path:p}).eq('id',row.id).eq('trip_id',tripId());if(error)throw error});
+  defer(async()=>{
+    const blob=await makeThumb(prepared);if(!blob)return;
+    const p=`${tripId()}/${session.user.id}/thumb-${uid()}.webp`;
+    try{
+      await storageUpload(bucket,p,new File([blob],'thumbnail.webp',{type:'image/webp'}));
+      const {error}=await db().from('media').update({thumbnail_path:p}).eq('id',row.id).eq('trip_id',tripId());if(error)throw error;
+      window.dispatchEvent(new CustomEvent('gtg:thumbnail-ready',{detail:{mediaId:row.id,album}}));
+    }catch(error){console.warn('Deferred preview skipped.',error);await db().storage.from(bucket).remove([p]).catch(()=>{})}
+  });
   return row
 }
 async function pool(items,limit,work){let i=0;async function next(){while(i<items.length){const n=i++;await work(items[n])}}await Promise.all(Array.from({length:Math.min(limit,items.length)},next))}
@@ -56,6 +92,7 @@ async function run(files,album){
   let saved=0,failed=0;const update=()=>{const s=document.querySelector('[data-gtg-upload-summary]'),bar=document.querySelector('[data-gtg-upload-bar]');if(s)s.textContent=`${saved} of ${queue.length} saved${failed?` · ${failed} failed`:''}`;if(bar)bar.style.width=`${Math.round(((saved+failed)/queue.length)*100)}%`};const indexed=queue.map((file,index)=>({file,index})),photos=indexed.filter(x=>!video(x.file)),videos=indexed.filter(x=>video(x.file));
   const work=async x=>{rowStatus(x.index,image(x.file)&&x.file.size>1600000?'Optimising…':'Starting…');try{await persist(x.file,album,(r,s,t)=>rowStatus(x.index,r>=1?'Saving…':`Uploading ${Math.round(r*100)}% · ${human(s)}/${human(t)}`));saved++;rowStatus(x.index,'Saved','ok')}catch(e){failed++;rowStatus(x.index,'Failed','fail');console.error(e)}update()};
   await pool(photos,concurrency(),work);await pool(videos,1,work);try{localStorage.removeItem(`gtg-upload-intent:${tripId()}`)}catch{};await wait(500);root.classList.remove('open');root.innerHTML='';
+  window.dispatchEvent(new CustomEvent('gtg:media-uploaded',{detail:{album,saved,failed}}));
   const toast=document.getElementById('toast');if(toast){toast.textContent=failed?`${saved} uploaded · ${failed} failed. Re-select failed files to resume.`:`${saved} uploaded.`;toast.classList.add('show');setTimeout(()=>toast.classList.remove('show'),4200)}
   if(album==='vault')setTimeout(()=>document.querySelector('[data-a="vault"]')?.click(),80)
 }
