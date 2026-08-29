@@ -7,8 +7,9 @@ const checks=[
   ['videos preserved after photos',perf.includes('if(a.video!==b.video)return a.video?1:-1')],
   ['gallery containment',perf.includes('content-visibility:auto')&&perf.includes('contain-intrinsic-size')],
   ['lazy offscreen images',perf.includes("img.loading='lazy'")&&perf.includes("img.fetchPriority='low'")],
-  ['video metadata only',perf.includes("video.preload='metadata'")],
+  ['gallery videos do not preload metadata',perf.includes("video.preload='none'")&&!perf.includes("video.preload='metadata'")],
+  ['bounded explicit tuning',perf.includes('function scheduleTune()')&&!perf.includes('MutationObserver')],
   ['resume notice',perf.includes('gtg-upload-intent:')&&perf.includes('select the same file again')],
-  ['performance layer loads before UX+',html.indexOf('girls-media-performance-max.js')>-1&&html.indexOf('girls-media-performance-max.js')<html.indexOf('girls-media-ux-plus.js')]
+  ['performance layer loads before UX+',html.includes('/girls-media-performance-max.js?v=2')&&html.indexOf('girls-media-performance-max.js')<html.indexOf('girls-media-ux-plus.js')]
 ];
 let failed=0;for(const [name,ok] of checks){console.log(`${ok?'PASS':'FAIL'} ${name}`);if(!ok)failed++;}if(failed)process.exit(1);
