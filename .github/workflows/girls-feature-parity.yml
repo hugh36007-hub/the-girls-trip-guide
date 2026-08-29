@@ -30,6 +30,8 @@ jobs:
           node --check girls-app-v2.js
           node --check girls-action-feedback.js
           node --check girls-session-guard.js
+          node --check girls-date-flow.js
+          node --check girls-payment-nudge.js
           node --check girls-product-parity.js
           node --check girls-document-audience.js
           node --check girls-hero-vault-ux.js
@@ -49,6 +51,7 @@ jobs:
           deno check supabase/functions/girls-accept-invite/index.ts
           deno check supabase/functions/girls-email-send/index.ts
           deno check supabase/functions/girls-trip-email/index.ts
+          deno check supabase/functions/girls-payment-nudge/index.ts
           deno check supabase/functions/girls-stripe-checkout/index.ts
       - name: Girls backend source parity contract
         run: node tests/girls-backend-source-parity.test.cjs
