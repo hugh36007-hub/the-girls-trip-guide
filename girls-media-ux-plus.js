@@ -70,7 +70,7 @@ async function persist(file,album,onProgress){
   const prepared=isVid?file:await compressPhoto(file),bucket=album==='vault'?'btg-vault':'btg-evidence';const {data:{session}}=await db().auth.getSession();if(!session?.user)throw Error('Your secure session expired. Sign in again.');const path=await storageUpload(bucket,`${tripId()}/${session.user.id}/${uid()}-${safe(prepared.name||file.name)}`,prepared,onProgress);
   let row;try{const {data,error}=await db().from('media').insert({trip_id:tripId(),album,storage_path:path,thumbnail_path:null,file_name:file.name,mime_type:file.type,size_bytes:prepared.size,created_by:session.user.id}).select('*').single();if(error)throw error;row=data}catch(e){await db().storage.from(bucket).remove([path]).catch(()=>{});throw e}
   optimistic(row,file,album);
-  defer(async()=>{
+  if(album==='evidence'||!isVid)defer(async()=>{
     const blob=await makeThumb(prepared);if(!blob)return;
     const p=`${tripId()}/${session.user.id}/thumb-${uid()}.webp`;
     try{
