@@ -29,6 +29,7 @@ jobs:
         run: |
           node --check girls-app-v2.js
           node --check girls-action-feedback.js
+          node --check girls-session-guard.js
           node --check girls-product-parity.js
           node --check girls-document-audience.js
           node --check girls-hero-vault-ux.js
@@ -37,6 +38,7 @@ jobs:
           node --check girls-media-performance-max.js
           node --check girls-media-ux-plus.js
           node --check girls-evidence-parity.js
+          node --check tests/girls-session-guard.test.cjs
           node --check tests/girls-media-ux-plus.test.cjs
           node --check tests/girls-media-performance-max.test.cjs
           node --check tests/girls-evidence-parity.test.cjs
@@ -66,6 +68,8 @@ jobs:
         run: node tests/hero-control-contract.test.cjs
       - name: Role-aware dock contract
         run: node tests/role-aware-dock.test.cjs
+      - name: Cross-tab session and owner guard
+        run: node tests/girls-session-guard.test.cjs
       - name: Premium media UX contract
         run: node tests/girls-media-ux-plus.test.cjs
       - name: Media performance max contract
