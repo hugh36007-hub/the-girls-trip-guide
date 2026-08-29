@@ -36,8 +36,10 @@ jobs:
           node --check girls-role-aware-dock.js
           node --check girls-media-performance-max.js
           node --check girls-media-ux-plus.js
+          node --check girls-evidence-parity.js
           node --check tests/girls-media-ux-plus.test.cjs
           node --check tests/girls-media-performance-max.test.cjs
+          node --check tests/girls-evidence-parity.test.cjs
       - name: Girls Edge Function type-check
         run: |
           deno check supabase/functions/girls-process-communications/index.ts
@@ -68,6 +70,8 @@ jobs:
         run: node tests/girls-media-ux-plus.test.cjs
       - name: Media performance max contract
         run: node tests/girls-media-performance-max.test.cjs
+      - name: Evidence parity contract
+        run: node tests/girls-evidence-parity.test.cjs
       - name: Girls action latency regression
         run: node tests/girls-action-latency.test.cjs
       - name: 100 customer journey regression
