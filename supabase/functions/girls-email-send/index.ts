@@ -123,12 +123,21 @@ Deno.serve(async request => {
     const to = String(input.to || '').trim().toLowerCase()
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(to)) throw new Error('Invalid recipient')
 
+    const { data: suppression, error: suppressionError } = await db.from('email_suppressions').select('reason').eq('email', to).maybeSingle()
+    if (suppressionError) throw suppressionError
+    if (suppression) {
+      return new Response(JSON.stringify({ ok: true, id: null, suppressed: true, reason: suppression.reason }), {
+        headers: { 'Content-Type': 'application/json' },
+      })
+    }
+
     const selected = person(input.character)
     const { data: key, error: keyError } = await db.rpc('girls_resend_api_key')
     if (keyError || !key) throw new Error('Girls email key unavailable')
 
     const html = render(input)
     const text = `${selected.name}: ${input.title}\n\n${input.message}\n\n${input.tripName}\n${input.url}`
+    const senderName = selected.name === 'The Girls Trip Guide' ? selected.name : `${selected.name} from The Girls Trip Guide`
     const response = await fetch('https://api.resend.com/emails', {
       method: 'POST',
       headers: {
@@ -137,7 +146,7 @@ Deno.serve(async request => {
         ...(input.idempotencyKey ? { 'Idempotency-Key': String(input.idempotencyKey) } : {}),
       },
       body: JSON.stringify({
-        from: `${selected.name} <${selected.mailbox}@thegirlstripguide.com>`,
+        from: `${senderName} <trip@thegirlstripguide.com>`,
         to: [to],
         subject: String(input.subject || `${input.title} · ${input.tripName}`),
         text,
