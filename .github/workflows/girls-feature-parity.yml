@@ -22,6 +22,9 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
+      - uses: denoland/setup-deno@v2
+        with:
+          deno-version: v2.x
       - name: JavaScript syntax
         run: |
           node --check girls-app-v2.js
@@ -30,6 +33,16 @@ jobs:
           node --check girls-hero-vault-ux.js
           node --check girls-hidden-upload-choice.js
           node --check girls-role-aware-dock.js
+      - name: Girls Edge Function type-check
+        run: |
+          deno check supabase/functions/girls-process-communications/index.ts
+          deno check supabase/functions/girls-auth-otp/index.ts
+          deno check supabase/functions/girls-accept-invite/index.ts
+          deno check supabase/functions/girls-email-send/index.ts
+          deno check supabase/functions/girls-trip-email/index.ts
+          deno check supabase/functions/girls-stripe-checkout/index.ts
+      - name: Girls backend source parity contract
+        run: node tests/girls-backend-source-parity.test.cjs
       - name: Existing release contract
         run: node tests/release-contract.test.cjs
       - name: Girls feature parity contract
