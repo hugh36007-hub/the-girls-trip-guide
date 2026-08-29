@@ -34,6 +34,11 @@ function tuneGallery(root=document){
   const videos=[...root.querySelectorAll?.('[data-panel="evidence"] .gallery video')||[]];videos.forEach(video=>{video.preload='none';});
 }
 function scheduleTune(){[0,80,350,1200].forEach(delay=>setTimeout(()=>tuneGallery(),delay));}
+function syncEvidenceState(event){
+  scheduleTune();
+  if(event?.detail?.album!=='evidence')return;
+  setTimeout(()=>window.dispatchEvent(new Event('popstate')),80);
+}
 function interruptedIntent(){
   try{
     const tripId=new URL(location.href).searchParams.get('trip_id');if(!tripId)return;
@@ -49,7 +54,7 @@ prewarm();installStyle();
 document.addEventListener('change',event=>{const input=event.target.closest?.('#uploadForm input[type="file"],#vaultUploadForm input[type="file"]');if(input)reorderSmallFirst(input);},true);
 document.addEventListener('pointerover',event=>{if(event.target.closest?.('[data-a="upload"],[data-a="vault"],button[data-tab="evidence"],#uploadForm input[type="file"],#vaultUploadForm input[type="file"]'))prewarm();},{capture:true,passive:true});
 document.addEventListener('click',event=>{if(event.target.closest?.('[data-tab="evidence"],[data-a="upload"],[data-delete-media]'))scheduleTune();},true);
-window.addEventListener('gtg:media-uploaded',scheduleTune);
+window.addEventListener('gtg:media-uploaded',syncEvidenceState);
 window.addEventListener('pageshow',scheduleTune);
 document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible')scheduleTune();});
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',()=>{scheduleTune();interruptedIntent();},{once:true});else{scheduleTune();interruptedIntent();}
