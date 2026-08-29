@@ -11,6 +11,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
 <link rel="preconnect" href="https://vtcmvwixfqyxqghibsla.supabase.co" crossorigin>
+<link rel="preconnect" href="https://vtcmvwixfqyxqghibsla.storage.supabase.co" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700;800;900&family=Caveat:wght@600;700&family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="/girls-app.css?v=1">
 <link rel="stylesheet" href="/girls-action-feedback.css?v=1">
@@ -34,16 +35,11 @@ if(window.supabase?.createClient){
     const client=originalCreateClient(...args);
     client.auth.signInWithOtp=async({email})=>{
       try{
-        const res=await fetch('https://vtcmvwixfqyxqghibsla.supabase.co/functions/v1/girls-auth-otp',{
-          method:'POST',
-          body:JSON.stringify({email})
-        });
+        const res=await fetch('https://vtcmvwixfqyxqghibsla.supabase.co/functions/v1/girls-auth-otp',{method:'POST',body:JSON.stringify({email})});
         const out=await res.json().catch(()=>({}));
         if(!res.ok)return {data:{user:null,session:null},error:{message:out.error||'Could not send sign-in code.'}};
         return {data:{user:null,session:null},error:null};
-      }catch(error){
-        return {data:{user:null,session:null},error:{message:error?.message||'Could not send sign-in code.'}};
-      }
+      }catch(error){return {data:{user:null,session:null},error:{message:error?.message||'Could not send sign-in code.'}};}
     };
     return client;
   };
@@ -60,5 +56,6 @@ if(window.supabase?.createClient){
 <script defer src="/girls-hero-vault-ux.js?v=2"></script>
 <script defer src="/girls-hidden-upload-choice.js?v=1"></script>
 <script defer src="/girls-role-aware-dock.js?v=2"></script>
+<script defer src="/girls-media-ux-plus.js?v=1"></script>
 </body>
 </html>
