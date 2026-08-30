@@ -1,0 +1,46 @@
+/* Keep the mobile document locked to the device viewport. Internal carousels/viewers still own their horizontal gestures. */
+html,
+body {
+  width: 100%;
+  max-width: 100%;
+  overflow-x: hidden;
+  overscroll-behavior-x: none;
+}
+
+@supports (overflow: clip) {
+  html,
+  body {
+    overflow-x: clip;
+  }
+}
+
+body {
+  position: relative;
+}
+
+#app,
+.shell,
+.screen,
+.dashboard,
+.appbar,
+.appbar-inner {
+  min-width: 0;
+  max-width: 100%;
+}
+
+#app {
+  width: 100%;
+  overflow-x: hidden;
+}
+
+@supports (overflow: clip) {
+  #app {
+    overflow-x: clip;
+  }
+}
+
+#modal-root,
+#drawerRoot,
+#modalRoot {
+  max-width: 100vw;
+}
