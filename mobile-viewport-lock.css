@@ -44,3 +44,54 @@ body {
 #modalRoot {
   max-width: 100vw;
 }
+
+/* Mobile Evidence header: keep the controls useful, but get the photos on screen sooner. */
+@media (max-width: 700px) {
+  body [data-panel="evidence"] > .section-head {
+    margin: 8px 0 8px !important;
+    gap: 8px !important;
+  }
+
+  body [data-panel="evidence"] > .section-head h2 {
+    margin: 0 !important;
+    font-size: 30px !important;
+    line-height: .94 !important;
+  }
+
+  body [data-panel="evidence"] > .section-head p {
+    margin: 4px 0 0 !important;
+    font-size: 12px !important;
+    line-height: 1.3 !important;
+  }
+
+  body [data-panel="evidence"] > .section-head .actions {
+    display: grid !important;
+    grid-template-columns: repeat(2,minmax(0,1fr)) !important;
+    width: 100% !important;
+    gap: 7px !important;
+  }
+
+  body [data-panel="evidence"] > .section-head .btn {
+    min-height: 42px !important;
+    padding: 9px 10px !important;
+    border-radius: 11px !important;
+  }
+
+  body [data-panel="evidence"] .gtg-evidence-summary,
+  body [data-panel="evidence"] .btg-storage-meter {
+    margin: 10px 0 12px !important;
+    padding: 13px 15px !important;
+    border-radius: 16px !important;
+  }
+
+  body [data-panel="evidence"] .btg-storage-meter-track {
+    height: 7px !important;
+    margin-top: 8px !important;
+  }
+
+  body [data-panel="evidence"] .btg-storage-meter-note {
+    margin: 8px 0 0 !important;
+    font-size: 12px !important;
+    line-height: 1.3 !important;
+  }
+}
