@@ -1,4 +1,4 @@
-/* Girls media quality hardening: Retina photo previews and natural mobile framing. */
+/* Girls media quality hardening: sharp thumbnail previews while preserving the original-file viewer. */
 (()=>{
 'use strict';
 if(window.__GTG_MEDIA_QUALITY_FIX__)return;window.__GTG_MEDIA_QUALITY_FIX__=true;
@@ -12,8 +12,10 @@ function installStyles(){
   if(document.getElementById('gtg-media-quality-fix-css'))return;
   const s=document.createElement('style');s.id='gtg-media-quality-fix-css';s.textContent=`
   @media(max-width:600px){
-    [data-panel="evidence"] .gallery .media:has(>img[data-media-id]){height:auto!important;aspect-ratio:auto!important;background:#090709!important}
-    [data-panel="evidence"] .gallery .media>img[data-media-id]{display:block!important;width:100%!important;height:auto!important;max-height:none!important;aspect-ratio:auto!important;object-fit:contain!important;background:#090709!important}
+    [data-panel="evidence"] .gallery{grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:8px!important}
+    [data-panel="evidence"] .gallery .media{min-width:0!important;height:auto!important;aspect-ratio:1/1!important;overflow:hidden!important;background:#090709!important}
+    [data-panel="evidence"] .gallery .media>img[data-media-id]{display:block!important;width:100%!important;height:100%!important;max-width:none!important;max-height:none!important;aspect-ratio:1/1!important;object-fit:cover!important;object-position:center!important;background:#090709!important}
+    [data-panel="evidence"] .gallery .gtg-video-preview{width:100%!important;height:100%!important;min-height:0!important;aspect-ratio:1/1!important}
   }
   `;document.head.appendChild(s);
 }
@@ -24,7 +26,7 @@ async function rowFor(id){
 }
 async function retinaUrl(row){
   const key=`${row.id}:${row.storage_path}`,cached=urls.get(key);if(cached?.url&&cached.expiresAt>Date.now()+60000)return cached.url;
-  const bucket=row.album==='vault'?'btg-vault':'btg-evidence';const {data,error}=await db().storage.from(bucket).createSignedUrl(row.storage_path,1800,{transform:{width:1280,height:1280,resize:'contain',quality:82}});if(error)throw error;
+  const bucket=row.album==='vault'?'btg-vault':'btg-evidence';const {data,error}=await db().storage.from(bucket).createSignedUrl(row.storage_path,1800,{transform:{width:720,height:720,resize:'cover',quality:80}});if(error)throw error;
   const url=data?.signedUrl||'';urls.set(key,{url,expiresAt:Date.now()+1800*1000});return url;
 }
 function preload(url){return new Promise((resolve,reject)=>{const img=new Image();img.decoding='async';img.addEventListener('load',()=>resolve(img),{once:true});img.addEventListener('error',()=>reject(Error('Photo could not be loaded.')),{once:true});img.src=url})}
