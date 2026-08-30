@@ -1,12 +1,18 @@
 import fs from 'node:fs';
 import assert from 'node:assert/strict';
 const flow=fs.readFileSync('girls-media-flow-refinement.js','utf8');
+const viewer=fs.readFileSync('girls-direct-photo-viewer.js','utf8');
+const social=fs.readFileSync('girls-media-social.js','utf8');
 const html=fs.readFileSync('create-trip.html','utf8');
 const grid=fs.readFileSync('girls-mobile-evidence-grid.js','utf8');
-for(const token of ["EASE='cubic-bezier(.22,.61,.36,1)'",'SLIDE_MS=260','gtg-flow-adjacent','bridge(src)','stopImmediatePropagation()','warmAroundIndex','fetchPriority=i<6','SEND_TIMEOUT=8000','send_trip_media_chat_message','Comment took too long to send','finally'])assert(flow.includes(token),`missing silky flow contract: ${token}`);
-assert(flow.includes("document.addEventListener('touchmove',onTouchMove,{capture:true,passive:false})"),'horizontal drag must be captured before the legacy jump handler');
-assert(flow.includes("document.addEventListener('submit',event=>{if(event.target?.matches?.('.gtg-media-thread-form'))"),'media-thread send must use fail-safe capture handling');
-assert(!grid.includes('gtg-grid-media-icon'),'redundant lower-right view icon must be removed');
-const social=html.indexOf('/girls-media-social.js?v=1'),flowIndex=html.indexOf('/girls-media-flow-refinement.js?v=1');
-assert(social>0&&flowIndex>social,'silky refinement must load after the existing media-social layer');
-console.log('PASS Girls media flow refinement: finger-following slide, bridge handoff, eager thumbnails, no eye icon and fail-safe comments');
+assert(flow.includes("image.loading=index<12?'eager':'lazy'"),'first 12 thumbnails must paint eagerly');
+assert(flow.includes("image.fetchPriority=index<6?'high':'auto'"),'first six thumbnails must have high priority');
+for(const obsolete of ['bridge(src)','handoff(g)','gtg-flow-adjacent',"addEventListener('touchstart'","addEventListener('submit'"])assert(!flow.includes(obsolete),`flow layer must not own ${obsolete}`);
+for(const token of ['width:300vw','class="track"','class="slide current"','async function move(dir)','gtg:viewer-media-change',"addEventListener('touchstart'","addEventListener('touchmove'"])assert(viewer.includes(token),`missing persistent viewer contract: ${token}`);
+assert(!social.includes('navigate(dx<0?1:-1)'),'social layer must not recreate the viewer to navigate');
+assert(!social.includes("stage.addEventListener('touchstart'"),'social layer must not compete for gestures');
+assert(!grid.includes('gtg-grid-media-icon'),'redundant lower-right view icon must remain removed');
+const socialIndex=html.indexOf('/girls-media-social.js?v=1'),flowIndex=html.indexOf('/girls-media-flow-refinement.js?v=1');
+assert(socialIndex>0&&flowIndex>socialIndex,'priority refinement must load after media social');
+console.log('PASS Girls persistent carousel, single-owner gestures and eager thumbnail policy');
+
