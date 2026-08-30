@@ -12,7 +12,7 @@ function installStyles(){
   if(document.getElementById('gtg-media-quality-fix-css'))return;
   const s=document.createElement('style');s.id='gtg-media-quality-fix-css';s.textContent=`
   @media(max-width:600px){
-    [data-panel="evidence"] .gallery .media:has(img:not(.gtg-video-preview img)){height:auto!important;aspect-ratio:auto!important;background:#090709!important}
+    [data-panel="evidence"] .gallery .media:has(>img[data-media-id]){height:auto!important;aspect-ratio:auto!important;background:#090709!important}
     [data-panel="evidence"] .gallery .media>img[data-media-id]{display:block!important;width:100%!important;height:auto!important;max-height:none!important;aspect-ratio:auto!important;object-fit:contain!important;background:#090709!important}
   }
   `;document.head.appendChild(s);
