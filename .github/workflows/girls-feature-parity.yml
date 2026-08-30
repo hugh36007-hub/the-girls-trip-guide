@@ -42,6 +42,7 @@ jobs:
           node --check girls-media-performance-max.js
           node --check girls-media-ux-plus.js
           node --check girls-evidence-parity.js
+          node --check girls-media-quality-fix.js
           node --check tests/girls-session-guard.test.cjs
           node --check tests/girls-media-ux-plus.test.cjs
           node --check tests/girls-media-performance-max.test.cjs
