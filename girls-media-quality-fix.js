@@ -1,4 +1,4 @@
-/* Girls media quality hardening: sharp thumbnail previews while preserving the original-file viewer. */
+/* Girls media quality hardening: sharp Instagram-style thumbnails while preserving the original-file viewer. */
 (()=>{
 'use strict';
 if(window.__GTG_MEDIA_QUALITY_FIX__)return;window.__GTG_MEDIA_QUALITY_FIX__=true;
@@ -12,10 +12,19 @@ function installStyles(){
   if(document.getElementById('gtg-media-quality-fix-css'))return;
   const s=document.createElement('style');s.id='gtg-media-quality-fix-css';s.textContent=`
   @media(max-width:600px){
-    [data-panel="evidence"] .gallery{grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:8px!important}
-    [data-panel="evidence"] .gallery .media{min-width:0!important;height:auto!important;aspect-ratio:1/1!important;overflow:hidden!important;background:#090709!important}
-    [data-panel="evidence"] .gallery .media>img[data-media-id]{display:block!important;width:100%!important;height:100%!important;max-width:none!important;max-height:none!important;aspect-ratio:1/1!important;object-fit:cover!important;object-position:center!important;background:#090709!important}
-    [data-panel="evidence"] .gallery .gtg-video-preview{width:100%!important;height:100%!important;min-height:0!important;aspect-ratio:1/1!important}
+    [data-panel="evidence"] .gallery{grid-template-columns:repeat(3,minmax(0,1fr))!important;gap:2px!important;align-items:stretch!important}
+    [data-panel="evidence"] .gallery .media{position:relative!important;min-width:0!important;width:100%!important;height:auto!important;aspect-ratio:1/1!important;overflow:hidden!important;border:0!important;border-radius:0!important;background:#050305!important;margin:0!important}
+    [data-panel="evidence"] .gallery .media>img[data-media-id],[data-panel="evidence"] .gallery .media>video,[data-panel="evidence"] .gallery .gtg-video-preview{display:block!important;width:100%!important;height:100%!important;min-height:0!important;max-width:none!important;max-height:none!important;aspect-ratio:1/1!important;object-fit:cover!important;object-position:center!important;border:0!important;border-radius:0!important;background:#050305!important}
+    [data-panel="evidence"] .gallery .gtg-video-preview{position:relative!important;padding:0!important;overflow:hidden!important}
+    [data-panel="evidence"] .gallery .gtg-video-preview img{position:absolute!important;inset:0!important;width:100%!important;height:100%!important;object-fit:cover!important}
+    [data-panel="evidence"] .gallery .gtg-video-preview span{display:none!important}
+    [data-panel="evidence"] .gallery .media::after{content:'▧';position:absolute!important;right:6px!important;bottom:6px!important;z-index:4!important;display:grid!important;place-items:center!important;width:22px!important;height:22px!important;border-radius:50%!important;background:rgba(0,0,0,.58)!important;color:#fff!important;font-size:12px!important;font-weight:900!important;line-height:1!important;text-shadow:0 1px 4px #000!important;pointer-events:none!important}
+    [data-panel="evidence"] .gallery .media:has(>video)::after,[data-panel="evidence"] .gallery .media:has(.gtg-video-preview)::after{content:'▶'!important;font-size:10px!important;padding-left:1px!important}
+    [data-panel="evidence"] .gallery .media-tools{position:absolute!important;top:4px!important;right:4px!important;z-index:5!important;display:flex!important;gap:3px!important}
+    [data-panel="evidence"] .gallery .media-tools button{display:grid!important;place-items:center!important;width:26px!important;height:26px!important;min-width:26px!important;padding:0!important;border:1px solid rgba(255,255,255,.38)!important;border-radius:50%!important;background:rgba(0,0,0,.55)!important;color:#fff!important;font-size:0!important;line-height:1!important;box-shadow:0 3px 10px rgba(0,0,0,.32)!important}
+    [data-panel="evidence"] .gallery .media-tools button[data-a="setMediaHero"]::after{content:'☆';font-size:16px!important;line-height:1!important}
+    [data-panel="evidence"] .gallery .media-tools button[data-delete-media]::after{content:'×';font-size:18px!important;line-height:1!important}
+    [data-panel="evidence"] .gallery .gtg-optimistic::after{display:none!important}
   }
   `;document.head.appendChild(s);
 }
@@ -37,7 +46,7 @@ async function upgrade(img){
 }
 function observe(){
   io?.disconnect();io=null;const imgs=[...document.querySelectorAll('[data-panel="evidence"] .gallery img[data-media-id]')];if(!imgs.length)return;
-  if(!('IntersectionObserver'in window)){imgs.slice(0,12).forEach(img=>void upgrade(img));return}
+  if(!('IntersectionObserver'in window)){imgs.slice(0,18).forEach(img=>void upgrade(img));return}
   io=new IntersectionObserver(entries=>entries.filter(e=>e.isIntersecting).forEach(e=>{io?.unobserve(e.target);void upgrade(e.target)}),{rootMargin:'700px 0px'});imgs.forEach(img=>io.observe(img));
 }
 function resetMedia(id){
