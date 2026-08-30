@@ -1,0 +1,12 @@
+import fs from 'node:fs';
+import assert from 'node:assert/strict';
+const flow=fs.readFileSync('girls-media-flow-refinement.js','utf8');
+const html=fs.readFileSync('create-trip.html','utf8');
+const grid=fs.readFileSync('girls-mobile-evidence-grid.js','utf8');
+for(const token of ["EASE='cubic-bezier(.22,.61,.36,1)'",'SLIDE_MS=260','gtg-flow-adjacent','bridge(src)','stopImmediatePropagation()','warmAroundIndex','fetchPriority=i<6','SEND_TIMEOUT=8000','send_trip_media_chat_message','Comment took too long to send','finally'])assert(flow.includes(token),`missing silky flow contract: ${token}`);
+assert(flow.includes("document.addEventListener('touchmove',onTouchMove,{capture:true,passive:false})"),'horizontal drag must be captured before the legacy jump handler');
+assert(flow.includes("document.addEventListener('submit',event=>{if(event.target?.matches?.('.gtg-media-thread-form'))"),'media-thread send must use fail-safe capture handling');
+assert(!grid.includes('gtg-grid-media-icon'),'redundant lower-right view icon must be removed');
+const social=html.indexOf('/girls-media-social.js?v=1'),flowIndex=html.indexOf('/girls-media-flow-refinement.js?v=1');
+assert(social>0&&flowIndex>social,'silky refinement must load after the existing media-social layer');
+console.log('PASS Girls media flow refinement: finger-following slide, bridge handoff, eager thumbnails, no eye icon and fail-safe comments');
