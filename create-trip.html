@@ -37,9 +37,9 @@ if(window.supabase?.createClient){
       try{
         const res=await fetch('https://vtcmvwixfqyxqghibsla.supabase.co/functions/v1/girls-auth-otp',{method:'POST',body:JSON.stringify({email})});
         const out=await res.json().catch(()=>({}));
-        if(!res.ok)return {data:{user:null,session:null},error:{message:out.error||'Could not send sign-in code.'}};
+        if(!res.ok)return {data:{user:null,session:null},error:{message:out.error||'Could not send the sign-in code.'}};
         return {data:{user:null,session:null},error:null};
-      }catch(error){return {data:{user:null,session:null},error:{message:error?.message||'Could not send sign-in code.'}};}
+      }catch(error){return {data:{user:null,session:null},error:{message:error?.message||'Could not send the sign-in code.'}};}
     };
     return client;
   };
@@ -61,7 +61,7 @@ if(window.supabase?.createClient){
 <script defer src="/girls-media-performance-max.js?v=2"></script>
 <script defer src="/girls-media-ux-plus.js?v=2"></script>
 <script defer src="/girls-evidence-parity.js?v=2"></script>
-<script defer src="/girls-media-quality-fix.js?v=1"></script>
+<script defer src="/girls-media-quality-fix.js?v=2"></script>
 <script defer src="/girls-direct-photo-viewer.js?v=1"></script>
 <script defer src="/girls-trip-social.js?v=2"></script>
 <script defer src="/girls-chat-sheet.js?v=2"></script>
