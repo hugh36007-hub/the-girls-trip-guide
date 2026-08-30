@@ -10,7 +10,7 @@ const db=()=>client||(client=window.supabase?.createClient?.(SUPA,KEY,{auth:{per
 const tripId=()=>new URL(location.href).searchParams.get('trip_id')||'';
 const connection=()=>navigator.connection||navigator.mozConnection||navigator.webkitConnection||null;
 const constrained=()=>{const c=connection();return Boolean(c?.saveData||/^(slow-2g|2g)$/i.test(String(c?.effectiveType||'')))};
-const evidenceActive=()=>Boolean(document.querySelector('.gtg-immersive-media-host,[data-panel="evidence"] .gallery .gtg-mobile-media-tile'));
+const evidenceActive=()=>Boolean(document.querySelector('.gtg-immersive-media-host,[data-panel="evidence"].active'));
 const homeReady=()=>Boolean(tripId()&&document.querySelector('#app .appbar')&&!evidenceActive());
 function markInput(){pauseUntil=Date.now()+PAUSE_AFTER_INPUT}
 function cancel(){runToken++;running=false;controller?.abort();controller=null}
@@ -27,7 +27,7 @@ async function cacheThumb(item,token,signal){
   if(token!==runToken||!item?.row?.thumbnail_path||!item.url||signal.aborted)return;
   const ready=await idleTurn(token);if(!ready||signal.aborted)return;
   const response=await fetch(item.url,{cache:'force-cache',credentials:'omit',priority:'low',signal});
-  if(response.ok||response.type==='opaque'){primed.set(String(item.row.id),item.url);scheduleApply()}
+  if(response.ok||response.type==='opaque')primed.set(String(item.row.id),item.url);
 }
 async function prime(){
   resetForTrip();if(running||!homeReady()||constrained()||document.visibilityState==='hidden'||!tripKey)return;
@@ -44,13 +44,14 @@ async function prime(){
   }catch(error){if(error?.name!=='AbortError')console.debug?.('Evidence thumbnail prime unavailable.',error)}
   finally{if(token===runToken){running=false;controller=null}}
 }
-function applyPrimed(){clearTimeout(applyTimer);document.querySelectorAll('[data-panel="evidence"] [data-media-id]').forEach(node=>{const id=node.dataset?.mediaId||node.closest?.('[data-media-id]')?.dataset?.mediaId||'',url=primed.get(String(id));if(!url)return;const img=node instanceof HTMLImageElement?node:node.querySelector?.('img');if(img&&!img.getAttribute('src')){img.decoding='async';img.setAttribute('src',url)}})}
-function scheduleApply(){clearTimeout(applyTimer);applyTimer=setTimeout(applyPrimed,12)}
+function applyPrimed(){clearTimeout(applyTimer);const panel=document.querySelector('[data-panel="evidence"].active');if(!panel)return;panel.querySelectorAll('[data-media-id]').forEach(node=>{const id=node.dataset?.mediaId||node.closest?.('[data-media-id]')?.dataset?.mediaId||'',url=primed.get(String(id));if(!url)return;const img=node instanceof HTMLImageElement?node:node.querySelector?.('img');if(img&&!img.getAttribute('src')){img.decoding='async';img.setAttribute('src',url)}})}
+function scheduleApply(delay=12){clearTimeout(applyTimer);applyTimer=setTimeout(applyPrimed,delay)}
 function schedule(delay=START_DELAY){clearTimeout(timer);timer=setTimeout(()=>{if(homeReady()&&!constrained())void prime()},delay)}
 function boot(){
   if(!window.supabase?.createClient){setTimeout(boot,60);return}resetForTrip();schedule();
-  const mo=new MutationObserver(()=>{resetForTrip();scheduleApply();if(evidenceActive())cancel();else if(homeReady()&&!running&&primed.size<THUMB_LIMIT)schedule(500)});mo.observe(document.documentElement,{childList:true,subtree:true});
+  const mo=new MutationObserver(()=>{resetForTrip();if(evidenceActive())cancel();else if(homeReady()&&!running&&primed.size<THUMB_LIMIT)schedule(500)});mo.observe(document.documentElement,{childList:true,subtree:true});
   document.addEventListener('pointerdown',event=>{markInput();if(event.target.closest?.('[data-tab="evidence"],[data-media-id]'))cancel()},{capture:true,passive:true});
+  document.addEventListener('click',event=>{if(event.target.closest?.('[data-tab="evidence"]'))scheduleApply(0)},true);
   document.addEventListener('keydown',markInput,{capture:true,passive:true});window.addEventListener('scroll',markInput,{passive:true});
   document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='hidden')cancel();else schedule(700)});
   window.addEventListener('pageshow',()=>schedule(900));
