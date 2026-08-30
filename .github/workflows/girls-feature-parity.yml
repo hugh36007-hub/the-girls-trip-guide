@@ -44,12 +44,14 @@ jobs:
           node --check girls-evidence-parity.js
           node --check girls-media-quality-fix.js
           node --check girls-mobile-evidence-grid.js
+          node --check girls-media-readiness.js
           node --check girls-direct-photo-viewer.js
           node --check tests/girls-session-guard.test.cjs
           node --check tests/girls-media-ux-plus.test.cjs
           node --check tests/girls-media-performance-max.test.cjs
           node --check tests/girls-evidence-parity.test.cjs
           node --check tests/girls-mobile-evidence-grid.test.mjs
+          node --check tests/girls-media-readiness.test.mjs
       - name: Girls Edge Function type-check
         run: |
           deno check supabase/functions/girls-process-communications/index.ts
@@ -87,6 +89,8 @@ jobs:
         run: node tests/girls-evidence-parity.test.cjs
       - name: Mobile Evidence visual contract
         run: node tests/girls-mobile-evidence-grid.test.mjs
+      - name: Media readiness contract
+        run: node tests/girls-media-readiness.test.mjs
       - name: Girls action latency regression
         run: node tests/girls-action-latency.test.cjs
       - name: 100 customer journey regression
