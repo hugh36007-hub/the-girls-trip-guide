@@ -23,21 +23,24 @@ function idleTurn(token){return new Promise(resolve=>{
     else setTimeout(()=>resolve(token===runToken&&!evidenceActive()&&document.visibilityState!=='hidden'),60);
   };check();
 })}
-async function cacheThumb(row,token,signal){
-  if(token!==runToken||!row?.thumbnail_path||signal.aborted)return;
+async function cacheThumb(item,token,signal){
+  if(token!==runToken||!item?.row?.thumbnail_path||!item.url||signal.aborted)return;
   const ready=await idleTurn(token);if(!ready||signal.aborted)return;
-  const {data,error}=await db().storage.from('btg-evidence').createSignedUrl(row.thumbnail_path,SIGNED_SECONDS);if(error||!data?.signedUrl||signal.aborted)return;
-  const url=data.signedUrl,response=await fetch(url,{cache:'force-cache',credentials:'omit',priority:'low',signal});
-  if(response.ok||response.type==='opaque'){primed.set(String(row.id),url);scheduleApply()}
+  const response=await fetch(item.url,{cache:'force-cache',credentials:'omit',priority:'low',signal});
+  if(response.ok||response.type==='opaque'){primed.set(String(item.row.id),item.url);scheduleApply()}
 }
 async function prime(){
   resetForTrip();if(running||!homeReady()||constrained()||document.visibilityState==='hidden'||!tripKey)return;
   const q=db();if(!q)return;running=true;const token=++runToken;controller=new AbortController();
   try{
     const {data,error}=await q.from('media').select('id,thumbnail_path,created_at').eq('trip_id',tripKey).eq('album','evidence').order('created_at',{ascending:false}).limit(THUMB_LIMIT);if(error)throw error;
-    const rows=(data||[]).filter(row=>row?.thumbnail_path);let cursor=0;
-    const worker=async()=>{while(token===runToken&&!controller.signal.aborted){const row=rows[cursor++];if(!row)return;if(primed.has(String(row.id)))continue;try{await cacheThumb(row,token,controller.signal)}catch(error){if(error?.name!=='AbortError')console.debug?.('Evidence thumbnail prime skipped.',error)}}};
-    await Promise.all(Array.from({length:Math.min(CONCURRENT,rows.length)},worker));
+    const rows=(data||[]).filter(row=>row?.thumbnail_path);if(!rows.length)return;
+    const {data:signed,error:signError}=await q.storage.from('btg-evidence').createSignedUrls(rows.map(row=>row.thumbnail_path),SIGNED_SECONDS);if(signError)throw signError;
+    const byPath=new Map((signed||[]).map(item=>[String(item.path||''),item.signedUrl||'']));
+    const items=rows.map((row,index)=>({row,url:byPath.get(String(row.thumbnail_path))||(signed?.[index]?.signedUrl||'')})).filter(item=>item.url);
+    let cursor=0;
+    const worker=async()=>{while(token===runToken&&!controller.signal.aborted){const item=items[cursor++];if(!item)return;if(primed.has(String(item.row.id)))continue;try{await cacheThumb(item,token,controller.signal)}catch(error){if(error?.name!=='AbortError')console.debug?.('Evidence thumbnail prime skipped.',error)}}};
+    await Promise.all(Array.from({length:Math.min(CONCURRENT,items.length)},worker));
   }catch(error){if(error?.name!=='AbortError')console.debug?.('Evidence thumbnail prime unavailable.',error)}
   finally{if(token===runToken){running=false;controller=null}}
 }
