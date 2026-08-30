@@ -45,6 +45,7 @@ jobs:
           node --check girls-media-quality-fix.js
           node --check girls-mobile-evidence-grid.js
           node --check girls-media-readiness.js
+          node --check girls-home-thumbnail-prime.js
           node --check girls-direct-photo-viewer.js
           node --check girls-media-social.js
           node --check girls-media-flow-refinement.js
@@ -55,6 +56,7 @@ jobs:
           node --check tests/girls-evidence-parity.test.cjs
           node --check tests/girls-mobile-evidence-grid.test.mjs
           node --check tests/girls-media-readiness.test.mjs
+          node --check tests/girls-home-thumbnail-prime.test.mjs
           node --check tests/girls-media-social-contract.test.cjs
           node --check tests/girls-media-flow-refinement.test.mjs
           node --check tests/girls-poll-nudge.test.mjs
@@ -98,6 +100,8 @@ jobs:
         run: node tests/girls-mobile-evidence-grid.test.mjs
       - name: Media readiness contract
         run: node tests/girls-media-readiness.test.mjs
+      - name: Home thumbnail prime contract
+        run: node tests/girls-home-thumbnail-prime.test.mjs
       - name: Media social interaction contract
         run: node tests/girls-media-social-contract.test.cjs
       - name: Media flow refinement contract
