@@ -47,6 +47,8 @@ jobs:
           node --check girls-media-readiness.js
           node --check girls-direct-photo-viewer.js
           node --check girls-media-social.js
+          node --check girls-media-flow-refinement.js
+          node --check girls-poll-nudge.js
           node --check tests/girls-session-guard.test.cjs
           node --check tests/girls-media-ux-plus.test.cjs
           node --check tests/girls-media-performance-max.test.cjs
@@ -54,6 +56,8 @@ jobs:
           node --check tests/girls-mobile-evidence-grid.test.mjs
           node --check tests/girls-media-readiness.test.mjs
           node --check tests/girls-media-social-contract.test.cjs
+          node --check tests/girls-media-flow-refinement.test.mjs
+          node --check tests/girls-poll-nudge.test.mjs
       - name: Girls Edge Function type-check
         run: |
           deno check supabase/functions/girls-process-communications/index.ts
@@ -96,6 +100,10 @@ jobs:
         run: node tests/girls-media-readiness.test.mjs
       - name: Media social interaction contract
         run: node tests/girls-media-social-contract.test.cjs
+      - name: Media flow refinement contract
+        run: node tests/girls-media-flow-refinement.test.mjs
+      - name: Poll nudge contract
+        run: node tests/girls-poll-nudge.test.mjs
       - name: Girls action latency regression
         run: node tests/girls-action-latency.test.cjs
       - name: 100 customer journey regression
