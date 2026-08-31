@@ -13,7 +13,9 @@ for(const token of ['width:300vw','class="track"','class="slide current"','async
 assert(!social.includes('navigate(dx<0?1:-1)'),'social layer must not recreate the viewer to navigate');
 assert(!social.includes("stage.addEventListener('touchstart'"),'social layer must not compete for gestures');
 assert(!grid.includes('gtg-grid-media-icon'),'redundant lower-right view icon must remain removed');
-assert(html.includes('defer src="/girls-media-flow-refinement.js?v=1"'),'priority refinement must remain immediately available with the viewer');
+assert(!html.includes('defer src="/girls-media-flow-refinement.js?v=1"'),'priority refinement must not execute on Home startup');
 assert(!html.includes('defer src="/girls-media-social.js?v=1"'),'media social must not block initial app paint');
-assert(deferred.includes('/girls-media-social.js?v=1'),'deferred loader must retain media social interactions');
-console.log('PASS Girls persistent carousel, single-owner gestures, eager thumbnail policy and deferred social layer');
+const flowIndex=deferred.indexOf('/girls-media-flow-refinement.js?v=1'),socialIndex=deferred.indexOf('/girls-media-social.js?v=1');
+assert(flowIndex>=0&&socialIndex>flowIndex,'Evidence route must retain priority refinement before media social');
+assert(deferred.includes("if(route==='evidence')await loadBundle('evidence')"),'Evidence route must load the viewer refinement and social bundle');
+console.log('PASS Girls persistent carousel, single-owner gestures, eager thumbnail policy and route-lazy social layer');
