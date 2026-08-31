@@ -1,0 +1,312 @@
+/* The Girls Trip Guide — final private-app refinement.
+   Presentation-only. Keeps backend, permissions and Evidence viewer/tile geometry untouched. */
+
+body:has(.dashboard){
+  --gtg-rose:#ff5ca8;
+  --gtg-rose-soft:#ff8dc4;
+  --gtg-champagne:#f3d3b5;
+  --gtg-ivory:#fff8f4;
+  --gtg-muted:#b9abb3;
+  --gtg-line:rgba(255,120,179,.28);
+  --gtg-line-soft:rgba(255,141,196,.13);
+  --gtg-card:#151116;
+  --gtg-card-deep:#0c090d;
+  background:
+    radial-gradient(circle at 12% -6%,rgba(255,92,168,.13),transparent 28rem),
+    radial-gradient(circle at 92% 18%,rgba(178,91,144,.09),transparent 25rem),
+    linear-gradient(180deg,#09070a 0%,#0b080c 54%,#070607 100%);
+  background-attachment:fixed;
+}
+body:has(.dashboard)::before{
+  content:"";
+  position:fixed;
+  inset:0;
+  z-index:-1;
+  pointer-events:none;
+  opacity:.72;
+  background:
+    radial-gradient(circle at 76% 18%,rgba(255,211,232,.045) 0 1px,transparent 1.5px) 0 0/22px 22px,
+    linear-gradient(112deg,transparent 0 34%,rgba(255,141,196,.035) 34.2% 34.5%,transparent 34.7% 100%),
+    linear-gradient(68deg,transparent 0 62%,rgba(243,211,181,.025) 62.2% 62.45%,transparent 62.7% 100%);
+}
+
+/* HOME — keep the branded masthead and make it feel deliberate rather than bulky. */
+body:has(.panel[data-panel="overview"].active) .appbar{
+  height:76px;
+  border-bottom-color:rgba(255,141,196,.15);
+  background:rgba(7,5,8,.94);
+  box-shadow:0 8px 30px rgba(0,0,0,.18);
+}
+body:has(.panel[data-panel="overview"].active) .appbar-inner{width:min(1340px,calc(100% - 38px))}
+body:has(.panel[data-panel="overview"].active) .brand img{height:58px}
+body:has(.panel[data-panel="overview"].active) .dashboard{padding-top:18px}
+
+body:has(.panel[data-panel="overview"].active) .hero-card{
+  height:360px;
+  border-radius:25px;
+  border-color:rgba(255,141,196,.30);
+  background:#100c10;
+  box-shadow:0 26px 70px rgba(0,0,0,.28),inset 0 1px 0 rgba(255,255,255,.035);
+}
+body:has(.panel[data-panel="overview"].active) .hero-card:after{
+  background:
+    linear-gradient(90deg,rgba(7,5,8,.72) 0%,rgba(7,5,8,.23) 48%,rgba(7,5,8,.04) 72%),
+    linear-gradient(180deg,rgba(5,3,5,.04) 18%,rgba(5,3,5,.18) 50%,rgba(5,3,5,.92) 100%);
+}
+body:has(.panel[data-panel="overview"].active) .hero-meta{left:30px;right:30px;bottom:28px}
+body:has(.panel[data-panel="overview"].active) .hero-meta h1{
+  margin:8px 0 10px;
+  color:var(--gtg-ivory);
+  font-size:clamp(54px,6vw,82px);
+  font-weight:800;
+  letter-spacing:-.03em;
+}
+body:has(.panel[data-panel="overview"].active) .hero-meta h1 span{color:var(--gtg-rose-soft)}
+body:has(.panel[data-panel="overview"].active) .trip-stamp{
+  min-width:188px;
+  border-color:rgba(255,141,196,.32);
+  background:rgba(14,9,13,.74);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.04);
+}
+
+/* Home statistics: lighter, more editorial and less box-like. */
+body:has(.dashboard) .stat-row{gap:10px;margin:13px 0 22px}
+body:has(.dashboard) .stat{
+  min-height:108px;
+  border-color:var(--gtg-line-soft);
+  border-radius:18px;
+  background:
+    radial-gradient(circle at 90% 10%,rgba(255,92,168,.08),transparent 7rem),
+    linear-gradient(145deg,#171217,#0c090d 82%);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.025),0 10px 28px rgba(0,0,0,.14);
+}
+body:has(.dashboard) .stat b{
+  color:var(--gtg-ivory);
+  font-family:Georgia,"Times New Roman",serif;
+  font-size:29px;
+  font-weight:400;
+}
+body:has(.dashboard) .stat>span{color:var(--gtg-rose-soft);letter-spacing:.12em}
+body:has(.dashboard) .stat small{color:#9f929a}
+
+/* INNER PAGES — remove repeated Home hero/stat area and compress the masthead. */
+body:has(.panel[data-panel="plan"].active) .hero-card,
+body:has(.panel[data-panel="money"].active) .hero-card,
+body:has(.panel[data-panel="evidence"].active) .hero-card,
+body:has(.panel[data-panel="group"].active) .hero-card,
+body:has(.panel[data-panel="plan"].active) .stat-row,
+body:has(.panel[data-panel="money"].active) .stat-row,
+body:has(.panel[data-panel="evidence"].active) .stat-row,
+body:has(.panel[data-panel="group"].active) .stat-row{display:none!important}
+
+body:has(.panel[data-panel="plan"].active) .appbar,
+body:has(.panel[data-panel="money"].active) .appbar,
+body:has(.panel[data-panel="evidence"].active) .appbar,
+body:has(.panel[data-panel="group"].active) .appbar{
+  height:54px;
+  min-height:54px;
+  border-bottom-color:rgba(255,141,196,.13);
+  background:rgba(8,6,9,.965);
+  -webkit-backdrop-filter:blur(16px);
+  backdrop-filter:blur(16px);
+}
+body:has(.panel[data-panel="plan"].active) .appbar-inner,
+body:has(.panel[data-panel="money"].active) .appbar-inner,
+body:has(.panel[data-panel="evidence"].active) .appbar-inner,
+body:has(.panel[data-panel="group"].active) .appbar-inner{
+  width:min(1280px,calc(100% - 30px));
+  gap:10px;
+}
+body:has(.panel[data-panel="plan"].active) .appbar .brand,
+body:has(.panel[data-panel="money"].active) .appbar .brand,
+body:has(.panel[data-panel="evidence"].active) .appbar .brand,
+body:has(.panel[data-panel="group"].active) .appbar .brand{display:none}
+body:has(.panel[data-panel="plan"].active) .trip-title,
+body:has(.panel[data-panel="money"].active) .trip-title,
+body:has(.panel[data-panel="evidence"].active) .trip-title,
+body:has(.panel[data-panel="group"].active) .trip-title{
+  display:flex!important;
+  min-width:0;
+  margin-right:auto;
+  text-align:left;
+  align-items:baseline;
+  gap:8px;
+}
+body:has(.panel[data-panel="plan"].active) .trip-title strong,
+body:has(.panel[data-panel="money"].active) .trip-title strong,
+body:has(.panel[data-panel="evidence"].active) .trip-title strong,
+body:has(.panel[data-panel="group"].active) .trip-title strong{
+  color:var(--gtg-ivory);
+  font-family:Inter,Arial,sans-serif;
+  font-size:13px;
+  font-weight:800;
+  letter-spacing:.01em;
+  text-transform:none;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  max-width:280px;
+}
+body:has(.panel[data-panel="plan"].active) .trip-title span,
+body:has(.panel[data-panel="money"].active) .trip-title span,
+body:has(.panel[data-panel="evidence"].active) .trip-title span,
+body:has(.panel[data-panel="group"].active) .trip-title span{
+  margin:0;
+  color:var(--gtg-rose-soft);
+  font-size:9px;
+  font-weight:700;
+  letter-spacing:.12em;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  max-width:260px;
+}
+body:has(.panel[data-panel="plan"].active) .trip-title span:before,
+body:has(.panel[data-panel="money"].active) .trip-title span:before,
+body:has(.panel[data-panel="evidence"].active) .trip-title span:before,
+body:has(.panel[data-panel="group"].active) .trip-title span:before{content:"· ";color:#76666f}
+body:has(.panel:not([data-panel="overview"]).active) .icon-btn{
+  width:40px;height:40px;
+  border-color:rgba(255,141,196,.20);
+  background:linear-gradient(180deg,#171217,#0d0a0e);
+}
+body:has(.panel:not([data-panel="overview"]).active) .dashboard{padding-top:9px}
+
+/* Page hierarchy */
+body:has(.dashboard) .panel.active>.section-head{margin:7px 1px 14px;align-items:flex-end}
+body:has(.dashboard) .panel.active>.section-head h2{
+  color:var(--gtg-ivory);
+  font-family:Inter,Arial,sans-serif;
+  font-size:clamp(29px,3.2vw,42px);
+  font-weight:850;
+  line-height:1;
+  letter-spacing:-.035em;
+}
+body:has(.dashboard) .panel.active>.section-head h2 span{color:var(--gtg-rose-soft)}
+body:has(.dashboard) .panel.active>.section-head p{margin-top:7px;color:var(--gtg-muted);line-height:1.45}
+
+/* Reusable surfaces — premium, quiet, readable. */
+body:has(.dashboard) .panel.active .card,
+body:has(.dashboard) .panel.active .money-row,
+body:has(.dashboard) .panel.active .empty,
+body:has(.dashboard) .gtg-parity-overview .card,
+body:has(.dashboard) .gtg-overview-strip,
+body:has(.dashboard) .gtg-plan-categories>button,
+body:has(.dashboard) .gtg-money-strip,
+body:has(.dashboard) .gtg-get-started{
+  border-color:var(--gtg-line-soft);
+  background:
+    radial-gradient(circle at 92% 8%,rgba(255,92,168,.055),transparent 9rem),
+    linear-gradient(145deg,#171217,#0d0a0e 82%);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.025),0 12px 34px rgba(0,0,0,.14);
+}
+body:has(.dashboard) .panel.active .card{border-radius:18px}
+body:has(.dashboard) .panel.active .eyebrow,
+body:has(.dashboard) .gtg-parity-overview .eyebrow{color:var(--gtg-rose-soft);letter-spacing:.17em}
+body:has(.dashboard) .panel.active .card h3,
+body:has(.dashboard) .panel.active .card h2{color:var(--gtg-ivory)}
+body:has(.dashboard) .panel.active .card p{color:var(--gtg-muted)}
+body:has(.dashboard) .panel.active .price,
+body:has(.dashboard) .panel.active .money-row span{color:var(--gtg-champagne)}
+
+body:has(.dashboard) .btn{
+  min-height:42px;
+  border-radius:12px;
+  border-color:rgba(255,141,196,.22);
+  background:linear-gradient(180deg,#181218,#0e0b0f);
+  color:#f1e9ee;
+}
+body:has(.dashboard) .btn.primary{
+  border-color:#ff73b5;
+  background:linear-gradient(180deg,#ff83c1,#f4519f);
+  color:#200b16;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.34),0 8px 22px rgba(70,12,43,.18);
+}
+
+/* Overview parity blocks */
+body:has(.dashboard) .gtg-parity-overview{margin-top:1px}
+body:has(.dashboard) .gtg-overview-grid{gap:12px}
+body:has(.dashboard) .gtg-overview-card{border-radius:19px}
+body:has(.dashboard) .gtg-overview-strip{border-radius:17px}
+body:has(.dashboard) .gtg-overview-strip b{color:var(--gtg-champagne)}
+body:has(.dashboard) .gtg-overview-strip small{color:var(--gtg-muted)}
+
+/* Plan / Money / Group refinements. */
+body:has(.dashboard) .gtg-plan-categories{gap:9px}
+body:has(.dashboard) .gtg-plan-categories>button{border-radius:16px}
+body:has(.dashboard) .gtg-plan-categories b,
+body:has(.dashboard) .gtg-money-strip b{color:var(--gtg-champagne)}
+body:has(.dashboard) .gtg-plan-tools{gap:8px}
+body:has(.dashboard) .crew-card{border-color:var(--gtg-line-soft)}
+body:has(.dashboard) .avatar{border-color:rgba(255,141,196,.24);background:linear-gradient(145deg,#b7437a,#53243c)}
+
+/* Evidence shell only. Never redefine .gallery, .gtg-mobile-media-tile or immersive viewer geometry. */
+body:has(.dashboard) [data-panel="evidence"].active>.section-head,
+body:has(.dashboard) [data-panel="evidence"].active .gtg-evidence-summary,
+body:has(.dashboard) [data-panel="evidence"].active .btg-storage-meter{position:relative;z-index:1}
+body:has(.dashboard) [data-panel="evidence"] .gtg-evidence-summary,
+body:has(.dashboard) [data-panel="evidence"] .btg-storage-meter{
+  border-color:var(--gtg-line-soft)!important;
+  background:linear-gradient(145deg,#171217,#0d0a0e)!important;
+}
+
+/* Dock: same interaction, quieter hierarchy. */
+body:has(.dashboard) .dock{
+  border-color:rgba(255,141,196,.24);
+  background:rgba(9,7,10,.93);
+  box-shadow:0 20px 54px rgba(0,0,0,.42),inset 0 1px 0 rgba(255,255,255,.025);
+}
+body:has(.dashboard) .dock button.active{background:rgba(255,92,168,.12);color:var(--gtg-ivory)}
+body:has(.dashboard) .dock button.active span,
+body:has(.dashboard) .dock button.active small{color:var(--gtg-rose-soft)}
+
+/* Authentication/trip picker: same product language as the dashboard. */
+body:not(:has(.dashboard)) .auth-card{
+  border-color:rgba(255,141,196,.30);
+  background:radial-gradient(circle at 80% 5%,rgba(255,92,168,.10),transparent 17rem),linear-gradient(145deg,#171116,#0b080c);
+  box-shadow:0 28px 80px rgba(0,0,0,.32);
+}
+
+@media(max-width:850px){
+  body:has(.dashboard) .shell{width:min(100% - 24px,1280px)}
+  body:has(.dashboard) .stat-row{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
+
+@media(max-width:600px){
+  body:has(.dashboard){background-attachment:scroll}
+  body:has(.panel[data-panel="overview"].active) .appbar{height:64px}
+  body:has(.panel[data-panel="overview"].active) .brand img{height:50px}
+  body:has(.panel[data-panel="overview"].active) .appbar-inner{width:calc(100% - 24px)}
+  body:has(.panel[data-panel="overview"].active) .dashboard{padding-top:11px}
+  body:has(.panel[data-panel="overview"].active) .hero-card{height:310px;border-radius:19px}
+  body:has(.panel[data-panel="overview"].active) .hero-meta{left:18px;right:18px;bottom:17px}
+  body:has(.panel[data-panel="overview"].active) .hero-meta h1{font-size:45px;line-height:.86}
+  body:has(.dashboard) .stat-row{gap:8px;margin-top:9px;margin-bottom:17px}
+  body:has(.dashboard) .stat{min-height:94px;padding:13px;border-radius:15px}
+  body:has(.dashboard) .stat b{font-size:25px}
+  body:has(.dashboard) .stat small{margin-top:7px;font-size:9.5px}
+
+  body:has(.panel:not([data-panel="overview"]).active) .appbar{height:48px;min-height:48px}
+  body:has(.panel:not([data-panel="overview"]).active) .appbar-inner{width:calc(100% - 20px);gap:8px}
+  body:has(.panel:not([data-panel="overview"]).active) .trip-title{gap:6px}
+  body:has(.panel:not([data-panel="overview"]).active) .trip-title strong{max-width:180px;font-size:12px}
+  body:has(.panel:not([data-panel="overview"]).active) .trip-title span{max-width:120px;font-size:8px}
+  body:has(.panel:not([data-panel="overview"]).active) .icon-btn{width:36px;height:36px}
+  body:has(.panel:not([data-panel="overview"]).active) .dashboard{padding-top:7px}
+  body:has(.dashboard) .panel.active>.section-head{margin:5px 0 10px;gap:8px}
+  body:has(.dashboard) .panel.active>.section-head h2{font-size:29px}
+  body:has(.dashboard) .panel.active>.section-head p{margin-top:4px;font-size:11.5px}
+  body:has(.dashboard) .panel.active>.section-head .actions{width:100%;gap:7px}
+  body:has(.dashboard) .panel.active>.section-head .actions .btn{flex:1;min-width:0}
+  body:has(.dashboard) .gtg-overview-grid{grid-template-columns:1fr}
+  body:has(.dashboard) .gtg-overview-strip{grid-template-columns:repeat(2,minmax(0,1fr))}
+  body:has(.dashboard) .dock{width:calc(100% - 22px);height:68px;border-radius:21px}
+}
+
+@media(max-width:390px){
+  body:has(.panel:not([data-panel="overview"]).active) .trip-title span{display:none}
+}
+
+@media(prefers-reduced-motion:reduce){
+  body:has(.dashboard) *{scroll-behavior:auto!important}
+}
