@@ -70,6 +70,7 @@ jobs:
           node --check tests/girls-poll-nudge.test.mjs
           node --check tests/girls-pwa-security-contract.test.cjs
           node --check tests/girls-contact-backend.test.cjs
+          node --check tests/girls-media-deletion-integrity.test.cjs
       - name: Girls Edge Function type-check
         run: |
           deno check supabase/functions/girls-process-communications/index.ts
@@ -87,6 +88,8 @@ jobs:
         run: node tests/girls-pwa-security-contract.test.cjs
       - name: Girls backend support contract
         run: node tests/girls-contact-backend.test.cjs
+      - name: Media permanent-deletion integrity contract
+        run: node tests/girls-media-deletion-integrity.test.cjs
       - name: Existing release contract
         run: node tests/release-contract.test.cjs
       - name: Girls feature parity contract
