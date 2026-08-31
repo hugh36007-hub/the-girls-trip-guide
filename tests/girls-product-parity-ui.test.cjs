@@ -26,8 +26,9 @@ for(const token of ['Photos','Videos','New · 72h','20 GB','Trip storage']) must
 
 // Preserve Girls design and keep parity supplementary to the authoritative runtime.
 must(html,'girls-app-v2.js','authoritative Girls runtime');
-must(html,'girls-product-parity.css','parity stylesheet');
-must(loader,'/girls-product-parity.js?v=1','post-dashboard parity runtime');
+assert(!html.includes('girls-product-parity.css'),'parity stylesheet must not be requested on the Home critical path');
+must(loader,'/girls-product-parity.css?v=1','route-lazy parity stylesheet');
+must(loader,'/girls-product-parity.js?v=1','route-lazy parity runtime');
 assert(!html.includes('defer src="/girls-product-parity.js'),'parity runtime must not compete with the critical dashboard load');
 assert(!js.includes('Coach')&&!js.includes('Freddy')&&!js.includes('Mickey')&&!js.includes('Charlie'),'Boys character identity leaked into Girls parity layer');
 assert(css.includes('var(--pink')&&css.includes("'Barlow Condensed'"),'Girls design tokens not reused');
