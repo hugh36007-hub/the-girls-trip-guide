@@ -22,6 +22,10 @@ body:has(.panel:not([data-panel="overview"]).active) .gtg-evidence-summary{
   margin:0 0 15px;
 }
 
+/* Home keeps the branded hero/stats; operational messaging stays in Group. */
+body:has([data-panel="overview"].active) .gtg-parity-overview{margin-top:0}
+body:has([data-panel="overview"].active) .gtg-parity-overview .gtg-message-panel{display:none!important}
+
 /* The original page actions remain authoritative; parity summaries should not duplicate them. */
 body:has([data-panel="plan"].active) .gtg-plan-summary [data-parity-existing],
 body:has([data-panel="group"].active) .gtg-group-summary [data-parity-existing="invite"]{
@@ -56,16 +60,17 @@ body:has([data-panel="plan"].active) .gtg-plan-summary .gtg-plan-tools .btn{
   padding:8px 11px;
 }
 
-/* A real close affordance for the full-height drawer. */
+/* Drawer: one obvious close affordance, fixed at the top-right. */
 .drawer{position:relative;overflow-y:auto;padding-top:24px}
+.drawer .gtg-legacy-drawer-close{display:none!important}
 .gtg-drawer-close-top{
-  position:sticky;
-  z-index:3;
-  top:0;
-  float:right;
+  position:absolute;
+  z-index:5;
+  top:16px;
+  right:16px;
   width:38px;
   height:38px;
-  margin:-6px 0 0 12px;
+  margin:0;
   border:1px solid rgba(255,141,196,.25);
   border-radius:11px;
   background:#151016;
@@ -75,7 +80,7 @@ body:has([data-panel="plan"].active) .gtg-plan-summary .gtg-plan-tools .btn{
 }
 
 @media(max-width:600px){
-  body:has(.panel:not([data-panel="overview"]).active) .dashboard{padding-top:6px;padding-bottom:144px}
+  body:has(.panel:not([data-panel="overview"]).active) .dashboard{padding-top:6px;padding-bottom:132px}
   body:has(.panel:not([data-panel="overview"]).active) .panel.active>.section-head{
     width:100%;
     gap:7px;
@@ -89,8 +94,17 @@ body:has([data-panel="plan"].active) .gtg-plan-summary .gtg-plan-tools .btn{
   body:has(.panel:not([data-panel="overview"]).active) .gtg-overview-strip>span,
   body:has(.panel:not([data-panel="overview"]).active) .gtg-money-strip>span{min-height:72px;padding:10px 11px}
   body:has([data-panel="group"].active) .gtg-group-summary .gtg-plan-tools{margin-top:9px}
+  body:has(.dashboard) .dock{
+    height:64px;
+    width:calc(100% - 28px);
+    bottom:max(8px,env(safe-area-inset-bottom));
+    padding:6px;
+  }
+  body:has(.dashboard) .dock button{border-radius:13px}
+  body:has(.dashboard) .dock button span{font-size:16px}
+  body:has(.dashboard) .dock button small{font-size:8px}
   .drawer{padding-top:16px}
-  .gtg-drawer-close-top{top:0;margin-top:0}
+  .gtg-drawer-close-top{top:14px;right:14px}
 }
 
 @media(min-width:430px) and (max-width:600px){
