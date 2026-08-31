@@ -8,17 +8,29 @@
   "start_url": "/create-trip?source=pwa",
   "scope": "/",
   "display": "standalone",
-  "display_override": ["standalone", "minimal-ui"],
+  "display_override": ["window-controls-overlay", "standalone", "minimal-ui"],
   "orientation": "any",
   "background_color": "#09070a",
   "theme_color": "#0b080c",
   "categories": ["travel", "lifestyle", "social"],
   "icons": [
     {
-      "src": "/assets/images/girls-trip-guide-logo.webp",
-      "sizes": "any",
-      "type": "image/webp",
+      "src": "/assets/images/gtg-pwa-192.svg?v=1",
+      "sizes": "192x192",
+      "type": "image/svg+xml",
       "purpose": "any"
+    },
+    {
+      "src": "/assets/images/gtg-pwa-512.svg?v=1",
+      "sizes": "512x512",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    },
+    {
+      "src": "/assets/images/gtg-pwa-maskable.svg?v=1",
+      "sizes": "512x512",
+      "type": "image/svg+xml",
+      "purpose": "maskable"
     }
   ],
   "shortcuts": [
@@ -26,6 +38,11 @@
       "name": "Open your trips",
       "short_name": "Your trips",
       "url": "/create-trip?source=pwa-shortcut"
+    },
+    {
+      "name": "Join a trip",
+      "short_name": "Join trip",
+      "url": "/create-trip?source=pwa-shortcut&join=1"
     }
   ]
 }
