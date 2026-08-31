@@ -26,12 +26,13 @@ const BUNDLES={
   ],
   drawer:['/girls-free-entitlement-guard.js?v=1'],
   home:['/girls-home-thumbnail-prime.js?v=1'],
-  hero:['/girls-live-dashboard-hero.js?v=3','/girls-live-chat-sync.js?v=1'],
+  hero:['/girls-live-dashboard-hero.js?v=4','/girls-live-chat-sync.js?v=1'],
   upload:['https://cdn.jsdelivr.net/npm/tus-js-client@4.3.1/dist/tus.min.js']
 };
 const STYLES={
   shell:['/girls-section-layout.css?v=1','/girls-product-parity.css?v=1','/girls-inner-page-polish.css?v=1'],
-  plan:['/girls-document-audience.css?v=1']
+  plan:['/girls-document-audience.css?v=1'],
+  hero:['/live-dashboard-hero.css?v=4']
 };
 const loaded=new Set(),pending=new Map(),loadedStyles=new Set(),pendingStyles=new Map();
 const visible=()=>document.visibilityState!=='hidden';
@@ -62,6 +63,9 @@ async function loadRoute(route){
  if(route==='group')await loadBundle('group');
  if(route==='evidence')await loadBundle('evidence');
 }
+
+/* Start fetching the live hero CSS while the secure dashboard data is still loading. */
+void loadStyle('/live-dashboard-hero.css?v=4');
 
 function afterDashboard(callback,delay=0){
  const run=()=>setTimeout(()=>{if(visible())callback()},delay);
