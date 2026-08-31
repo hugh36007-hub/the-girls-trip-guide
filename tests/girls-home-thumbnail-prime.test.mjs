@@ -11,9 +11,10 @@ assert(prime.includes('if(token!==runToken||!item?.row?.thumbnail_path'),'Girls 
 assert(prime.includes("const panel=document.querySelector('[data-panel=\"evidence\"].active');if(!panel)return"),'Girls primer must not attach/decode cached thumbnails while Evidence is hidden');
 const peek=grid.indexOf('GTGHomeThumbnailPrime?.peek'),ready=grid.indexOf("if(card.dataset.gtgMobileGridReady==='1')return");
 assert(peek>=0&&ready>peek,'Girls grid must apply a primed thumbnail even when the hidden grid was normalised earlier');
-const readiness=html.indexOf('/girls-media-readiness.js?v=2'),viewer=html.indexOf('/girls-direct-photo-viewer.js?v=4');
-assert(readiness>0&&viewer>readiness,'Girls readiness and viewer must remain immediate and correctly ordered');
+assert(!html.includes('/girls-media-readiness.js?v=2')&&!html.includes('/girls-direct-photo-viewer.js?v=4'),'Girls Evidence readiness and viewer must stay off the Home critical path');
+const readiness=deferred.indexOf('/girls-media-readiness.js?v=2'),viewer=deferred.indexOf('/girls-direct-photo-viewer.js?v=4');
+assert(readiness>0&&viewer>readiness,'Girls Evidence route must retain readiness before viewer');
 assert(!html.includes('defer src="/girls-home-thumbnail-prime.js?v=1"'),'Girls home thumbnail primer must not be a direct startup script');
 assert(deferred.includes('/girls-home-thumbnail-prime.js?v=1'),'Girls deferred loader must retain the home thumbnail primer');
-assert(deferred.includes('requestIdleCallback')&&deferred.includes('afterDashboard')&&deferred.includes('6000'),'Girls home thumbnail primer must wait for the dashboard, then a long post-paint idle window');
+assert(deferred.includes('requestIdleCallback')&&deferred.includes('afterDashboard')&&deferred.includes('15000'),'Girls home thumbnail primer must wait for the dashboard, then a long post-paint idle window');
 console.log('PASS Girls home thumbnail prime: first 30 stored thumbnails, batch signing, two low-priority workers and delayed post-paint startup');
