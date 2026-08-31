@@ -8,6 +8,9 @@ const html=fs.readFileSync('create-trip.html','utf8');
 const critical=fs.readFileSync('girls-critical-style-loader.js','utf8');
 const deferred=fs.readFileSync('girls-performance-loader.js','utf8');
 const authBridge=fs.readFileSync('girls-supabase-auth-bridge.js','utf8');
+const dateFlow=fs.readFileSync('girls-date-flow.js','utf8');
+const heroUx=fs.readFileSync('girls-hero-vault-ux.js','utf8');
+const roleDock=fs.readFileSync('girls-role-aware-dock.js','utf8');
 const manifest=fs.readFileSync('manifest.webmanifest','utf8');
 const sw=fs.readFileSync('sw.js','utf8');
 const headers=fs.readFileSync('_headers','utf8');
@@ -36,11 +39,16 @@ assert(polishCss.includes('padding-bottom:148px')||polishCss.includes('padding-b
 assert(polishCss.includes('text-align:left'),'inner page titles must return to a clear left-aligned hierarchy');
 assert(polishCss.includes('min-width:430px'),'wider phone summaries should compact into one row where appropriate');
 
-for(const href of ['/mobile-viewport-lock.css?v=2','/girls-product-parity.css?v=1','/girls-final-refinement.css?v=1','/girls-inner-page-polish.css?v=1']){
-  assert(html.includes(`rel=\"preload\" as=\"style\" href=\"${href}\"`),`missing nonblocking preload ${href}`);
+for(const href of ['/mobile-viewport-lock.css?v=2','/girls-final-refinement.css?v=1','/girls-hero-vault-ux.css?v=1']){
+  assert(html.includes(`rel=\"preload\" as=\"style\" href=\"${href}\"`),`missing Home-shell preload ${href}`);
   assert(critical.includes(href),`critical loader must activate ${href}`);
 }
-assert(html.includes('/girls-inner-page-polish.js?v=1'),'inner page hierarchy polish missing');
+for(const href of ['/girls-product-parity.css?v=1','/girls-inner-page-polish.css?v=1','/girls-document-audience.css?v=1']){
+  assert(!html.includes(`rel=\"preload\" as=\"style\" href=\"${href}\"`),`route CSS must not preload on Home: ${href}`);
+  assert(deferred.includes(href),`route loader must retain ${href}`);
+}
+assert(!html.includes('/girls-inner-page-polish.js?v=1'),'inner-page DOM polish must not execute on Home startup');
+assert(deferred.includes('/girls-inner-page-polish.js?v=1'),'route loader must retain inner-page hierarchy polish');
 assert(html.includes('/girls-critical-style-loader.js?v=1'),'critical style loader missing');
 assert(html.includes('/girls-performance-loader.js?v=1'),'performance loader missing');
 
@@ -55,18 +63,22 @@ assert(authBridge.includes('functions/v1/girls-auth-otp'),'OTP bridge must prese
 assert(!html.includes('tus-js-client@4.3.1/dist/tus.min.js'),'resumable upload library must not execute on Home startup');
 assert(deferred.includes('tus-js-client@4.3.1/dist/tus.min.js'),'upload intent must retain resumable upload support');
 assert(!html.includes('defer src="/girls-product-parity.js?v=1"'),'supplementary parity data must not compete with initial dashboard load');
-assert(deferred.includes('/girls-product-parity.js?v=1'),'post-dashboard loader must retain the parity layer');
-assert(deferred.includes("route==='overview'?1200:220"),'Home parity work must wait until the authoritative dashboard paints');
-assert(deferred.includes('6000'),'Home thumbnail prime must wait well beyond the initial paint window');
+assert(deferred.includes('/girls-product-parity.js?v=1'),'route loader must retain the parity layer');
+assert(!deferred.includes("route==='overview'?1200:220"),'Home parity must not auto-refresh the authoritative dashboard after paint');
+assert(deferred.includes('15000'),'Home thumbnail prime must wait beyond the Lighthouse critical window');
+assert(!dateFlow.includes('data-payment-nudge-loader'),'date helper must not side-load payment scripts');
+assert(!dateFlow.includes('data-trip-social-loader'),'date helper must not side-load social scripts');
+assert(heroUx.includes("observe(app,{childList:true})")&&!heroUx.includes("observe(document.documentElement"),'hero controls must observe only authoritative app rerenders');
+assert(roleDock.includes("observe(app,{childList:true})")&&!roleDock.includes("observe(document.documentElement"),'dock normalisation must observe only authoritative app rerenders');
 
-for(const src of ['/girls-trip-social.js?v=2','/girls-chat-sheet.js?v=2','/girls-media-social.js?v=1','/girls-poll-nudge.js?v=1','/girls-home-thumbnail-prime.js?v=1','/evidence-intro-dismiss.js?v=1']){
-  assert(!html.includes(`defer src=\"${src}\"`),`noncritical script must not block startup: ${src}`);
-  assert(deferred.includes(src),`deferred loader must retain ${src}`);
+for(const src of [
+ '/girls-vault-contract-fix.js?v=1','/girls-section-layout.js?v=1','/girls-free-entitlement-guard.js?v=1','/girls-inner-page-polish.js?v=1','/girls-document-audience.js?v=1','/girls-hidden-upload-choice.js?v=1','/girls-media-performance-max.js?v=2','/girls-media-ux-plus.js?v=2','/girls-evidence-parity.js?v=2','/girls-media-quality-fix.js?v=4','/girls-mobile-evidence-grid.js?v=2','/girls-media-readiness.js?v=2','/girls-direct-photo-viewer.js?v=4','/girls-media-flow-refinement.js?v=1','/girls-trip-social.js?v=2','/girls-chat-sheet.js?v=2','/girls-media-social.js?v=1','/girls-poll-nudge.js?v=1','/girls-home-thumbnail-prime.js?v=1','/evidence-intro-dismiss.js?v=1'
+]){
+  assert(!html.includes(`defer src=\"${src}\"`),`noncritical script must not execute on Home startup: ${src}`);
+  assert(deferred.includes(src),`route loader must retain ${src}`);
 }
-for(const src of ['/girls-role-aware-dock.js?v=2','/girls-media-readiness.js?v=2','/girls-direct-photo-viewer.js?v=4','/girls-media-flow-refinement.js?v=1']){
-  assert(html.includes(src),`core interaction must remain immediate: ${src}`);
-}
-for(const token of ['requestIdleCallback','document.visibilityState','MutationObserver','afterDashboard'])assert(deferred.includes(token),`performance loader missing ${token}`);
+for(const src of ['/girls-role-aware-dock.js?v=2','/girls-hero-vault-ux.js?v=2'])assert(html.includes(src),`Home-critical interaction must remain immediate: ${src}`);
+for(const token of ['requestIdleCallback','document.visibilityState','MutationObserver','afterDashboard','loadRoute'])assert(deferred.includes(token),`performance loader missing ${token}`);
 
 const parsed=JSON.parse(manifest);
 assert.equal(parsed.start_url,'/create-trip?source=pwa');
@@ -78,4 +90,4 @@ assert(sw.includes("request.destination==='script'||request.destination==='style
 assert(headers.includes('/sw.js'),'service worker cache header missing');
 assert(headers.includes('Service-Worker-Allowed: /'),'service worker scope header missing');
 
-console.log('PASS Girls final refinement: compact shell, correct hierarchy, isolated Evidence geometry, route-aware enhancements, nonblocking auth/fonts, early hero discovery and PWA contract');
+console.log('PASS Girls final refinement: compact shell, isolated Evidence geometry, route-lazy enhancements, bounded observers, nonblocking auth/fonts and PWA contract');
