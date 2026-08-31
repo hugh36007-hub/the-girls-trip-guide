@@ -10,7 +10,8 @@ const styles=[
  '/girls-product-parity.css?v=1',
  '/girls-document-audience.css?v=1',
  '/girls-hero-vault-ux.css?v=1',
- '/girls-final-refinement.css?v=1'
+ '/girls-final-refinement.css?v=1',
+ '/girls-inner-page-polish.css?v=1'
 ];
 for(const href of styles){
  if(document.querySelector(`link[rel="stylesheet"][href="${href}"]`))continue;
