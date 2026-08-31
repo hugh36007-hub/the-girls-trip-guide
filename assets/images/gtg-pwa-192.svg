@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="192" height="192" viewBox="0 0 192 192" role="img" aria-label="The Girls Trip Guide">
+  <rect width="192" height="192" rx="34" fill="#070507"/>
+  <rect x="10" y="10" width="172" height="172" rx="28" fill="none" stroke="#ff4fa3" stroke-width="3"/>
+  <text x="96" y="66" text-anchor="middle" fill="#ff83c1" font-family="Arial,Helvetica,sans-serif" font-size="18" font-weight="800" letter-spacing="2">THE GIRLS</text>
+  <text x="96" y="104" text-anchor="middle" fill="#ffffff" font-family="Arial,Helvetica,sans-serif" font-size="34" font-weight="900" letter-spacing="1">TRIP</text>
+  <text x="96" y="134" text-anchor="middle" fill="#ffffff" font-family="Arial,Helvetica,sans-serif" font-size="24" font-weight="900" letter-spacing="3">GUIDE</text>
+  <circle cx="96" cy="153" r="4" fill="#ff4fa3"/>
+</svg>

@@ -1,0 +1,61 @@
+name: Deploy Girls Supabase functions
+
+on:
+  workflow_dispatch:
+
+concurrency:
+  group: deploy-girls-supabase-production
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    env:
+      SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+      PROJECT_REF: vtcmvwixfqyxqghibsla
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - uses: denoland/setup-deno@v2
+        with:
+          deno-version: v2.x
+      - name: Verify Girls production sources
+        run: |
+          node tests/girls-backend-source-parity.test.cjs
+          node tests/girls-contact-backend.test.cjs
+          deno check supabase/functions/girls-process-communications/index.ts
+          deno check supabase/functions/girls-auth-otp/index.ts
+          deno check supabase/functions/girls-accept-invite/index.ts
+          deno check supabase/functions/girls-email-send/index.ts
+          deno check supabase/functions/girls-trip-email/index.ts
+          deno check supabase/functions/girls-payment-nudge/index.ts
+          deno check supabase/functions/girls-stripe-checkout/index.ts
+          deno check supabase/functions/girls-contact-email/index.ts
+          deno check supabase/functions/media-action/index.ts
+      - name: Verify deployment credentials
+        shell: bash
+        run: |
+          test -n "$SUPABASE_ACCESS_TOKEN" || { echo "SUPABASE_ACCESS_TOKEN repository secret is not configured."; exit 1; }
+      - name: Deploy Girls auth OTP
+        run: npx supabase@2.115.0 functions deploy girls-auth-otp --project-ref "$PROJECT_REF" --no-verify-jwt
+      - name: Deploy Girls invitation acceptance
+        run: npx supabase@2.115.0 functions deploy girls-accept-invite --project-ref "$PROJECT_REF" --no-verify-jwt
+      - name: Deploy Girls communications processor
+        run: npx supabase@2.115.0 functions deploy girls-process-communications --project-ref "$PROJECT_REF" --no-verify-jwt
+      - name: Deploy Girls approved email renderer
+        run: npx supabase@2.115.0 functions deploy girls-email-send --project-ref "$PROJECT_REF" --no-verify-jwt
+      - name: Deploy Girls trip email
+        run: npx supabase@2.115.0 functions deploy girls-trip-email --project-ref "$PROJECT_REF"
+      - name: Deploy Girls payment nudge
+        run: npx supabase@2.115.0 functions deploy girls-payment-nudge --project-ref "$PROJECT_REF"
+      - name: Deploy Girls Stripe checkout
+        run: npx supabase@2.115.0 functions deploy girls-stripe-checkout --project-ref "$PROJECT_REF"
+      - name: Deploy Girls support backend
+        run: npx supabase@2.115.0 functions deploy girls-contact-email --project-ref "$PROJECT_REF" --no-verify-jwt
+      - name: Deploy shared media action
+        run: npx supabase@2.115.0 functions deploy media-action --project-ref "$PROJECT_REF"

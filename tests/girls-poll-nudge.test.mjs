@@ -2,7 +2,7 @@ import fs from 'node:fs';
 import assert from 'node:assert/strict';
 const ui=fs.readFileSync('girls-poll-nudge.js','utf8');
 const base=fs.readFileSync('supabase/migrations/20260830074523_poll_nudge_chat_link.sql','utf8');
-const hardening=fs.readFileSync('supabase/migrations/20260830083348_media_interaction_hardening.sql','utf8');
+const hardening=fs.readFileSync('supabase/migrations/20260830085233_media_interaction_hardening.sql','utf8');
 const html=fs.readFileSync('create-trip.html','utf8');
 const deferred=fs.readFileSync('girls-performance-loader.js','utf8');
 for(const token of ['data-gtg-poll-nudge','send_trip_poll_nudge','Poll nudge sent to Group chat.','gtg-chat-poll-link','Vote now'])assert(ui.includes(token));

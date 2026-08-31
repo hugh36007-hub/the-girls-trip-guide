@@ -97,4 +97,3 @@ $function$;
 
 revoke all on function public.send_trip_poll_nudge(uuid) from public, anon;
 grant execute on function public.send_trip_poll_nudge(uuid) to authenticated;
-
