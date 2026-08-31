@@ -67,6 +67,7 @@ jobs:
           node --check tests/girls-media-social-contract.test.cjs
           node --check tests/girls-media-flow-refinement.test.mjs
           node --check tests/girls-poll-nudge.test.mjs
+          node --check tests/girls-pwa-security-contract.test.cjs
       - name: Girls Edge Function type-check
         run: |
           deno check supabase/functions/girls-process-communications/index.ts
@@ -79,6 +80,8 @@ jobs:
           deno check supabase/functions/media-action/index.ts
       - name: Girls backend source parity contract
         run: node tests/girls-backend-source-parity.test.cjs
+      - name: Girls PWA and browser-security contract
+        run: node tests/girls-pwa-security-contract.test.cjs
       - name: Existing release contract
         run: node tests/release-contract.test.cjs
       - name: Girls feature parity contract
@@ -119,5 +122,5 @@ jobs:
         run: node tests/girls-poll-nudge.test.mjs
       - name: Girls action latency regression
         run: node tests/girls-action-latency.test.cjs
-      - name: 100 customer journey regression
+      - name: 100 static product-contract regression
         run: node tests/retest-100.cjs
