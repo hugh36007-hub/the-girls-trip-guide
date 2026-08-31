@@ -54,6 +54,7 @@ jobs:
           node --check girls-critical-style-loader.js
           node --check girls-supabase-auth-bridge.js
           node --check girls-performance-loader.js
+          node --check girls-live-chat-sync.js
           node --check girls-pwa-register.js
           node --check girls-contact.js
           node --check sw.js
@@ -65,6 +66,7 @@ jobs:
           node --check tests/girls-mobile-evidence-grid.test.mjs
           node --check tests/girls-media-readiness.test.mjs
           node --check tests/girls-home-thumbnail-prime.test.mjs
+          node --check tests/girls-home-chat-expand.test.cjs
           node --check tests/girls-media-social-contract.test.cjs
           node --check tests/girls-media-flow-refinement.test.mjs
           node --check tests/girls-poll-nudge.test.mjs
@@ -120,6 +122,8 @@ jobs:
         run: node tests/girls-media-readiness.test.mjs
       - name: Home thumbnail prime contract
         run: node tests/girls-home-thumbnail-prime.test.mjs
+      - name: Home chat expansion contract
+        run: node tests/girls-home-chat-expand.test.cjs
       - name: Final dashboard and critical-path contract
         run: node scripts/girls-final-refinement-contract.mjs
       - name: Media social interaction contract
