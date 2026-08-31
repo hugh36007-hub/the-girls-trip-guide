@@ -90,6 +90,3 @@ window.addEventListener('pageshow',syncActiveForms);
 installStyles();
 setTimeout(syncActiveForms,0);
 })();
-
-(()=>{'use strict';if(document.querySelector('script[data-payment-nudge-loader="girls"]'))return;const script=document.createElement('script');script.src='/girls-payment-nudge.js?v=2';script.async=false;script.dataset.paymentNudgeLoader='girls';document.head.append(script)})();
-(()=>{'use strict';if(document.querySelector('script[data-trip-social-loader="girls"]'))return;const script=document.createElement('script');script.src='/girls-trip-social.js?v=1';script.async=false;script.dataset.tripSocialLoader='girls';document.head.append(script)})();
