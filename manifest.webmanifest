@@ -1,0 +1,31 @@
+{
+  "id": "/create-trip",
+  "name": "The Girls Trip Guide",
+  "short_name": "Girls Trip",
+  "description": "Keep the plan, money, group and trip evidence together in one private place.",
+  "lang": "en-GB",
+  "dir": "ltr",
+  "start_url": "/create-trip?source=pwa",
+  "scope": "/",
+  "display": "standalone",
+  "display_override": ["standalone", "minimal-ui"],
+  "orientation": "any",
+  "background_color": "#09070a",
+  "theme_color": "#0b080c",
+  "categories": ["travel", "lifestyle", "social"],
+  "icons": [
+    {
+      "src": "/assets/images/girls-trip-guide-logo.webp",
+      "sizes": "any",
+      "type": "image/webp",
+      "purpose": "any"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Open your trips",
+      "short_name": "Your trips",
+      "url": "/create-trip?source=pwa-shortcut"
+    }
+  ]
+}
