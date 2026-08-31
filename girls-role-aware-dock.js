@@ -136,11 +136,14 @@ document.addEventListener('pointerdown',event=>{
   if(dock)dock.classList.remove('is-compact');
 },{capture:true,passive:true});
 
-const dockObserver=new MutationObserver(()=>{
-  clearTimeout(window.__gtgRoleDockTimer);
-  window.__gtgRoleDockTimer=setTimeout(normaliseDock,20);
-});
-dockObserver.observe(document.documentElement,{childList:true,subtree:true});
-window.addEventListener('popstate',()=>setTimeout(normaliseDock,40));
-setTimeout(()=>{normaliseDock();setCompact((window.scrollY||0)>100)},80);
+let normaliseQueued=false;
+function scheduleNormalise(delay=0){
+  if(normaliseQueued)return;normaliseQueued=true;
+  setTimeout(()=>{normaliseQueued=false;normaliseDock()},delay);
+}
+const app=document.getElementById('app');
+if(app)new MutationObserver(()=>scheduleNormalise(0)).observe(app,{childList:true});
+window.addEventListener('popstate',()=>scheduleNormalise(20));
+if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',()=>scheduleNormalise(0),{once:true});else scheduleNormalise(0);
+setTimeout(()=>setCompact((window.scrollY||0)>100),100);
 })();
