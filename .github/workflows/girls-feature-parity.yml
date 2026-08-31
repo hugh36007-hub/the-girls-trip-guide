@@ -35,6 +35,7 @@ jobs:
           node --check girls-trip-social.js
           node --check girls-chat-sheet.js
           node --check girls-product-parity.js
+          node --check girls-inner-page-polish.js
           node --check girls-document-audience.js
           node --check girls-hero-vault-ux.js
           node --check girls-hidden-upload-choice.js
