@@ -1,0 +1,49 @@
+# Reproducible Girls production function/storage configuration.
+# The project ref is supplied by deployment tooling; this file controls local/CLI behaviour.
+project_id = "the-girls-trip-guide"
+
+[storage]
+enabled = true
+file_size_limit = "500MiB"
+
+[storage.buckets.btg-documents]
+public = false
+file_size_limit = "25MiB"
+allowed_mime_types = ["application/pdf", "image/jpeg", "image/png", "image/webp", "image/heic", "image/heif"]
+
+[storage.buckets.btg-evidence]
+public = false
+file_size_limit = "500MiB"
+allowed_mime_types = ["image/jpeg", "image/png", "image/webp", "image/heic", "image/heif", "video/mp4", "video/quicktime", "video/webm"]
+
+[storage.buckets.btg-vault]
+public = false
+file_size_limit = "500MiB"
+allowed_mime_types = ["image/jpeg", "image/png", "image/webp", "image/heic", "image/heif", "video/mp4", "video/quicktime", "video/webm"]
+
+[functions.girls-auth-otp]
+verify_jwt = false
+
+[functions.girls-accept-invite]
+verify_jwt = false
+
+[functions.girls-process-communications]
+verify_jwt = false
+
+[functions.girls-email-send]
+verify_jwt = false
+
+[functions.girls-trip-email]
+verify_jwt = true
+
+[functions.girls-payment-nudge]
+verify_jwt = true
+
+[functions.girls-stripe-checkout]
+verify_jwt = true
+
+[functions.girls-contact-email]
+verify_jwt = false
+
+[functions.media-action]
+verify_jwt = true
