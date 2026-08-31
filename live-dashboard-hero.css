@@ -47,6 +47,15 @@
 .live-date-card{grid-area:dates;align-self:start;height:auto;padding:14px 16px}
 .live-date-card b{display:block;color:var(--live-accent);font-size:9px;letter-spacing:.17em;text-transform:uppercase}
 .live-date-card span{display:block;margin-top:9px;color:#fff;font-size:12px;line-height:1.5}
+/* Quiet skeletons keep the final geometry stable while photo/chat data arrives. */
+.live-data-loading i,.live-line{display:block;border-radius:999px;background:linear-gradient(90deg,rgba(255,255,255,.055),rgba(255,123,193,.14),rgba(255,255,255,.055));background-size:220% 100%;animation:live-shell-pulse 1.4s ease-in-out infinite}
+.live-data-loading i{width:58%;height:48%;border-radius:14px;opacity:.72}
+.live-line{width:100%;height:8px;margin:0 0 7px}.live-line-short{width:58px;margin:0}.live-line-mid{width:72%;margin-bottom:0}
+.live-message-loading .live-message-avatar{background:rgba(255,123,193,.08);border-color:rgba(255,123,193,.18)}
+.live-message-loading[data-live-chat-sync="1"] .live-message-avatar{background:transparent;border-color:rgba(255,123,193,.42)}
+.live-message-loading b{min-width:70px}.live-message-loading p{min-height:24px}
+@keyframes live-shell-pulse{0%,100%{background-position:0 0;opacity:.55}50%{background-position:100% 0;opacity:.9}}
+@media(prefers-reduced-motion:reduce){.live-data-loading i,.live-line{animation:none}}
 @media(max-width:700px){
   .hero-card.live-snapshot-hero{padding:16px!important;gap:12px 11px;grid-template-columns:minmax(0,1.12fr) minmax(0,.88fr)}
   .live-hero-title{padding:6px 2px 0 2px}
