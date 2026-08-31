@@ -3,11 +3,13 @@ import fs from 'node:fs';
 const js=fs.readFileSync('girls-hero-vault-ux.js','utf8');
 const chooser=fs.readFileSync('girls-hidden-upload-choice.js','utf8');
 const html=fs.readFileSync('create-trip.html','utf8');
+const loader=fs.readFileSync('girls-performance-loader.js','utf8');
 const uploadPolicy=fs.readFileSync('supabase/migrations/20260828210044_allow_hidden_gallery_upload_without_pin.sql','utf8');
 const returnPolicy=fs.readFileSync('supabase/migrations/20260828210203_allow_hidden_gallery_upload_return_without_view.sql','utf8');
 const checks=[
  ['hero script loaded',html.includes('/girls-hero-vault-ux.js?v=2')],
- ['hidden upload chooser loaded',html.includes('/girls-hidden-upload-choice.js?v=1')],
+ ['hidden upload chooser excluded from Home startup',!html.includes('/girls-hidden-upload-choice.js?v=1')],
+ ['hidden upload chooser retained by Evidence route',loader.includes('/girls-hidden-upload-choice.js?v=1')&&loader.includes("if(route==='evidence')await loadBundle('evidence')")],
  ['hero stylesheet loaded',html.includes('/girls-hero-vault-ux.css?v=1')],
  ['change hero control',js.includes('Change trip hero')],
  ['set hero wording',js.includes('Set as trip hero')],
