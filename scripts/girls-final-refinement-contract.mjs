@@ -43,6 +43,13 @@ for(const href of ['/mobile-viewport-lock.css?v=2','/girls-final-refinement.css?
   assert(html.includes(`rel=\"preload\" as=\"style\" href=\"${href}\"`),`missing Home-shell preload ${href}`);
   assert(critical.includes(href),`critical loader must activate ${href}`);
 }
+assert(critical.includes('/live-dashboard-hero.css?v=6'),'final Home stylesheet must be activated by the first private startup script');
+assert(critical.includes('/girls-live-dashboard-hero.js?v=6'),'final Home transformer must be registered before girls-app-v2 can render');
+assert(critical.includes("cloneNode(true)" )&&critical.includes('gtg-first-paint-cover'),'parsed private loading shell must remain as one stable paint cover during hydration');
+assert(critical.includes("hero.classList.contains('live-snapshot-hero')"),'paid overview cover must remain until the final Home shell exists');
+assert(critical.includes('requestAnimationFrame(()=>requestAnimationFrame'),'stable cover must release only after final layout settles across two frames');
+assert(!deferred.includes('installHomePaintGuard'),'deferred loader must not perform a second Home paint handoff');
+assert(!deferred.includes('girls-live-dashboard-hero'),'deferred loader must not trigger a late final-Home rewrite');
 for(const href of ['/girls-product-parity.css?v=1','/girls-inner-page-polish.css?v=1','/girls-document-audience.css?v=1']){
   assert(!html.includes(`rel=\"preload\" as=\"style\" href=\"${href}\"`),`route CSS must not preload on Home: ${href}`);
   assert(deferred.includes(href),`route loader must retain ${href}`);
@@ -99,4 +106,4 @@ assert(sw.includes("request.destination==='script'||request.destination==='style
 assert(headers.includes('/sw.js'),'service worker cache header missing');
 assert(headers.includes('Service-Worker-Allowed: /'),'service worker scope header missing');
 
-console.log('PASS Girls final refinement: compact shell, isolated Evidence geometry, route-lazy enhancements, bounded observers, inline critical CSS, early LCP primer, nonblocking auth/fonts and PWA contract');
+console.log('PASS Girls final refinement: one stable startup paint, compact shell, isolated Evidence geometry, route-lazy enhancements, bounded observers, inline critical CSS, early LCP primer, nonblocking auth/fonts and PWA contract');
