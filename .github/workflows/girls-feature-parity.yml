@@ -52,6 +52,7 @@ jobs:
           node --check girls-media-flow-refinement.js
           node --check girls-poll-nudge.js
           node --check girls-critical-style-loader.js
+          node --check girls-supabase-auth-bridge.js
           node --check girls-performance-loader.js
           node --check girls-pwa-register.js
           node --check sw.js
