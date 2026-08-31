@@ -19,7 +19,7 @@ const GALS={
  lola:{name:'Lola',role:'The Chaos Agent',img:'lola.webp',sample:'Three days to go. Statistically, this is still organised.'},
  seb:{name:'Seb',role:'The Hammer',img:'seb.webp',sample:'Grace asked. Ava itemised. I’m the third reminder.'}
 };
-const state={client:null,user:null,trip:null,members:[],bookings:[],documents:[],expenses:[],expensePeople:[],requests:[],requestPeople:[],entitlements:[],settings:null,messages:[],media:[],paid:false,owner:false,ready:false,lastTripId:null};
+const state={client:null,user:null,trip:null,members:[],bookings:[],documents:[],expenses:[],expensePeople:[],requests:[],requestPeople:[],entitlements:[],settings:null,messages:[],media:[],mediaCount:0,paid:false,owner:false,ready:false,lastTripId:null};
 let refreshTimer=0;
 const esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]||c));
 const money=v=>new Intl.NumberFormat('en-GB',{style:'currency',currency:'GBP'}).format(Number(v||0));
@@ -43,6 +43,7 @@ async function load(){
  try{
   const {data:{user}}=await client.auth.getUser();if(!user)return false;
   state.user=user;
+  const mediaLimit=tab()==='evidence'?250:18;
   const qs=await Promise.all([
    client.from('trips').select('*').eq('id',id).eq('product_key','girls').maybeSingle(),
    client.from('trip_members').select('*').eq('trip_id',id).order('created_at'),
@@ -55,11 +56,11 @@ async function load(){
    client.from('trip_entitlements').select('*').eq('trip_id',id).eq('active',true),
    client.from('communication_settings').select('*').eq('trip_id',id).maybeSingle(),
    client.from('trip_messages').select('*').eq('trip_id',id).order('created_at',{ascending:false}).limit(50),
-   client.from('media').select('id,album,mime_type,created_at,created_by').eq('trip_id',id).eq('album','evidence').order('created_at',{ascending:false}).limit(250)
+   client.from('media').select('id,album,mime_type,created_at,created_by',{count:'exact'}).eq('trip_id',id).eq('album','evidence').order('created_at',{ascending:false}).limit(mediaLimit)
   ]);
   if(qs[0].error||!qs[0].data)return false;
   const [t,m,b,d,e,ep,r,rp,en,set,msg,media]=qs;
-  Object.assign(state,{trip:t.data,members:m.data||[],bookings:b.data||[],documents:d.data||[],expenses:e.data||[],expensePeople:ep.data||[],requests:r.data||[],requestPeople:rp.data||[],entitlements:en.data||[],settings:set.data||null,messages:msg.data||[],media:media.data||[]});
+  Object.assign(state,{trip:t.data,members:m.data||[],bookings:b.data||[],documents:d.data||[],expenses:e.data||[],expensePeople:ep.data||[],requests:r.data||[],requestPeople:rp.data||[],entitlements:en.data||[],settings:set.data||null,messages:msg.data||[],media:media.data||[],mediaCount:Number(media.count??(media.data||[]).length)});
   state.paid=state.entitlements.some(x=>x.active!==false&&['full_trip','evidence','full_comms'].includes(x.entitlement));
   state.owner=state.trip.owner_id===state.user.id;state.ready=true;state.lastTripId=id;
   return true;
@@ -81,7 +82,7 @@ function overview(){
   <article class="card gtg-overview-card"><div class="eyebrow">Trip overview</div><h2>${next?'Next on the plan':'Ready when you are'}</h2><p>${next?`${esc(bookingLabel(next))}${bookingDate(next)?` · ${fmt(bookingDate(next))}`:''}`:'Add the first booking and keep the useful version in one place.'}</p><div class="gtg-inline-actions"><button class="btn" data-parity-go="plan">Open plan</button>${state.owner?'<button class="btn" data-parity-existing="addBooking">Add first item</button>':''}</div></article>
   <article class="card gtg-overview-card"><div class="eyebrow">State of affairs</div><h2>${dueRequests()} outstanding</h2><p>${money(totalRecorded())} recorded across bookings and expenses.</p><div class="gtg-inline-actions"><button class="btn" data-parity-go="money">Open money</button></div></article>
  </div>
- <div class="gtg-overview-strip"><span><b>${confirmedCount()}/${state.members.length}</b><small>Group confirmed</small></span><span><b>${pending}</b><small>Invites pending</small></span><span><b>${passportCount()}/${state.members.length}</b><small>Passports checked</small></span><span><b>${state.media.length}</b><small>Evidence</small></span></div>
+ <div class="gtg-overview-strip"><span><b>${confirmedCount()}/${state.members.length}</b><small>Group confirmed</small></span><span><b>${pending}</b><small>Invites pending</small></span><span><b>${passportCount()}/${state.members.length}</b><small>Passports checked</small></span><span><b>${state.mediaCount}</b><small>Evidence</small></span></div>
  ${state.owner&&!state.bookings.length&&!state.documents.length?`<aside class="gtg-get-started"><div><span class="eyebrow">Getting started</span><b>Start with the group, then add what is booked.</b><small>Keep travel, stays, documents and costs together.</small></div><button class="btn primary" data-parity-go="group">Open the group</button></aside>`:''}
  ${state.paid&&state.owner?messagePanel():state.paid&&!state.owner?memberOverview():''}`;
  if(anchor)anchor.insertAdjacentElement('afterend',block);else dashboard.prepend(block)
@@ -109,7 +110,7 @@ function groupEnhance(){
  if(tab()!=='group')return;const root=sectionRoot();if(!root)return;
  const pending=Math.max(0,state.members.length-confirmedCount());
  const block=document.createElement('section');block.dataset.parityBlock='group';block.className='gtg-group-summary';
- block.innerHTML=`<div class="gtg-overview-strip"><span><b>${confirmedCount()}/${state.members.length}</b><small>Confirmed</small></span><span><b>${pending}</b><small>Invites pending</small></span><span><b>${passportCount()}/${state.members.length}</b><small>Passports checked</small></span><span><b>${state.paid?state.media.length:'—'}</b><small>Uploads</small></span></div>${state.owner?'<div class="gtg-plan-tools"><button class="btn primary" data-parity-existing="invite">+ Invite</button>'+ (state.paid?'<button class="btn" data-parity-comms>GALS communications</button>':'<button class="btn" data-parity-reminders>Trip reminders</button>')+'</div>':`<article class="card gtg-readonly"><div class="eyebrow">Member view</div><b>Read only</b><p>The organiser controls names, passports, invitations and official trip details.</p></article>`}`;
+ block.innerHTML=`<div class="gtg-overview-strip"><span><b>${confirmedCount()}/${state.members.length}</b><small>Confirmed</small></span><span><b>${pending}</b><small>Invites pending</small></span><span><b>${passportCount()}/${state.members.length}</b><small>Passports checked</small></span><span><b>${state.paid?state.mediaCount:'—'}</b><small>Uploads</small></span></div>${state.owner?'<div class="gtg-plan-tools"><button class="btn primary" data-parity-existing="invite">+ Invite</button>'+ (state.paid?'<button class="btn" data-parity-comms>GALS communications</button>':'<button class="btn" data-parity-reminders>Trip reminders</button>')+'</div>':`<article class="card gtg-readonly"><div class="eyebrow">Member view</div><b>Read only</b><p>The organiser controls names, passports, invitations and official trip details.</p></article>`}`;
  root.prepend(block)
 }
 
@@ -127,7 +128,7 @@ function dockBadges(){
  dock.querySelectorAll('.gtg-dock-badge').forEach(x=>x.remove());
  const moneyBtn=dock.querySelector('[data-tab="money"]'),evidenceBtn=dock.querySelector('[data-tab="evidence"]'),groupBtn=dock.querySelector('[data-tab="group"]');
  const add=(btn,n,label='')=>{if(!btn||!n)return;const b=document.createElement('span');b.className='gtg-dock-badge';b.textContent=n>99?'99+':String(n);b.title=label;btn.appendChild(b)};
- add(moneyBtn,dueRequests(),'Outstanding payments');add(evidenceBtn,state.paid?state.media.length:0,'Evidence');add(groupBtn,Math.max(0,state.members.length-confirmedCount()),'Pending invitations')
+ add(moneyBtn,dueRequests(),'Outstanding payments');add(evidenceBtn,state.paid?state.mediaCount:0,'Evidence');add(groupBtn,Math.max(0,state.members.length-confirmedCount()),'Pending invitations')
 }
 
 function drawerEntitlements(){
