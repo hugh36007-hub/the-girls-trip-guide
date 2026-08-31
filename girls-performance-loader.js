@@ -1,4 +1,4 @@
-/* Girls performance: route-aware loading for noncritical enhancements. */
+/* Girls performance: keep the Home shell critical; defer only noncritical enhancements. */
 (()=>{
 'use strict';
 if(window.__GTG_PERFORMANCE_LOADER__)return;window.__GTG_PERFORMANCE_LOADER__=true;
@@ -26,13 +26,13 @@ const BUNDLES={
   ],
   drawer:['/girls-free-entitlement-guard.js?v=1'],
   home:['/girls-home-thumbnail-prime.js?v=1'],
-  hero:['/girls-live-dashboard-hero.js?v=4','/girls-live-chat-sync.js?v=2'],
+  hero:['/girls-live-dashboard-hero.js?v=5','/girls-live-chat-sync.js?v=2'],
   upload:['https://cdn.jsdelivr.net/npm/tus-js-client@4.3.1/dist/tus.min.js']
 };
 const STYLES={
   shell:['/girls-section-layout.css?v=1','/girls-product-parity.css?v=1','/girls-inner-page-polish.css?v=1'],
   plan:['/girls-document-audience.css?v=1'],
-  hero:['/live-dashboard-hero.css?v=4']
+  hero:['/live-dashboard-hero.css?v=5']
 };
 const loaded=new Set(),pending=new Map(),loadedStyles=new Set(),pendingStyles=new Map();
 const visible=()=>document.visibilityState!=='hidden';
@@ -63,9 +63,22 @@ async function loadRoute(route){
  if(route==='group')await loadBundle('group');
  if(route==='evidence')await loadBundle('evidence');
 }
+function installHomePaintGuard(){
+ if(document.getElementById('gtg-home-first-paint-css'))return;
+ const style=document.createElement('style');style.id='gtg-home-first-paint-css';style.textContent=`
+.dashboard .hero-card.gtg-live-pending:not(.live-snapshot-hero){background:radial-gradient(ellipse at 88% 2%,rgba(255,79,163,.12),transparent 38%),linear-gradient(145deg,#171017,#080608)!important;border-color:rgba(255,123,193,.26)!important;overflow:hidden!important}
+.dashboard .hero-card.gtg-live-pending:not(.live-snapshot-hero)>*{visibility:hidden!important}
+.dashboard .hero-card.gtg-live-pending:not(.live-snapshot-hero):after{display:none!important}
+.dashboard .hero-card.gtg-live-pending:not(.live-snapshot-hero):before{content:"";position:absolute;inset:20px;z-index:5;border-radius:16px;background:linear-gradient(90deg,rgba(255,123,193,.18),rgba(255,123,193,.06)) 0 8px/42% 12px no-repeat,linear-gradient(90deg,rgba(255,255,255,.11),rgba(255,255,255,.045)) 0 43px/54% 54px no-repeat,linear-gradient(90deg,rgba(255,255,255,.08),rgba(255,255,255,.035)) 0 116px/46% 13px no-repeat,linear-gradient(145deg,rgba(255,255,255,.06),rgba(255,255,255,.02)) 62% 0/38% 44% no-repeat,linear-gradient(145deg,rgba(255,255,255,.055),rgba(255,255,255,.018)) 0 72%/54% 28% no-repeat,linear-gradient(145deg,rgba(255,255,255,.055),rgba(255,255,255,.018)) 64% 72%/36% 28% no-repeat;pointer-events:none}
+`;
+ document.head.appendChild(style);
+ const claim=()=>{const hero=document.querySelector('.dashboard .hero-card');if(!hero||hero.classList.contains('live-snapshot-hero'))return;const paid=[...hero.querySelectorAll('.eyebrow')].some(x=>/full trip/i.test(x.textContent||''));if(paid&&action()==='overview')hero.classList.add('gtg-live-pending')};
+ claim();const app=document.getElementById('app')||document.body;new MutationObserver(claim).observe(app,{childList:true,subtree:true});
+}
 
-/* Start fetching the live hero CSS while the secure dashboard data is still loading. */
-void loadStyle('/live-dashboard-hero.css?v=4');
+/* The current Home shell starts loading before the secure dashboard has finished hydrating. */
+installHomePaintGuard();
+void loadBundle('hero');
 
 function afterDashboard(callback,delay=0){
  const run=()=>setTimeout(()=>{if(visible())callback()},delay);
@@ -76,7 +89,6 @@ function afterDashboard(callback,delay=0){
 }
 function scheduleInitial(){
  const route=action();
- afterDashboard(()=>void loadBundle('hero'),0);
  if(route!=='overview')afterDashboard(()=>void loadRoute(route),0);
  if(route==='group'||route==='evidence'||route==='plan'||route==='money')afterDashboard(()=>idle(()=>void loadBundle('parity')),600);
  if(route==='overview')afterDashboard(()=>setTimeout(()=>{if(visible()&&action()==='overview')idle(()=>void loadBundle('home'))},15000),0);
@@ -85,7 +97,6 @@ function scheduleInitial(){
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',scheduleInitial,{once:true});else scheduleInitial();
 window.addEventListener('popstate',()=>{const route=action();void loadBundle('hero');void loadRoute(route);if(route!=='overview')idle(()=>void loadBundle('parity'))});
 
-/* User intent always wins over background scheduling. */
 document.addEventListener('pointerdown',event=>{
  const target=event.target.closest?.('[data-tab],[data-a],[data-action],[data-trip-social-tab],[data-parity-comms],[data-role-expense],[data-role-upload]');if(!target)return;
  const tab=target.dataset.tab||'';const a=target.dataset.a||target.dataset.action||'';
@@ -98,7 +109,6 @@ document.addEventListener('pointerdown',event=>{
  if(tab==='group'||target.matches('[data-trip-social-tab],[data-parity-comms]'))void loadRoute('group');
 },{capture:true,passive:true});
 
-/* Home parity content is below the critical viewport. Load it only when the user actually explores Home. */
 let homeIntent=false;
 function loadHomeIntent(){if(homeIntent||action()!=='overview')return;homeIntent=true;void loadBundle('parity')}
 window.addEventListener('scroll',()=>{if((window.scrollY||0)>40)loadHomeIntent()},{passive:true});
