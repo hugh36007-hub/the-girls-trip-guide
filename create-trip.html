@@ -17,8 +17,9 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
 <link rel="preconnect" href="https://vtcmvwixfqyxqghibsla.supabase.co" crossorigin>
-<link rel="preconnect" href="https://vtcmvwixfqyxqghibsla.storage.supabase.co" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700;800;900&family=Caveat:wght@600;700&family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<link rel="preload" as="image" href="/assets/images/hero.webp" type="image/webp" fetchpriority="high">
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700;800;900&family=Caveat:wght@600;700&family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
+<noscript><link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700;800;900&family=Caveat:wght@600;700&family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet"></noscript>
 <link rel="stylesheet" href="/girls-app.css?v=1">
 <link rel="preload" as="style" href="/mobile-viewport-lock.css?v=2">
 <link rel="preload" as="style" href="/girls-action-feedback.css?v=1">
@@ -37,25 +38,8 @@
 <div id="modalRoot" class="modal-wrap"></div>
 <div id="toast" class="toast" aria-live="polite"></div>
 <noscript><main class="auth-screen"><section class="auth-card"><h1>JavaScript required</h1><p>The private trip app needs JavaScript enabled.</p></section></main></noscript>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.112.4"></script>
-<script>
-if(window.supabase?.createClient){
-  const originalCreateClient=window.supabase.createClient.bind(window.supabase);
-  window.supabase.createClient=(...args)=>{
-    const client=originalCreateClient(...args);
-    client.auth.signInWithOtp=async({email})=>{
-      try{
-        const res=await fetch('https://vtcmvwixfqyxqghibsla.supabase.co/functions/v1/girls-auth-otp',{method:'POST',body:JSON.stringify({email})});
-        const out=await res.json().catch(()=>({}));
-        if(!res.ok)return {data:{user:null,session:null},error:{message:out.error||'Could not send sign-in code.'}};
-        return {data:{user:null,session:null},error:null};
-      }catch(error){return {data:{user:null,session:null},error:{message:error?.message||'Could not send sign-in code.'}};}
-    };
-    return client;
-  };
-}
-</script>
-<script defer src="https://cdn.jsdelivr.net/npm/tus-js-client@4.3.1/dist/tus.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.112.4"></script>
+<script defer src="/girls-supabase-auth-bridge.js?v=1"></script>
 <script defer src="/girls-action-feedback.js?v=1"></script>
 <script defer src="/girls-app-v2.js?v=1"></script>
 <script defer src="/girls-session-guard.js?v=1"></script>
@@ -63,7 +47,6 @@ if(window.supabase?.createClient){
 <script defer src="/girls-vault-contract-fix.js?v=1"></script>
 <script defer src="/girls-section-layout.js?v=1"></script>
 <script defer src="/girls-free-entitlement-guard.js?v=1"></script>
-<script defer src="/girls-product-parity.js?v=1"></script>
 <script defer src="/girls-inner-page-polish.js?v=1"></script>
 <script defer src="/girls-document-audience.js?v=1"></script>
 <script defer src="/girls-hero-vault-ux.js?v=2"></script>
