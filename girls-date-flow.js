@@ -90,3 +90,5 @@ window.addEventListener('pageshow',syncActiveForms);
 installStyles();
 setTimeout(syncActiveForms,0);
 })();
+
+(()=>{'use strict';if(document.querySelector('script[data-live-dashboard-loader="girls"]'))return;const script=document.createElement('script');script.src='/girls-live-dashboard-hero.js?v=4';script.async=false;script.dataset.liveDashboardLoader='girls';document.head.append(script)})();
