@@ -60,14 +60,40 @@ Deno.serve(async (req: Request) => {
 
     if (action === "permanent-delete") {
       if (!trip || trip.owner_id !== user.id) return json({ error: "Album owner required" }, 403);
-      if (media.visibility_state !== "removed_pending_owner") return json({ error: "Remove the media from the group before permanently deleting it" }, 409);
+      if (!["removed_pending_owner", "deleting"].includes(String(media.visibility_state))) {
+        return json({ error: "Remove the media from the group before permanently deleting it" }, 409);
+      }
+
+      // Two-phase, retry-safe deletion. Mark the row first so a storage success followed
+      // by a database failure cannot leave a normal visible record pointing at missing files.
+      let markedThisAttempt = false;
+      if (media.visibility_state !== "deleting") {
+        const { data: marked, error: markError } = await admin.from("media")
+          .update({ visibility_state: "deleting" })
+          .eq("id", media.id)
+          .eq("visibility_state", "removed_pending_owner")
+          .select("id")
+          .maybeSingle();
+        if (markError) throw markError;
+        if (!marked) return json({ error: "Media deletion state changed. Please retry." }, 409);
+        markedThisAttempt = true;
+      }
+
       const bucket = media.album === "vault" ? "btg-vault" : "btg-evidence";
       const paths = [media.storage_path, media.thumbnail_path].filter(Boolean) as string[];
       if (paths.length) {
-        const { error } = await admin.storage.from(bucket).remove(paths);
-        if (error) throw error;
+        const { error: storageError } = await admin.storage.from(bucket).remove(paths);
+        if (storageError) {
+          if (markedThisAttempt) {
+            await admin.from("media").update({ visibility_state: "removed_pending_owner" }).eq("id", media.id).eq("visibility_state", "deleting");
+          }
+          throw storageError;
+        }
       }
-      const { error: deleteError } = await admin.from("media").delete().eq("id", media.id);
+
+      // If this final delete fails, leave visibility_state='deleting'. A repeat call is
+      // explicitly accepted above and can safely finish the database deletion.
+      const { error: deleteError } = await admin.from("media").delete().eq("id", media.id).eq("visibility_state", "deleting");
       if (deleteError) throw deleteError;
       return json({ ok: true, deleted: media.id });
     }
