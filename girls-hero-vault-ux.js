@@ -3,7 +3,7 @@
 
 const SUPABASE_URL='https://vtcmvwixfqyxqghibsla.supabase.co';
 const SUPABASE_KEY='sb_publishable_qBQzJjFxSToEGxPJEcmskg_GNd4M4cP';
-let client=null;
+let client=null,enhanceQueued=false;
 const db=()=>client||(client=window.supabase?.createClient(SUPABASE_URL,SUPABASE_KEY,{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true}}));
 const tripId=()=>new URL(location.href).searchParams.get('trip_id')||'';
 const toast=msg=>{const el=document.getElementById('toast');if(!el)return;el.textContent=msg;el.classList.add('show');setTimeout(()=>el.classList.remove('show'),2800)};
@@ -18,6 +18,14 @@ async function state(){
  if(!user||!trip)return null;
  const paid=trip.plan==='full'||(entitlements||[]).some(x=>x.active!==false&&['full_trip','evidence','vault','full_comms'].includes(x.entitlement));
  return {q,user,trip,paid,owner:trip.owner_id===user.id};
+}
+
+function domState(){
+ const hero=document.querySelector('.dashboard .hero-card');
+ if(!hero)return null;
+ const paid=[...hero.querySelectorAll('.eyebrow')].some(x=>/full trip/i.test(x.textContent||''));
+ const owner=Boolean(document.querySelector('[data-panel="money"] [data-a="addExpense"], [data-panel="plan"] [data-a="addBooking"], [data-a="editTrip"]'));
+ return {paid,owner};
 }
 
 function enhanceHeroControls(s){
@@ -54,6 +62,15 @@ function hardenVaultButton(s){
    gallery.insertAdjacentElement('beforebegin',note);
   }
  }
+}
+
+function enhanceFromDom(){
+ const s=domState();if(!s)return;
+ enhanceHeroControls(s);hardenVaultButton(s);
+}
+function scheduleEnhance(){
+ if(enhanceQueued)return;enhanceQueued=true;
+ requestAnimationFrame(()=>{enhanceQueued=false;enhanceFromDom()});
 }
 
 async function serverVaultUnlocked(q,id){
@@ -106,11 +123,9 @@ function interceptVaultRender(){
  },true);
 }
 
-async function enhance(){try{const s=await state();enhanceHeroControls(s);hardenVaultButton(s)}catch{}}
-
 interceptVaultRender();
-const observer=new MutationObserver(()=>{clearTimeout(window.__gtgHeroVaultTimer);window.__gtgHeroVaultTimer=setTimeout(enhance,40)});
-observer.observe(document.documentElement,{childList:true,subtree:true});
-window.addEventListener('popstate',()=>setTimeout(enhance,80));
-setTimeout(enhance,150);
+const app=document.getElementById('app');
+if(app)new MutationObserver(scheduleEnhance).observe(app,{childList:true});
+window.addEventListener('popstate',()=>setTimeout(scheduleEnhance,0));
+if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',scheduleEnhance,{once:true});else scheduleEnhance();
 })();
