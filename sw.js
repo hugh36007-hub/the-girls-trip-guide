@@ -1,7 +1,7 @@
-const CACHE_VERSION='gtg-pwa-v1';
+const CACHE_VERSION='gtg-pwa-v2';
 const STATIC_CACHE=`${CACHE_VERSION}-static`;
 const PAGE_CACHE=`${CACHE_VERSION}-pages`;
-const APP_SHELL=['/create-trip','/create-trip.html','/manifest.webmanifest','/assets/images/girls-trip-guide-logo.webp'];
+const APP_SHELL=['/create-trip','/create-trip.html','/manifest.webmanifest','/assets/images/gtg-pwa-192.svg?v=1','/assets/images/girls-trip-guide-logo.webp'];
 
 self.addEventListener('install',event=>{
  event.waitUntil(caches.open(STATIC_CACHE).then(cache=>cache.addAll(APP_SHELL)));
