@@ -18,8 +18,8 @@ async function loadSnapshot(tripId){
   let [tripRes,mediaRes,msgRes,membersRes,userRes]=await Promise.all([
     q.from('trips').select('id,name,start_date,end_date,owner_id').eq('id',tripId).eq('product_key','girls').single(),
     getMedia(),
-    q.from('trip_messages').select('message,created_at,sender_user_id').eq('trip_id',tripId).order('created_at',{ascending:false}).limit(1),
-    q.from('trip_members').select('name,user_id').eq('trip_id',tripId),
+    q.from('trip_messages').select('message,created_at,sender_user_id,recipient_member_id').eq('trip_id',tripId).order('created_at',{ascending:false}).limit(1),
+    q.from('trip_members').select('id,name,user_id').eq('trip_id',tripId),
     q.auth.getUser()
   ]);
   if(tripRes.error)return null;
@@ -30,12 +30,19 @@ async function loadSnapshot(tripId){
     const {data}=await q.storage.from('btg-evidence').createSignedUrl(path,1800);if(data?.signedUrl)urls.push(data.signedUrl);
   }
   const latest=msgRes.data?.[0]||null,members=membersRes.data||[],sender=latest?members.find(m=>m.user_id===latest.sender_user_id):null;
-  return {trip:tripRes.data,urls,message:latest?{text:latest.message,at:latest.created_at,from:sender?.name||'Organiser'}:null,memberCount:members.length,isOwner:userRes.data?.user?.id===tripRes.data.owner_id};
+  return {trip:tripRes.data,urls,message:latest?{text:latest.message,at:latest.created_at,from:sender?.name||'Organiser',to:latest.recipient_member_id||''}:null,members,memberCount:members.length,isOwner:userRes.data?.user?.id===tripRes.data.owner_id};
 }
-function openMessages(){
-  const proxy=document.createElement('button');
-  proxy.type='button';proxy.dataset.a='messageCrew';proxy.hidden=true;
-  document.body.appendChild(proxy);proxy.click();proxy.remove();
+async function openMessages(snap){
+  if(!snap?.message){const proxy=document.createElement('button');proxy.type='button';proxy.dataset.a='messageCrew';proxy.hidden=true;document.body.appendChild(proxy);proxy.click();proxy.remove();return;}
+  const q=db(),recipient=snap.message.to||'';
+  let query=q.from('trip_messages').select('message,created_at,sender_user_id,recipient_member_id').eq('trip_id',snap.trip.id).order('created_at',{ascending:true}).limit(100);
+  query=recipient?query.eq('recipient_member_id',recipient):query.is('recipient_member_id',null);
+  const {data,error}=await query;if(error)return;
+  const label=recipient?(snap.members.find(m=>m.id===recipient)?.name||'Group member'):'Whole group';
+  const rows=(data||[]).map(row=>{const sender=snap.members.find(m=>m.user_id===row.sender_user_id)?.name||'Organiser';return `<div class="money-row"><div><b>${esc(sender)}</b><div style="font-size:11px;color:var(--muted);margin-top:4px;line-height:1.45">${esc(row.message)}</div><div style="font-size:9px;color:var(--muted);margin-top:5px">${esc(new Date(row.created_at).toLocaleString('en-GB',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'}))}</div></div></div>`}).join('')||'<div class="empty">No messages in this conversation yet.</div>';
+  const root=document.getElementById('modalRoot');if(!root)return;
+  root.innerHTML=`<div class="modal"><h2>${esc(label)}</h2><div class="card" style="max-height:42vh;overflow:auto;margin:14px 0"><div class="eyebrow">Conversation</div>${rows}</div><form id="messageForm" class="form"><input type="hidden" name="recipient" value="${esc(recipient)}"><div class="field"><label>Message</label><textarea name="message" required maxlength="500" placeholder="Write a message…"></textarea></div><div class="modal-actions"><button type="button" class="btn" data-a="close">Close</button><button class="btn primary">Send</button></div></form></div>`;
+  root.classList.add('open');
 }
 async function mount(){
   if(mountBusy)return;
@@ -58,9 +65,9 @@ async function mount(){
     hero.appendChild(photo);
     const msg=document.createElement('div');msg.className='live-message-card';msg.innerHTML=`<div class="live-hero-label"><span>Latest message</span></div><div class="live-message-meta"><span class="live-message-avatar">${esc((snap.message?.from||'T').slice(0,1).toUpperCase())}</span><b>${esc(snap.message?.from||'Trip')}</b><time>${esc(snap.message?relativeTime(snap.message.at):'')}</time></div><p>${esc(snap.message?.text||'No trip messages yet.')}</p>`;
     if(snap.isOwner){
-      msg.setAttribute('role','button');msg.setAttribute('tabindex','0');msg.setAttribute('aria-label','Open messages');
-      msg.addEventListener('click',openMessages);
-      msg.addEventListener('keydown',event=>{if(event.key==='Enter'||event.key===' '){event.preventDefault();openMessages()}});
+      msg.setAttribute('role','button');msg.setAttribute('tabindex','0');msg.setAttribute('aria-label',snap.message?'Open this conversation':'Start a message');
+      msg.addEventListener('click',()=>void openMessages(snap));
+      msg.addEventListener('keydown',event=>{if(event.key==='Enter'||event.key===' '){event.preventDefault();void openMessages(snap)}});
     }
     hero.appendChild(msg);
     const dates=document.createElement('div');dates.className='live-date-card';dates.innerHTML=`<b>Trip dates</b><span>${fmt(snap.trip.start_date)}<br>${fmt(snap.trip.end_date)}</span>`;hero.appendChild(dates);
