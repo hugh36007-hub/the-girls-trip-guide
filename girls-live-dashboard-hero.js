@@ -4,7 +4,7 @@
 if(!document.querySelector('link[data-live-dashboard-hero]')){const link=document.createElement('link');link.rel='stylesheet';link.href='/live-dashboard-hero.css?v=3';link.dataset.liveDashboardHero='1';document.head.appendChild(link)}
 const URL='https://vtcmvwixfqyxqghibsla.supabase.co';
 const KEY='sb_publishable_qBQzJjFxSToEGxPJEcmskg_GNd4M4cP';
-let client=null,rotateTimer=0,mountToken=0,mountBusy=false;
+let client=null,rotateTimer=0,mountToken=0,mountBusy=false,mountQueued=false;
 const esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]||c));
 const fmt=v=>v?new Date(`${String(v).slice(0,10)}T12:00:00`).toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'}):'TBC';
 const relativeTime=value=>{const ms=Date.now()-new Date(value||0).getTime();if(!Number.isFinite(ms)||ms<0)return'';const m=Math.floor(ms/60000);if(m<1)return'now';if(m<60)return`${m}m ago`;const h=Math.floor(m/60);if(h<24)return`${h}h ago`;return`${Math.floor(h/24)}d ago`};
@@ -44,19 +44,24 @@ async function openMessages(snap){
   root.innerHTML=`<div class="modal"><h2>${esc(label)}</h2><div class="card" style="max-height:42vh;overflow:auto;margin:14px 0"><div class="eyebrow">Conversation</div>${rows}</div><form id="messageForm" class="form"><input type="hidden" name="recipient" value="${esc(recipient)}"><div class="field"><label>Message</label><textarea name="message" required maxlength="500" placeholder="Write a message…"></textarea></div><div class="modal-actions"><button type="button" class="btn" data-a="close">Close</button><button class="btn primary">Send</button></div></form></div>`;
   root.classList.add('open');
 }
+function requestMount(){
+  if(mountBusy){mountQueued=true;return;}
+  queueMicrotask(()=>void mount());
+}
 async function mount(){
-  if(mountBusy)return;
+  if(mountBusy){mountQueued=true;return;}
   const hero=document.querySelector('.dashboard .hero-card');
   if(!hero||hero.dataset.liveSnapshot==='1')return;
   const paid=[...hero.querySelectorAll('.eyebrow')].some(x=>/full trip/i.test(x.textContent||''));if(!paid)return;
   const tripId=new URL(location.href).searchParams.get('trip_id');if(!tripId)return;
   const titleSource=hero.querySelector('.hero-meta>div:first-child');if(!titleSource)return;
-  mountBusy=true;
+  mountBusy=true;mountQueued=false;
   const token=++mountToken;
   try{
-    const snap=await loadSnapshot(tripId).catch(()=>null);if(!snap||token!==mountToken||!hero.isConnected)return;
+    const snap=await loadSnapshot(tripId).catch(()=>null);if(!snap)return;
+    if(token!==mountToken||!hero.isConnected){mountQueued=true;return;}
     if(snap.urls[0])await preload(snap.urls[0]);
-    if(token!==mountToken||!hero.isConnected)return;
+    if(token!==mountToken||!hero.isConnected){mountQueued=true;return;}
     const title=titleSource.cloneNode(true);title.className='live-hero-title';const eyebrow=title.querySelector('.eyebrow');if(eyebrow)eyebrow.textContent='FOR THE RECORD';
     const subtitle=title.querySelector('p');if(subtitle)subtitle.textContent=`${snap.trip.name} · ${snap.memberCount} crew`;
     hero.classList.add('live-snapshot-hero');hero.dataset.liveSnapshot='1';hero.innerHTML='';hero.appendChild(title);
@@ -72,7 +77,10 @@ async function mount(){
     hero.appendChild(msg);
     const dates=document.createElement('div');dates.className='live-date-card';dates.innerHTML=`<b>Trip dates</b><span>${fmt(snap.trip.start_date)}<br>${fmt(snap.trip.end_date)}</span>`;hero.appendChild(dates);
     clearInterval(rotateTimer);if(snap.urls.length>1){let i=0;rotateTimer=setInterval(()=>{const img=hero.querySelector('.live-photo-open img');if(!img||!hero.isConnected){clearInterval(rotateTimer);return}i=(i+1)%snap.urls.length;img.src=snap.urls[i]},6000)}
-  }finally{mountBusy=false;}
+  }finally{
+    mountBusy=false;
+    if(mountQueued){mountQueued=false;setTimeout(requestMount,0)}
+  }
 }
-const observer=new MutationObserver(()=>queueMicrotask(()=>void mount()));observer.observe(document.getElementById('app')||document.body,{childList:true,subtree:true});queueMicrotask(()=>void mount());
+const observer=new MutationObserver(requestMount);observer.observe(document.getElementById('app')||document.body,{childList:true,subtree:true});requestMount();
 })();
