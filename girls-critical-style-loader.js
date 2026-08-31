@@ -1,4 +1,4 @@
-/* Girls performance: start refinement CSS early without adding parser-blocking stylesheets. */
+/* Girls performance: load only styles required by the initial private-app shell. */
 (()=>{
 'use strict';
 if(window.__GTG_CRITICAL_STYLE_LOADER__)return;window.__GTG_CRITICAL_STYLE_LOADER__=true;
@@ -6,12 +6,8 @@ const styles=[
  '/mobile-viewport-lock.css?v=2',
  '/girls-action-feedback.css?v=1',
  '/girls-drawer-fix.css?v=1',
- '/girls-section-layout.css?v=1',
- '/girls-product-parity.css?v=1',
- '/girls-document-audience.css?v=1',
  '/girls-hero-vault-ux.css?v=1',
- '/girls-final-refinement.css?v=1',
- '/girls-inner-page-polish.css?v=1'
+ '/girls-final-refinement.css?v=1'
 ];
 for(const href of styles){
  if(document.querySelector(`link[rel="stylesheet"][href="${href}"]`))continue;
