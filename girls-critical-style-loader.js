@@ -18,9 +18,10 @@ for(const href of styles){
 }
 
 function loadFinalHome(){
- const src='/girls-live-dashboard-hero.js?v=6';
- if(document.querySelector(`script[src="${src}"]`))return;
- const script=document.createElement('script');script.src=src;script.async=false;script.dataset.gtgCriticalHome='1';document.head.appendChild(script);
+ for(const src of ['/girls-live-dashboard-hero.js?v=6','/girls-live-chat-sync.js?v=3']){
+   if(document.querySelector(`script[src="${src}"]`))continue;
+   const script=document.createElement('script');script.src=src;script.async=false;script.dataset.gtgCriticalHome='1';document.head.appendChild(script);
+ }
 }
 
 function installStablePaintCover(){
