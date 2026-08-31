@@ -19,6 +19,9 @@ assert(scheduled.includes(".in('status',['girls_ready','girls_scheduled','girls_
 assert(scheduled.includes("status:'girls_scheduled'"),'Girls quiet-hours rescheduling must remain isolated');
 assert(scheduled.includes("idempotencyKey:`gtg-${row.id}-${r.id}`"),'Scheduled Girls email idempotency key changed');
 assert(scheduled.includes("in('entitlement',['full_trip','full_comms'])"),'Girls Free/Full communications entitlement check changed');
+assert(scheduled.includes('20*60*60*1000'),'Girls optional-message 20-hour rate limit missing');
+assert(scheduled.includes("reason:'Held by optional-message rate limit'"),'Girls optional-message reschedule reason missing');
+assert(scheduled.includes(".eq('essential',false).gte('sent_at',cutoff)"),'Girls optional-message rate-limit query changed');
 
 assert(invite.includes("trip.product_key!=='girls'"),'Invitation sender must reject non-Girls trips');
 assert(invite.includes("idempotencyKey:`gtg-invite-${commId}`"),'Invitation idempotency key changed');
@@ -35,4 +38,4 @@ assert(stripe.includes("const PRICE_ID='price_1U7JW9EUQ5rJLL4MdDH2x3qP'"),'Girls
 
 console.log('Girls backend source parity contract: PASS');
 console.log('Scheduled and invitation email paths use girls-email-send');
-console.log('Girls queue/product isolation, idempotency, entitlements and v3 banners preserved');
+console.log('Girls queue/product isolation, idempotency, entitlements, optional-message limiting and v3 banners preserved');
