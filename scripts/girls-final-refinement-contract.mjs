@@ -53,9 +53,18 @@ assert(html.includes('/girls-critical-style-loader.js?v=1'),'critical style load
 assert(html.includes('/girls-performance-loader.js?v=1'),'performance loader missing');
 
 // Critical-path performance safeguards.
+assert(html.includes('<style id="gtg-core-styles">'),'core private-app CSS must be inline so Home has no blocking first-party stylesheet request');
+assert(!html.includes('rel="stylesheet" href="/girls-app.css?v=1"'),'girls-app.css must not remain render-blocking after the inline critical-shell move');
 assert(html.includes('rel="preload" as="image" href="/assets/images/hero.webp"'),'default Home hero must be discoverable before runtime render');
 assert(html.includes('fetchpriority="high"'),'Home hero preload must be high priority');
-assert(!html.includes('vtcmvwixfqyxqghibsla.storage.supabase.co" crossorigin'),'do not spend a fifth initial preconnect on storage');
+assert(html.includes('<main class="dashboard" aria-busy="true"'),'private app must ship a geometry-stable dashboard primer before Supabase hydration');
+assert(html.includes('src="/assets/images/hero.webp" width="1600" height="900"'),'dashboard primer must reserve the LCP image geometry explicitly');
+assert(html.includes('girls-trip-guide-logo.webp" width="512" height="512"'),'loading logo must reserve square geometry');
+assert(!html.includes('rel="preconnect" href="https://fonts.googleapis.com"'),'async fonts must not consume a critical preconnect');
+assert(!html.includes('rel="preconnect" href="https://fonts.gstatic.com"'),'font binaries must not consume a critical preconnect');
+assert(!html.includes('rel="preconnect" href="https://cdn.jsdelivr.net"'),'Supabase script preload must replace a redundant jsDelivr preconnect');
+assert(!html.includes('vtcmvwixfqyxqghibsla.storage.supabase.co" crossorigin'),'do not spend an initial preconnect on storage');
+assert(html.includes('rel="preload" as="script" href="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.112.4"'),'Supabase runtime must be discoverable from the head rather than waiting for the parser to reach the body');
 assert(html.includes('media="print" onload="this.media=\'all\'"'),'Google Fonts CSS must not block first render');
 assert(html.includes('defer src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.112.4"'),'Supabase runtime must not block HTML parsing');
 assert(html.includes('/girls-supabase-auth-bridge.js?v=1'),'deferred Girls OTP bridge missing');
@@ -90,4 +99,4 @@ assert(sw.includes("request.destination==='script'||request.destination==='style
 assert(headers.includes('/sw.js'),'service worker cache header missing');
 assert(headers.includes('Service-Worker-Allowed: /'),'service worker scope header missing');
 
-console.log('PASS Girls final refinement: compact shell, isolated Evidence geometry, route-lazy enhancements, bounded observers, nonblocking auth/fonts and PWA contract');
+console.log('PASS Girls final refinement: compact shell, isolated Evidence geometry, route-lazy enhancements, bounded observers, inline critical CSS, early LCP primer, nonblocking auth/fonts and PWA contract');
