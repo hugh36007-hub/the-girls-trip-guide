@@ -8,7 +8,7 @@ const BUNDLES={
   shell:['/girls-section-layout.js?v=1','/girls-inner-page-polish.js?v=1'],
   plan:['/girls-document-audience.js?v=1'],
   money:['/girls-payment-nudge.js?v=2'],
-  group:['/girls-trip-social.js?v=2','/girls-chat-sheet.js?v=2','/girls-poll-nudge.js?v=1'],
+  group:['/girls-trip-social.js?v=2','/girls-chat-sheet.js?v=2','/girls-conversation-inbox.js?v=1','/girls-poll-nudge.js?v=1'],
   evidence:[
     '/girls-vault-contract-fix.js?v=1',
     '/girls-hidden-upload-choice.js?v=1',
