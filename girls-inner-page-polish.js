@@ -6,9 +6,19 @@ let queued=false;
 const schedule=()=>{if(queued)return;queued=true;requestAnimationFrame(()=>{queued=false;polish()})};
 
 function activePanel(){return document.querySelector('.dashboard .panel.active')}
+function placeOverview(){
+ const panel=document.querySelector('.dashboard .panel[data-panel="overview"].active');
+ const summary=panel?.querySelector(':scope > [data-parity-block="overview"]');
+ if(!panel||!summary)return;
+ /* Messaging belongs in Group; keeping it on Home made the overview unnecessarily long. */
+ summary.querySelector('.gtg-message-panel')?.remove();
+ const head=[...panel.querySelectorAll(':scope > .section-head')].find(el=>/overview/i.test(el.textContent||''));
+ if(head&&head.nextElementSibling!==summary)head.insertAdjacentElement('afterend',summary);
+}
 function placeSummary(panel){
- const head=panel?.querySelector(':scope > .section-head');
- const summary=panel?.querySelector(':scope > [data-parity-block]');
+ if(!panel||panel.dataset.panel==='overview')return;
+ const head=panel.querySelector(':scope > .section-head');
+ const summary=panel.querySelector(':scope > [data-parity-block]');
  if(!head||!summary)return;
  if(head.nextElementSibling!==summary)head.insertAdjacentElement('afterend',summary);
 
@@ -35,17 +45,18 @@ function placeSummary(panel){
 function drawerClose(){
  const wrap=document.getElementById('drawerRoot');
  const drawer=wrap?.querySelector('.drawer');
- if(!wrap?.classList.contains('open')||!drawer||drawer.querySelector('.gtg-drawer-close-top'))return;
+ if(!wrap?.classList.contains('open')||!drawer)return;
+ const legacy=[...drawer.querySelectorAll('button')].find(el=>(el.textContent||'').trim().toLowerCase()==='close');
+ if(legacy)legacy.classList.add('gtg-legacy-drawer-close');
+ if(drawer.querySelector('.gtg-drawer-close-top'))return;
  const button=document.createElement('button');
  button.type='button';button.className='gtg-drawer-close-top';button.setAttribute('aria-label','Close trip menu');button.textContent='×';
- button.addEventListener('click',()=>{
-  const existing=[...drawer.querySelectorAll('button')].find(el=>(el.textContent||'').trim().toLowerCase()==='close');
-  if(existing)existing.click();else wrap.classList.remove('open');
- });
- drawer.appendChild(button);
+ button.addEventListener('click',()=>{if(legacy)legacy.click();else wrap.classList.remove('open')});
+ drawer.prepend(button);
 }
 
 function polish(){
+ placeOverview();
  placeSummary(activePanel());
  drawerClose();
 }
