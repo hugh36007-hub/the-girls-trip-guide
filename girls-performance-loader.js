@@ -26,7 +26,7 @@ const BUNDLES={
   ],
   drawer:['/girls-free-entitlement-guard.js?v=1'],
   home:['/girls-home-thumbnail-prime.js?v=1'],
-  hero:['/girls-live-dashboard-hero.js?v=2'],
+  hero:['/girls-live-dashboard-hero.js?v=3'],
   upload:['https://cdn.jsdelivr.net/npm/tus-js-client@4.3.1/dist/tus.min.js']
 };
 const STYLES={
