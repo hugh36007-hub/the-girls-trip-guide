@@ -6,7 +6,7 @@
   padding:22px!important;
   display:grid!important;
   grid-template-columns:minmax(0,1.16fr) minmax(0,.84fr);
-  grid-template-areas:"title photo" "message dates";
+  grid-template-areas:"title dates" "message photo";
   grid-template-rows:auto auto;
   gap:16px 18px;
   align-content:start;
@@ -36,15 +36,15 @@
 .live-photo-open img{display:block;width:100%;height:100%;object-fit:cover}
 .live-photo-empty{display:grid;place-items:center;width:100%;height:100%;padding:20px;color:rgba(255,255,255,.5);font-size:11px;text-align:center}
 .live-photo-add{position:absolute;z-index:3;left:50%;bottom:10px;transform:translateX(-50%);white-space:nowrap;border:1px solid rgba(255,123,193,.68);border-radius:999px;background:rgba(8,6,8,.88);color:#fff;padding:9px 12px;font-size:8px;font-weight:900;letter-spacing:.12em;text-transform:uppercase;backdrop-filter:blur(10px)}
-.live-message-card,.live-date-card{align-self:stretch;height:100%;border:1px solid rgba(255,123,193,.25);border-radius:17px;background:linear-gradient(180deg,rgba(19,12,18,.86),rgba(9,6,9,.78));box-shadow:inset 0 1px 0 rgba(255,255,255,.018)}
-.live-message-card{grid-area:message;padding:15px 16px;cursor:pointer}
+.live-message-card,.live-date-card{border:1px solid rgba(255,123,193,.25);border-radius:17px;background:linear-gradient(180deg,rgba(19,12,18,.86),rgba(9,6,9,.78));box-shadow:inset 0 1px 0 rgba(255,255,255,.018)}
+.live-message-card{grid-area:message;align-self:stretch;height:100%;padding:15px 16px;cursor:pointer}
 .live-message-card[role="button"]:active{transform:scale(.995)}
 .live-message-meta{display:flex;align-items:center;gap:8px;margin-bottom:8px;min-width:0}
 .live-message-avatar{width:30px;height:30px;flex:0 0 30px;border:1px solid rgba(255,123,193,.42);border-radius:50%;display:grid;place-items:center;color:var(--live-accent);font-size:10px;font-weight:900}
 .live-message-meta b{font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .live-message-meta time{margin-left:auto;color:rgba(255,255,255,.46);font-size:9px;white-space:nowrap}
 .live-message-card p{margin:0;color:rgba(255,255,255,.84);font-size:12.5px;line-height:1.42}
-.live-date-card{grid-area:dates;padding:15px 16px}
+.live-date-card{grid-area:dates;align-self:start;height:auto;padding:14px 16px}
 .live-date-card b{display:block;color:var(--live-accent);font-size:9px;letter-spacing:.17em;text-transform:uppercase}
 .live-date-card span{display:block;margin-top:9px;color:#fff;font-size:12px;line-height:1.5}
 @media(max-width:700px){
