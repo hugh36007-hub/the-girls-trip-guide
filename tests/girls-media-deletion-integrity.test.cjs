@@ -1,0 +1,11 @@
+const fs=require('node:fs');
+const assert=require('node:assert/strict');
+const edge=fs.readFileSync('supabase/functions/media-action/index.ts','utf8');
+const migration=fs.readFileSync('supabase/migrations/20260831191909_media_deletion_two_phase_state.sql','utf8');
+assert(edge.includes('["removed_pending_owner", "deleting"]'),'permanent delete must accept retry state');
+assert(edge.includes('visibility_state: "deleting"'),'permanent delete must mark deletion before storage removal');
+assert(edge.indexOf('visibility_state: "deleting"')<edge.indexOf('.remove(paths)'),'deletion state must be persisted before storage removal');
+assert(edge.includes('visibility_state: "removed_pending_owner"'),'storage failure must restore pending-owner state on the first attempt');
+assert(edge.includes('.delete().eq("id", media.id).eq("visibility_state", "deleting")'),'final row delete must be state-guarded');
+assert(migration.includes("'deleting'"),'database constraint must allow retry deletion state');
+console.log('Girls media permanent-deletion integrity contract: PASS');
