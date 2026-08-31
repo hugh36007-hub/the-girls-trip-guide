@@ -26,7 +26,7 @@ const BUNDLES={
   ],
   drawer:['/girls-free-entitlement-guard.js?v=1'],
   home:['/girls-home-thumbnail-prime.js?v=1'],
-  hero:['/girls-live-dashboard-hero.js?v=1'],
+  hero:['/girls-live-dashboard-hero.js?v=2'],
   upload:['https://cdn.jsdelivr.net/npm/tus-js-client@4.3.1/dist/tus.min.js']
 };
 const STYLES={
@@ -72,18 +72,20 @@ function afterDashboard(callback,delay=0){
 }
 function scheduleInitial(){
  const route=action();
+ afterDashboard(()=>void loadBundle('hero'),0);
  if(route!=='overview')afterDashboard(()=>void loadRoute(route),0);
  if(route==='group'||route==='evidence'||route==='plan'||route==='money')afterDashboard(()=>idle(()=>void loadBundle('parity')),600);
  if(route==='overview')afterDashboard(()=>setTimeout(()=>{if(visible()&&action()==='overview')idle(()=>void loadBundle('home'))},15000),0);
 }
 
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',scheduleInitial,{once:true});else scheduleInitial();
-window.addEventListener('popstate',()=>{const route=action();void loadRoute(route);if(route!=='overview')idle(()=>void loadBundle('parity'))});
+window.addEventListener('popstate',()=>{const route=action();void loadBundle('hero');void loadRoute(route);if(route!=='overview')idle(()=>void loadBundle('parity'))});
 
 /* User intent always wins over background scheduling. */
 document.addEventListener('pointerdown',event=>{
  const target=event.target.closest?.('[data-tab],[data-a],[data-action],[data-trip-social-tab],[data-parity-comms],[data-role-expense],[data-role-upload]');if(!target)return;
  const tab=target.dataset.tab||'';const a=target.dataset.a||target.dataset.action||'';
+ if(tab==='overview'||tab==='home')void loadBundle('hero');
  if(['plan','money','group','evidence'].includes(tab)){void loadRoute(tab);void loadBundle('parity')}
  if(target.matches('[data-role-expense]')||a==='addExpense')void loadRoute('money');
  if(target.matches('[data-role-upload]')||['upload','vault','vaultUpload'].includes(a)){void loadRoute('evidence');void loadBundle('upload')}
