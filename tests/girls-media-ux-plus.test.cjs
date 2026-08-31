@@ -1,6 +1,7 @@
 const fs=require('fs');
 const src=fs.readFileSync('girls-media-ux-plus.js','utf8');
 const html=fs.readFileSync('create-trip.html','utf8');
+const loader=fs.readFileSync('girls-performance-loader.js','utf8');
 const checks=[
   'storage.supabase.co/storage/v1/upload/resumable',
   'chunkSize:6*1024*1024',
@@ -20,7 +21,8 @@ const checks=[
   "new CustomEvent('gtg:media-uploaded'"
 ];
 for(const x of checks)if(!src.includes(x))throw new Error(`Missing Girls media UX contract: ${x}`);
-if(!html.includes('/girls-media-ux-plus.js?v=2'))throw new Error('Girls media UX enhancer v2 is not loaded by create-trip.html');
+if(html.includes('/girls-media-ux-plus.js?v=2'))throw new Error('Girls media UX enhancer must not execute on Home startup');
+if(!loader.includes('/girls-media-ux-plus.js?v=2')||!loader.includes("if(route==='evidence')await loadBundle('evidence')"))throw new Error('Girls media UX enhancer v2 must load with the Evidence route');
 const persist=src.indexOf(".from('media').insert");
 const defer=src.indexOf("if(album==='evidence'||!isVid)defer(async()=>");
 if(persist<0||defer<0||persist>defer)throw new Error('Girls upload must be durable before deferred thumbnail work.');
