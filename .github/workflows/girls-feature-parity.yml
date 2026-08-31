@@ -55,6 +55,7 @@ jobs:
           node --check girls-supabase-auth-bridge.js
           node --check girls-performance-loader.js
           node --check girls-pwa-register.js
+          node --check girls-contact.js
           node --check sw.js
           node --check scripts/girls-final-refinement-contract.mjs
           node --check tests/girls-session-guard.test.cjs
@@ -68,6 +69,7 @@ jobs:
           node --check tests/girls-media-flow-refinement.test.mjs
           node --check tests/girls-poll-nudge.test.mjs
           node --check tests/girls-pwa-security-contract.test.cjs
+          node --check tests/girls-contact-backend.test.cjs
       - name: Girls Edge Function type-check
         run: |
           deno check supabase/functions/girls-process-communications/index.ts
@@ -77,11 +79,14 @@ jobs:
           deno check supabase/functions/girls-trip-email/index.ts
           deno check supabase/functions/girls-payment-nudge/index.ts
           deno check supabase/functions/girls-stripe-checkout/index.ts
+          deno check supabase/functions/girls-contact-email/index.ts
           deno check supabase/functions/media-action/index.ts
       - name: Girls backend source parity contract
         run: node tests/girls-backend-source-parity.test.cjs
       - name: Girls PWA and browser-security contract
         run: node tests/girls-pwa-security-contract.test.cjs
+      - name: Girls backend support contract
+        run: node tests/girls-contact-backend.test.cjs
       - name: Existing release contract
         run: node tests/release-contract.test.cjs
       - name: Girls feature parity contract
