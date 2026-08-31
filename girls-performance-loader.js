@@ -7,6 +7,7 @@ const BUNDLES={
   parity:['/girls-product-parity.js?v=1'],
   group:['/girls-trip-social.js?v=2','/girls-chat-sheet.js?v=2','/girls-poll-nudge.js?v=1'],
   evidence:['/girls-media-social.js?v=1','/evidence-intro-dismiss.js?v=1'],
+  hero:['/girls-live-dashboard-hero.js?v=1'],
   home:['/girls-home-thumbnail-prime.js?v=1'],
   upload:['https://cdn.jsdelivr.net/npm/tus-js-client@4.3.1/dist/tus.min.js']
 };
@@ -33,6 +34,7 @@ function afterDashboard(callback,delay=0){
 }
 function scheduleInitial(){
  const route=action();
+ if(route==='overview')afterDashboard(()=>void loadBundle('hero'),40);
  afterDashboard(()=>idle(()=>void loadBundle('parity')),route==='overview'?1200:220);
  if(route==='group')afterDashboard(()=>idle(()=>void loadBundle('group')),260);
  if(route==='evidence')afterDashboard(()=>idle(()=>void loadBundle('evidence')),160);
@@ -42,6 +44,7 @@ function scheduleInitial(){
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',scheduleInitial,{once:true});else scheduleInitial();
 window.addEventListener('popstate',()=>{
  const route=action();
+ if(route==='overview')void loadBundle('hero');
  if(route==='group')void loadBundle('group');
  if(route==='evidence')void loadBundle('evidence');
 });
@@ -50,10 +53,11 @@ window.addEventListener('popstate',()=>{
 document.addEventListener('pointerdown',event=>{
  const target=event.target.closest?.('[data-tab],[data-a],[data-action],[data-trip-social-tab],[data-parity-comms]');if(!target)return;
  const tab=target.dataset.tab||'';const a=target.dataset.a||target.dataset.action||'';
+ if(tab==='overview')void loadBundle('hero');
  if(tab==='group'||target.matches('[data-trip-social-tab],[data-parity-comms]'))void loadBundle('group');
  if(tab==='evidence'||['upload','vault'].includes(a))void loadBundle('evidence');
  if(['upload','vault'].includes(a)||target.closest?.('#uploadForm,#vaultUploadForm'))void loadBundle('upload');
 },{capture:true,passive:true});
 
-document.addEventListener('visibilitychange',()=>{if(visible()&&action()==='overview'&&!loaded.has(BUNDLES.parity[0]))afterDashboard(()=>idle(()=>void loadBundle('parity')),500)});
+document.addEventListener('visibilitychange',()=>{if(visible()&&action()==='overview'){if(!loaded.has(BUNDLES.hero[0]))void loadBundle('hero');if(!loaded.has(BUNDLES.parity[0]))afterDashboard(()=>idle(()=>void loadBundle('parity')),500)}});
 })();
