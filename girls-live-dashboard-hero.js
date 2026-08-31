@@ -11,11 +11,12 @@ const relativeTime=value=>{const ms=Date.now()-new Date(value||0).getTime();if(!
 function db(){if(!client&&window.supabase?.createClient)client=window.supabase.createClient(URL,KEY,{auth:{persistSession:true,autoRefreshToken:false,detectSessionInUrl:false}});return client}
 async function loadSnapshot(tripId){
   const q=db();if(!q)return null;
-  const [tripRes,mediaRes,msgRes,membersRes]=await Promise.all([
-    q.from('trips').select('id,name,start_date,end_date').eq('id',tripId).eq('product_key','girls').single(),
+  const [tripRes,mediaRes,msgRes,membersRes,userRes]=await Promise.all([
+    q.from('trips').select('id,name,start_date,end_date,owner_id').eq('id',tripId).eq('product_key','girls').single(),
     q.from('media').select('id,storage_path,thumbnail_path,mime_type,created_at').eq('trip_id',tripId).eq('album','evidence').like('mime_type','image/%').order('created_at',{ascending:false}).limit(5),
     q.from('trip_messages').select('message,created_at,sender_user_id').eq('trip_id',tripId).order('created_at',{ascending:false}).limit(1),
-    q.from('trip_members').select('name,user_id').eq('trip_id',tripId)
+    q.from('trip_members').select('name,user_id').eq('trip_id',tripId),
+    q.auth.getUser()
   ]);
   if(tripRes.error)return null;
   const urls=[];
@@ -24,7 +25,12 @@ async function loadSnapshot(tripId){
     const {data}=await q.storage.from('btg-evidence').createSignedUrl(path,1800);if(data?.signedUrl)urls.push(data.signedUrl);
   }
   const latest=msgRes.data?.[0]||null,members=membersRes.data||[],sender=latest?members.find(m=>m.user_id===latest.sender_user_id):null;
-  return {trip:tripRes.data,urls,message:latest?{text:latest.message,at:latest.created_at,from:sender?.name||'Organiser'}:null,memberCount:members.length};
+  return {trip:tripRes.data,urls,message:latest?{text:latest.message,at:latest.created_at,from:sender?.name||'Organiser'}:null,memberCount:members.length,isOwner:userRes.data?.user?.id===tripRes.data.owner_id};
+}
+function openMessages(){
+  const proxy=document.createElement('button');
+  proxy.type='button';proxy.dataset.a='messageCrew';proxy.hidden=true;
+  document.body.appendChild(proxy);proxy.click();proxy.remove();
 }
 async function mount(){
   const hero=document.querySelector('.dashboard .hero-card');
@@ -39,7 +45,13 @@ async function mount(){
   const photo=document.createElement('div');photo.className='live-photo-block';
   photo.innerHTML=`<div class="live-hero-label"><span>Latest photo</span><span aria-hidden="true">↻</span></div><div class="live-photo-frame"><button type="button" class="live-photo-open" data-a="vault" aria-label="Open Hidden Gallery">${snap.urls[0]?`<img src="${esc(snap.urls[0])}" alt="Latest trip photo">`:'<span class="live-photo-empty">No trip photos yet.</span>'}</button><button type="button" class="live-photo-add" data-a="upload">+ Add trip photo</button></div>`;
   hero.appendChild(photo);
-  const msg=document.createElement('div');msg.className='live-message-card';msg.innerHTML=`<div class="live-hero-label"><span>Latest message</span></div><div class="live-message-meta"><span class="live-message-avatar">${esc((snap.message?.from||'T').slice(0,1).toUpperCase())}</span><b>${esc(snap.message?.from||'Trip')}</b><time>${esc(snap.message?relativeTime(snap.message.at):'')}</time></div><p>${esc(snap.message?.text||'No trip messages yet.')}</p>`;hero.appendChild(msg);
+  const msg=document.createElement('div');msg.className='live-message-card';msg.innerHTML=`<div class="live-hero-label"><span>Latest message</span></div><div class="live-message-meta"><span class="live-message-avatar">${esc((snap.message?.from||'T').slice(0,1).toUpperCase())}</span><b>${esc(snap.message?.from||'Trip')}</b><time>${esc(snap.message?relativeTime(snap.message.at):'')}</time></div><p>${esc(snap.message?.text||'No trip messages yet.')}</p>`;
+  if(snap.isOwner){
+    msg.setAttribute('role','button');msg.setAttribute('tabindex','0');msg.setAttribute('aria-label','Open messages');
+    msg.addEventListener('click',openMessages);
+    msg.addEventListener('keydown',event=>{if(event.key==='Enter'||event.key===' '){event.preventDefault();openMessages()}});
+  }
+  hero.appendChild(msg);
   const dates=document.createElement('div');dates.className='live-date-card';dates.innerHTML=`<b>Trip dates</b><span>${fmt(snap.trip.start_date)}<br>${fmt(snap.trip.end_date)}</span>`;hero.appendChild(dates);
   clearInterval(rotateTimer);if(snap.urls.length>1){let i=0;rotateTimer=setInterval(()=>{const img=hero.querySelector('.live-photo-open img');if(!img||!hero.isConnected){clearInterval(rotateTimer);return}i=(i+1)%snap.urls.length;img.src=snap.urls[i]},6000)}
 }
