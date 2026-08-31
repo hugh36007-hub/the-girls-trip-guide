@@ -1,6 +1,7 @@
 /* Full Trip home hero: live latest photos + latest message. */
 (() => {
 'use strict';
+if(!document.querySelector('link[data-live-dashboard-hero]')){const link=document.createElement('link');link.rel='stylesheet';link.href='/live-dashboard-hero.css?v=1';link.dataset.liveDashboardHero='1';document.head.appendChild(link)}
 const URL='https://vtcmvwixfqyxqghibsla.supabase.co';
 const KEY='sb_publishable_qBQzJjFxSToEGxPJEcmskg_GNd4M4cP';
 let client=null,rotateTimer=0,mountToken=0;
