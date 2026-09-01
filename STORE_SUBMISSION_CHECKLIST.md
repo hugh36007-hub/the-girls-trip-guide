@@ -5,10 +5,10 @@
 - [x] Native web payload builds with locally bundled Supabase/TUS runtime.
 - [x] Native payload contains no service worker.
 - [x] Native contract tests pass.
-- [ ] Android debug APK compiles in the isolated build workflow.
-- [ ] Android unsigned release AAB compiles in the isolated build workflow.
-- [ ] iOS simulator build compiles without signing in the isolated build workflow.
-- [ ] iOS simulator installs and launches in the automated smoke test.
+- [x] Android debug APK compiles in the isolated build workflow.
+- [x] Android unsigned release AAB compiles in the isolated build workflow.
+- [x] iOS simulator build compiles without signing in the isolated build workflow.
+- [x] iOS simulator installs and launches in the automated smoke test.
 - [ ] Universal Links and Android App Links verified after owner identifiers exist.
 - [ ] OTP, session restoration, multi-trip selection and sign-out tested on real devices.
 - [ ] Photo/video picker, large upload interruption and resume tested on real devices.
