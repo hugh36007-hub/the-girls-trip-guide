@@ -1,0 +1,190 @@
+name: Native platform build
+
+on:
+  push:
+    branches:
+      - native-app-isolated
+    paths:
+      - 'package.json'
+      - 'package-lock.json'
+      - 'capacitor.config.json'
+      - 'native-app.js'
+      - 'native-url.js'
+      - 'native-app.css'
+      - 'girls-live-chat-sync.js'
+      - 'girls-trip-social.js'
+      - 'girls-conversation-inbox.js'
+      - 'girls-media-social.js'
+      - 'girls-pwa-register.js'
+      - 'delete-account.html'
+      - 'scripts/build-mobile-web.mjs'
+      - 'scripts/configure-native-platforms.mjs'
+      - 'tests/native/**'
+      - 'ios/**'
+      - 'android/**'
+      - '.github/workflows/native-platform-build.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: native-platform-build
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: macos-15
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: native-app-isolated
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: '21'
+
+      - name: Install pinned native toolchain
+        run: |
+          if test -f package-lock.json; then
+            npm ci
+          else
+            npm install
+          fi
+
+      - name: Build native web payload
+        run: npm run mobile:prepare
+
+      - name: Generate platform projects when absent
+        run: |
+          test -d ios || npx cap add ios
+          test -d android || npx cap add android
+          npx cap sync
+
+      - name: Apply native platform configuration
+        run: node scripts/configure-native-platforms.mjs
+
+      - name: Generate approved native branding
+        run: |
+          mkdir -p native-assets
+          cp assets/images/gtg-pwa-512.svg native-assets/icon.svg
+          cp assets/images/gtg-pwa-maskable.svg native-assets/icon-foreground.svg
+          cp assets/images/gtg-pwa-512.svg native-assets/splash.svg
+          npx capacitor-assets generate --ios --android --assetPath native-assets --iconBackgroundColor '#070507' --splashBackgroundColor '#070507'
+
+      - name: Run native contract tests
+        run: npm run test:native
+
+      - name: Run shared product release guards
+        run: |
+          node tests/release-contract.test.cjs
+          node tests/girls-feature-parity.test.cjs
+          node tests/girls-product-parity-ui.test.cjs
+          node tests/girls-pwa-security-contract.test.cjs
+          node tests/retest-100.cjs
+
+      - name: Verify payload boundaries
+        run: |
+          test -f mobile-web/index.html
+          test -f mobile-web/native-app.js
+          test -f mobile-web/native-url.js
+          test -f mobile-web/native-app.css
+          test -f mobile-web/vendor/supabase.js
+          test -f mobile-web/vendor/tus.min.js
+          test ! -f mobile-web/worker.js
+          test ! -f mobile-web/service-worker.js
+          test ! -f mobile-web/sw.js
+          test ! -f mobile-web/girls-pwa-register.js
+          ! grep -R -E '(^|[^A-Za-z0-9_])(sk|rk)_live_' ios android mobile-web
+
+      - name: Compile Android debug APK
+        working-directory: android
+        run: ./gradlew assembleDebug
+
+      - name: Compile Android release bundle for signing
+        working-directory: android
+        run: ./gradlew bundleRelease
+
+      - name: Compile iOS simulator build without signing
+        run: >-
+          xcodebuild
+          -project ios/App/App.xcodeproj
+          -scheme App
+          -configuration Debug
+          -sdk iphonesimulator
+          -destination 'generic/platform=iOS Simulator'
+          -derivedDataPath "$RUNNER_TEMP/gtg-ios-build"
+          CODE_SIGNING_ALLOWED=NO
+          build
+
+      - name: Smoke-test iOS app launch
+        timeout-minutes: 5
+        env:
+          DERIVED_DATA: ${{ runner.temp }}/gtg-ios-build
+        run: |
+          RUNTIME_ID=$(xcrun simctl list runtimes --json | python3 -c "import json,sys; r=[x for x in json.load(sys.stdin)['runtimes'] if x.get('isAvailable') and x.get('platform')=='iOS']; print(r[-1]['identifier'])")
+          DEVICE_TYPE_ID=$(xcrun simctl list devicetypes --json | python3 -c "import json,sys; d=[x for x in json.load(sys.stdin)['devicetypes'] if x['name'].startswith('iPhone')]; print(next((x['identifier'] for x in d if x['name']=='iPhone 16 Pro'),d[0]['identifier']))")
+          DEVICE_ID=$(xcrun simctl create 'GTG CI iPhone' "$DEVICE_TYPE_ID" "$RUNTIME_ID")
+          trap 'xcrun simctl shutdown "$DEVICE_ID" >/dev/null 2>&1 || true; xcrun simctl delete "$DEVICE_ID" >/dev/null 2>&1 || true' EXIT
+          xcrun simctl boot "$DEVICE_ID"
+          READY=''
+          for attempt in {1..24}; do
+            if xcrun simctl spawn "$DEVICE_ID" launchctl print system >/dev/null 2>&1; then READY=1; break; fi
+            sleep 5
+          done
+          test -n "$READY" || { echo 'The hosted simulator did not become ready within two minutes.'; exit 1; }
+          xcrun simctl install "$DEVICE_ID" "$DERIVED_DATA/Build/Products/Debug-iphonesimulator/App.app"
+          xcrun simctl launch "$DEVICE_ID" com.storystone.thegirlstripguide
+          sleep 8
+          xcrun simctl io "$DEVICE_ID" screenshot "$RUNNER_TEMP/gtg-ios-launch.png"
+
+      - name: Commit reproducible platform projects
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add package-lock.json ios android
+          if git diff --cached --quiet; then
+            echo 'Native projects already current.'
+          else
+            git commit -m 'Generate native platform projects'
+            git push origin HEAD:native-app-isolated
+          fi
+
+      - name: Upload Android debug build
+        uses: actions/upload-artifact@v4
+        with:
+          name: girls-trip-guide-android-debug
+          path: android/app/build/outputs/apk/debug/app-debug.apk
+          if-no-files-found: error
+          retention-days: 14
+
+      - name: Upload Android unsigned release bundle
+        uses: actions/upload-artifact@v4
+        with:
+          name: girls-trip-guide-android-release-unsigned
+          path: android/app/build/outputs/bundle/release/app-release.aab
+          if-no-files-found: error
+          retention-days: 14
+
+      - name: Upload iOS simulator build
+        uses: actions/upload-artifact@v4
+        with:
+          name: girls-trip-guide-ios-simulator
+          path: ${{ runner.temp }}/gtg-ios-build/Build/Products/Debug-iphonesimulator/App.app
+          if-no-files-found: error
+          retention-days: 14
+
+      - name: Upload iOS launch smoke screenshot
+        uses: actions/upload-artifact@v4
+        with:
+          name: girls-trip-guide-ios-launch-smoke
+          path: ${{ runner.temp }}/gtg-ios-launch.png
+          if-no-files-found: error
+          retention-days: 14

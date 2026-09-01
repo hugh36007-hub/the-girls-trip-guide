@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - main
+      - native-app-isolated
       - release/girls-feature-parity-20260828
       - release/girls-product-parity-completion-20260828
       - feature/girls-document-audience-20260828

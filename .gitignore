@@ -7,3 +7,9 @@ backend-ready/.env.*
 node_modules/
 .DS_Store
 Thumbs.db
+mobile-web/
+native-assets/
+ios/build/
+android/.gradle/
+android/build/
+android/app/build/
