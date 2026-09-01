@@ -23,6 +23,7 @@ on:
       - 'ios/**'
       - 'android/**'
       - '.github/workflows/native-platform-build.yml'
+      - '.github/workflows/girls-feature-parity.yml'
   workflow_dispatch:
 
 permissions:
