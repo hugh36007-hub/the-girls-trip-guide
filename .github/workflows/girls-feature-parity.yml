@@ -26,6 +26,8 @@ jobs:
       - uses: denoland/setup-deno@v2
         with:
           deno-version: v2.x
+      - name: Install pinned JavaScript dependencies
+        run: npm ci
       - name: JavaScript syntax
         run: |
           node --check girls-app-v2.js
