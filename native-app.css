@@ -153,3 +153,25 @@
     max-height: 100dvh;
   }
 }
+
+@media (max-width: 600px) {
+  .gtg-native body .hero {
+    min-height: 0 !important;
+    padding-top: clamp(190px, 45.82vw, 250px) !important;
+  }
+
+  .gtg-native body .hero-scene,
+  .gtg-native body .hero-shade {
+    height: clamp(190px, 45.82vw, 250px) !important;
+  }
+
+  .gtg-native body .hero .mini-label,
+  .gtg-native body .hero h1 {
+    position: static !important;
+    max-width: none !important;
+  }
+
+  .gtg-native body .hero-copy {
+    padding: 24px 0 48px !important;
+  }
+}

@@ -25,6 +25,8 @@ test('landing and app navigation respect iPhone safe areas', async () => {
   assert.match(source, /\.gtg-native \.landing-header,/);
   assert.match(source, /padding-top: var\(--gtg-safe-top\)/);
   assert.match(source, /padding-bottom: max\(10px, var\(--gtg-safe-bottom\)\)/);
+  assert.match(source, /\.gtg-native body \.hero/);
+  assert.match(source, /padding-top: clamp\(190px, 45\.82vw, 250px\) !important/);
 });
 
 test('iOS status content stays legible on the black native chrome', async () => {
