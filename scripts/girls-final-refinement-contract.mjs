@@ -74,7 +74,7 @@ assert(!html.includes('vtcmvwixfqyxqghibsla.storage.supabase.co" crossorigin'),'
 assert(html.includes('rel="preload" as="script" href="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.112.4"'),'Supabase runtime must be discoverable from the head rather than waiting for the parser to reach the body');
 assert(html.includes('media="print" onload="this.media=\'all\'"'),'Google Fonts CSS must not block first render');
 assert(html.includes('defer src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.112.4"'),'Supabase runtime must not block HTML parsing');
-assert(html.includes('/girls-supabase-auth-bridge.js?v=1'),'deferred Girls OTP bridge missing');
+assert(html.includes('/girls-supabase-auth-bridge.js?v=2'),'deferred Girls OTP bridge missing');
 assert(authBridge.includes('functions/v1/girls-auth-otp'),'OTP bridge must preserve isolated Girls auth routing');
 assert(!html.includes('tus-js-client@4.3.1/dist/tus.min.js'),'resumable upload library must not execute on Home startup');
 assert(deferred.includes('tus-js-client@4.3.1/dist/tus.min.js'),'upload intent must retain resumable upload support');

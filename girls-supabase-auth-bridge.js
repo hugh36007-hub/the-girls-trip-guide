@@ -4,7 +4,10 @@
 if(window.__GTG_SUPABASE_AUTH_BRIDGE__)return;window.__GTG_SUPABASE_AUTH_BRIDGE__=true;
 if(!window.supabase?.createClient)return;
 const originalCreateClient=window.supabase.createClient.bind(window.supabase);
+const clients=new Map();
 window.supabase.createClient=(...args)=>{
+  const cacheKey=`${String(args[0]||'')}|${String(args[1]||'')}`;
+  if(clients.has(cacheKey))return clients.get(cacheKey);
   const client=originalCreateClient(...args);
   client.auth.signInWithOtp=async({email})=>{
     try{
@@ -14,6 +17,7 @@ window.supabase.createClient=(...args)=>{
       return {data:{user:null,session:null},error:null};
     }catch(error){return {data:{user:null,session:null},error:{message:error?.message||'Could not send sign-in code.'}};}
   };
+  clients.set(cacheKey,client);
   return client;
 };
 })();

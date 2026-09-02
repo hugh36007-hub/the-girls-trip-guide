@@ -24,7 +24,7 @@ const BUNDLES={
     '/evidence-intro-dismiss.js?v=1',
     '/video-thumbnail-fix.js?v=1'
   ],
-  drawer:['/girls-free-entitlement-guard.js?v=1'],
+  drawer:['/girls-free-entitlement-guard.js?v=1','/trip-export-menu-guard.js?v=1','/trip-export.js?v=1'],
   home:['/girls-home-thumbnail-prime.js?v=1'],
   upload:['https://cdn.jsdelivr.net/npm/tus-js-client@4.3.1/dist/tus.min.js']
 };
