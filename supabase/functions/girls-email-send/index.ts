@@ -147,6 +147,7 @@ Deno.serve(async request => {
       },
       body: JSON.stringify({
         from: `${senderName} <trip@thegirlstripguide.com>`,
+        reply_to: 'hello@thegirlstripguide.com',
         to: [to],
         subject: String(input.subject || `${input.title} · ${input.tripName}`),
         text,

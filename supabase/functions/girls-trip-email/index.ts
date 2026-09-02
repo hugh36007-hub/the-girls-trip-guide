@@ -12,7 +12,7 @@ async function deliver(payload:any){
   const r=await fetch(`${env('SUPABASE_URL')}/functions/v1/girls-email-send`,{method:'POST',headers:{'Content-Type':'application/json','x-btg-cron-secret':env('BTG_CRON_SECRET')},body:JSON.stringify(payload)})
   const out=await r.json().catch(()=>({}))
   if(!r.ok||!out?.ok)throw new Error(out?.error||`Girls email send ${r.status}`)
-  return out.id
+  return out
 }
 Deno.serve(async req=>{
   if(req.method==='OPTIONS')return new Response('ok',{headers:cors})
@@ -74,8 +74,9 @@ Deno.serve(async req=>{
 
     const delivery=(async()=>{
       try{
-        const providerId=await deliver(payload)
-        await db.from('communications').update({status:'sent',sent_at:new Date().toISOString(),provider:'resend',provider_message_id:providerId,attempt_count:1,last_attempt_at:new Date().toISOString(),last_error:null,character:'grace'}).eq('id',commId)
+        const result=await deliver(payload)
+        if(result.suppressed){await db.from('communications').update({status:'cancelled',reason:`Recipient suppressed: ${result.reason||'delivery blocked'}`,attempt_count:1,last_attempt_at:new Date().toISOString(),last_error:null,character:'grace'}).eq('id',commId);return}
+        await db.from('communications').update({status:'sent',sent_at:new Date().toISOString(),provider:'resend',provider_message_id:result.id,attempt_count:1,last_attempt_at:new Date().toISOString(),last_error:null,character:'grace'}).eq('id',commId)
         await db.from('communications').update({status:'cancelled',reason:'Superseded by delivered invitation',last_error:null}).eq('trip_id',tripId).eq('recipient_member_id',member.id).eq('trigger_code','T03').in('status',['girls_ready','girls_scheduled','girls_failed']).neq('id',commId)
       }catch(e){
         console.error('Girls invitation background delivery failed',e instanceof Error?e.message:String(e))
@@ -84,7 +85,7 @@ Deno.serve(async req=>{
     })()
     EdgeRuntime.waitUntil(delivery)
 
-    return json({ok:true,member,communicationId:commId,sent:true,accepted:true})
+    return json({ok:true,member,communicationId:commId,sent:false,queued:true,accepted:true})
   }catch(e){
     console.error(e)
     return json({error:e instanceof Error?e.message:'Invitation failed'},500)
