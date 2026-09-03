@@ -1,6 +1,11 @@
 name: Android signed release
 
 on:
+  push:
+    branches:
+      - native-app-isolated
+    paths:
+      - '.github/workflows/android-signed-release.yml'
   workflow_dispatch:
 
 permissions:
