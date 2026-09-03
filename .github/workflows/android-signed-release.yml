@@ -119,11 +119,31 @@ jobs:
         run: ./gradlew bundleRelease
 
       - name: Verify AAB signature
+        shell: bash
         run: |
           AAB='android/app/build/outputs/bundle/release/app-release.aab'
           test -s "$AAB"
-          jarsigner -verify -strict "$AAB"
-          echo 'Signed Android App Bundle verified.'
+
+          # Android upload keys are intentionally self-signed. Verify the JAR
+          # signature without treating the self-signed certificate chain as a
+          # trust-store failure, then prove the AAB uses the configured key.
+          jarsigner -verify "$AAB"
+
+          EXPECTED_SHA256="$(keytool -list -v \
+            -keystore "$ANDROID_UPLOAD_KEYSTORE_PATH" \
+            -storepass "$ANDROID_UPLOAD_KEYSTORE_PASSWORD" \
+            -alias "$ANDROID_UPLOAD_KEY_ALIAS" \
+            | sed -n 's/^[[:space:]]*SHA256: //p' \
+            | head -n 1)"
+
+          ACTUAL_SHA256="$(keytool -printcert -jarfile "$AAB" \
+            | sed -n 's/^[[:space:]]*SHA256: //p' \
+            | head -n 1)"
+
+          test -n "$EXPECTED_SHA256"
+          test -n "$ACTUAL_SHA256"
+          test "$EXPECTED_SHA256" = "$ACTUAL_SHA256"
+          echo 'Signed Android App Bundle verified against the configured upload key.'
 
       - name: Verify no signing material entered the repository
         run: |
