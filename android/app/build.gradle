@@ -1,5 +1,16 @@
 apply plugin: 'com.android.application'
 
+def releaseKeystorePath = System.getenv('ANDROID_UPLOAD_KEYSTORE_PATH')
+def releaseStorePassword = System.getenv('ANDROID_UPLOAD_KEYSTORE_PASSWORD')
+def releaseKeyAlias = System.getenv('ANDROID_UPLOAD_KEY_ALIAS')
+def releaseKeyPassword = System.getenv('ANDROID_UPLOAD_KEY_PASSWORD')
+def releaseSigningConfigured = [
+    releaseKeystorePath,
+    releaseStorePassword,
+    releaseKeyAlias,
+    releaseKeyPassword
+].every { value -> value != null && !value.trim().isEmpty() }
+
 android {
     namespace = "com.storystone.thegirlstripguide"
     compileSdk = rootProject.ext.compileSdkVersion
@@ -16,8 +27,21 @@ android {
             ignoreAssetsPattern = '!.svn:!.git:!.ds_store:!*.scc:.*:!CVS:!thumbs.db:!picasa.ini:!*~'
         }
     }
+    signingConfigs {
+        if (releaseSigningConfigured) {
+            release {
+                storeFile file(releaseKeystorePath)
+                storePassword releaseStorePassword
+                keyAlias releaseKeyAlias
+                keyPassword releaseKeyPassword
+            }
+        }
+    }
     buildTypes {
         release {
+            if (releaseSigningConfigured) {
+                signingConfig signingConfigs.release
+            }
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
