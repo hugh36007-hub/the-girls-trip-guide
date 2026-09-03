@@ -1,0 +1,138 @@
+name: Android signed release
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  signed-release:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    env:
+      ANDROID_UPLOAD_KEYSTORE_PATH: ${{ runner.temp }}/gtg-upload-key.jks
+      ANDROID_UPLOAD_KEYSTORE_BASE64: ${{ secrets.GTG_ANDROID_UPLOAD_KEYSTORE_BASE64 }}
+      ANDROID_UPLOAD_KEYSTORE_PASSWORD: ${{ secrets.GTG_ANDROID_UPLOAD_KEYSTORE_PASSWORD }}
+      ANDROID_UPLOAD_KEY_ALIAS: ${{ secrets.GTG_ANDROID_UPLOAD_KEY_ALIAS }}
+      ANDROID_UPLOAD_KEY_PASSWORD: ${{ secrets.GTG_ANDROID_UPLOAD_KEY_PASSWORD }}
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: native-app-isolated
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: '21'
+
+      - name: Validate and materialize upload key
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          import base64
+          import os
+          from pathlib import Path
+
+          required = [
+              'ANDROID_UPLOAD_KEYSTORE_BASE64',
+              'ANDROID_UPLOAD_KEYSTORE_PASSWORD',
+              'ANDROID_UPLOAD_KEY_ALIAS',
+              'ANDROID_UPLOAD_KEY_PASSWORD',
+          ]
+          missing = [name for name in required if not os.environ.get(name)]
+          if missing:
+              raise SystemExit('Missing required GitHub signing secrets: ' + ', '.join(missing))
+
+          try:
+              key_bytes = base64.b64decode(
+                  os.environ['ANDROID_UPLOAD_KEYSTORE_BASE64'],
+                  validate=True,
+              )
+          except Exception as exc:
+              raise SystemExit(f'Upload keystore secret is not valid base64: {exc}')
+
+          if not key_bytes:
+              raise SystemExit('Decoded upload keystore is empty.')
+
+          key_path = Path(os.environ['ANDROID_UPLOAD_KEYSTORE_PATH'])
+          key_path.write_bytes(key_bytes)
+          key_path.chmod(0o600)
+          print('Upload keystore materialized securely on the runner.')
+          PY
+
+          keytool -list \
+            -keystore "$ANDROID_UPLOAD_KEYSTORE_PATH" \
+            -storepass "$ANDROID_UPLOAD_KEYSTORE_PASSWORD" \
+            -alias "$ANDROID_UPLOAD_KEY_ALIAS" \
+            >/dev/null
+
+      - name: Install pinned native toolchain
+        run: npm ci
+
+      - name: Build native web payload
+        run: npm run mobile:prepare
+
+      - name: Sync Android project
+        run: |
+          test -d android || npx cap add android
+          npx cap sync android
+          node scripts/configure-native-platforms.mjs
+
+      - name: Generate approved Android branding
+        run: |
+          mkdir -p native-assets
+          cp assets/images/gtg-pwa-512.svg native-assets/icon.svg
+          cp assets/images/gtg-pwa-maskable.svg native-assets/icon-foreground.svg
+          cp assets/images/gtg-pwa-512.svg native-assets/splash.svg
+          npx capacitor-assets generate --android --assetPath native-assets --iconBackgroundColor '#070507' --splashBackgroundColor '#070507'
+
+      - name: Run native contract tests
+        run: npm run test:native
+
+      - name: Run release guards
+        run: |
+          node tests/release-contract.test.cjs
+          node tests/girls-feature-parity.test.cjs
+          node tests/girls-product-parity-ui.test.cjs
+          node tests/girls-pwa-security-contract.test.cjs
+          node tests/retest-100.cjs
+
+      - name: Verify Android package identity
+        run: |
+          grep -Fq 'applicationId "com.storystone.thegirlstripguide"' android/app/build.gradle
+          grep -Fq '"appId": "com.storystone.thegirlstripguide"' capacitor.config.json
+
+      - name: Build signed release AAB
+        working-directory: android
+        run: ./gradlew bundleRelease
+
+      - name: Verify AAB signature
+        run: |
+          AAB='android/app/build/outputs/bundle/release/app-release.aab'
+          test -s "$AAB"
+          jarsigner -verify -strict "$AAB"
+          echo 'Signed Android App Bundle verified.'
+
+      - name: Verify no signing material entered the repository
+        run: |
+          test -z "$(git status --porcelain -- '*.jks' '*.keystore')"
+          ! git ls-files | grep -E '\.(jks|keystore)$'
+
+      - name: Upload signed Android release bundle
+        uses: actions/upload-artifact@v4
+        with:
+          name: girls-trip-guide-android-release-signed
+          path: android/app/build/outputs/bundle/release/app-release.aab
+          if-no-files-found: error
+          retention-days: 14
+
+      - name: Remove upload key
+        if: always()
+        run: rm -f "$ANDROID_UPLOAD_KEYSTORE_PATH"
