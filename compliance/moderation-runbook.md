@@ -1,7 +1,8 @@
 # The Girls Trip Guide — moderation and complaints runbook
 
 Version: 4 September 2026  
-Owner: Storystone Ltd safety lead
+Online Safety Lead: Hugh Azmi  
+Deputy Online Safety Lead: Ediz
 
 1. Record the report time, reporter contact, trip reference, content reference and allegation. Never copy suspected CSAM.
 2. Triage:
@@ -21,7 +22,7 @@ Operational contact: hello@thegirlstripguide.com
 
 ## Launch dependencies
 
-- Named safety lead and deputy recorded.
+- Named safety lead and deputy recorded — completed 4 September 2026.
 - NCA CSEA Industry Reporting Portal registration complete.
 - Support mailbox receipt and monitoring tested.
 - Report log location and access permissions confirmed.
