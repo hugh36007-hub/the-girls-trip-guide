@@ -9,6 +9,7 @@ const PRICE_ID='price_1U7JW9EUQ5rJLL4MdDH2x3qP'
 const SITE='https://thegirlstripguide.com/create-trip'
 const PROJECT='vtcmvwixfqyxqghibsla'
 const WEBHOOK_URL=`https://${PROJECT}.supabase.co/functions/v1/stripe-webhook`
+const LEGAL_VERSION='2026-09-04'
 const UUID=/^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i
 
 function env(name:string){const v=Deno.env.get(name)||'';if(!v)throw new Error(`${name} is not configured.`);return v}
@@ -105,7 +106,7 @@ async function reusablePending(tripId:string,userId:string){
         await verifyAndActivate(s,userId)
         return {alreadyActive:true,reference:s.id}
       }
-      if(s?.status==='open'&&s?.url)return {url:s.url,id:s.id,reused:true}
+      if(s?.status==='open'&&s?.url&&s?.metadata?.terms_accepted==='true'&&s?.metadata?.immediate_access_requested==='true'&&s?.metadata?.legal_version===LEGAL_VERSION)return {url:s.url,id:s.id,reused:true}
       if(s?.status==='expired')await service(`purchases?id=eq.${encodeURIComponent(row.id)}`,{method:'PATCH',headers:{Prefer:'return=minimal'},body:JSON.stringify({status:'cancelled'})})
     }catch(error){console.warn('Pending checkout inspection failed',error)}
   }
@@ -124,6 +125,7 @@ Deno.serve(async(req)=>{
       const tripId=clean(body?.tripId,80)
       if(!UUID.test(tripId))return json({error:'A secure trip is required before purchase.'},400)
       const trip=await assertOwner(tripId,user.id)
+      if(body?.termsAccepted!==true||body?.immediateAccessRequested!==true||clean(body?.legalVersion,20)!==LEGAL_VERSION||clean(body?.refundPolicyVersion,20)!==LEGAL_VERSION)return json({error:'Please accept the current legal terms and request immediate access before checkout.'},400)
       if(await currentEntitlement(tripId))return json({ok:true,paid:true,already_active:true,tripId},200)
       const pending=await reusablePending(tripId,user.id)
       if(pending?.alreadyActive)return json({ok:true,paid:true,already_active:true,tripId,reference:pending.reference},200)
@@ -134,7 +136,8 @@ Deno.serve(async(req)=>{
       params.set('success_url',`${SITE}?stripe=success&session_id={CHECKOUT_SESSION_ID}`);params.set('cancel_url',`${SITE}?stripe=cancelled`)
       params.set('metadata[product]','the-full-trip');params.set('metadata[product_key]','girls');params.set('metadata[trip_name]',clean(body?.tripName,160)||trip.name||'The Full Trip')
       params.set('metadata[trip_id]',tripId);params.set('metadata[purchaser_user_id]',user.id)
-      params.set('payment_intent_data[metadata][product]','the-full-trip');params.set('payment_intent_data[metadata][product_key]','girls');params.set('payment_intent_data[metadata][trip_id]',tripId)
+      const consentedAt=new Date().toISOString();params.set('metadata[terms_accepted]','true');params.set('metadata[immediate_access_requested]','true');params.set('metadata[legal_version]',LEGAL_VERSION);params.set('metadata[refund_policy_version]',LEGAL_VERSION);params.set('metadata[consented_at]',consentedAt)
+      params.set('payment_intent_data[metadata][product]','the-full-trip');params.set('payment_intent_data[metadata][product_key]','girls');params.set('payment_intent_data[metadata][trip_id]',tripId);params.set('payment_intent_data[metadata][terms_accepted]','true');params.set('payment_intent_data[metadata][immediate_access_requested]','true');params.set('payment_intent_data[metadata][legal_version]',LEGAL_VERSION);params.set('payment_intent_data[metadata][consented_at]',consentedAt)
       const customerEmail=clean(body?.email,320);if(customerEmail&&/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(customerEmail))params.set('customer_email',customerEmail)
       const session=await stripeRequest('checkout/sessions',params)
       await upsertPurchase({tripId,session,userId:user.id,status:'pending'})
