@@ -24,5 +24,5 @@ Operational contact: hello@thegirlstripguide.com
 
 - Named safety lead and deputy recorded — completed 4 September 2026.
 - NCA CSEA Industry Reporting Portal registration complete.
-- Support mailbox receipt and monitoring tested.
+- Mailbox test sent 4 September 2026 (marker GTG-20260904-01) but not received: add the apex MX record `inbound-smtp.eu-west-1.amazonaws.com` at priority 10, then retest; daily monitoring ownership remains to be confirmed.
 - Report log location and access permissions confirmed.
