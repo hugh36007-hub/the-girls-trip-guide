@@ -19,7 +19,7 @@ for(const href of styles){
 }
 
 function loadFinalHome(){
- for(const src of ['/girls-live-dashboard-hero.js?v=6','/girls-live-chat-sync.js?v=3']){
+ for(const src of ['/girls-live-dashboard-hero.js?v=6','/girls-live-chat-sync.js?v=3','/girls-parity-refresh-20260904.js?v=1']){
    if(document.querySelector(`script[src="${src}"]`))continue;
    const script=document.createElement('script');script.src=src;script.async=false;script.dataset.gtgCriticalHome='1';document.head.appendChild(script);
  }
