@@ -8,6 +8,7 @@ const styles=[
  '/girls-drawer-fix.css?v=1',
  '/girls-hero-vault-ux.css?v=1',
  '/girls-final-refinement.css?v=1',
+ '/girls-date-focus-fix.css?v=1',
  '/live-dashboard-hero.css?v=6'
 ];
 for(const href of styles){
