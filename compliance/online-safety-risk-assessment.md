@@ -53,7 +53,7 @@ Review: at least annually and before a significant service change
 
 ## Remaining corporate dependencies
 
-1. Storystone Ltd must designate a named UK safety lead and deputy.
+1. Completed 4 September 2026: Hugh Azmi designated Online Safety Lead; Ediz designated Deputy Online Safety Lead.
 2. Register for the National Crime Agency CSEA Industry Reporting Portal and keep the reporting route operational.
 3. Confirm that hello@thegirlstripguide.com and the contact-form destination are monitored every working day.
 4. Keep a moderation/report log and conduct quarterly sampling during public testing.
