@@ -27,3 +27,4 @@
 
   globalThis.GTGNativeUrl = Object.freeze({ normalise });
 })();
+// Rebuild trigger: 2026-09-05 address privacy sync.
