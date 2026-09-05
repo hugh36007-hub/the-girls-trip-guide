@@ -30,5 +30,8 @@
   "devDependencies": {
     "@capacitor/assets": "3.0.5",
     "@capacitor/cli": "8.5.0"
+  },
+  "overrides": {
+    "tar": "7.5.22"
   }
 }

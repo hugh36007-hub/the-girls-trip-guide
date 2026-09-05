@@ -6,6 +6,8 @@ on:
       - native-app-isolated
     paths:
       - '.github/workflows/android-signed-release.yml'
+      - 'package.json'
+      - 'package-lock.json'
   workflow_dispatch:
 
 permissions:
@@ -38,7 +40,7 @@ jobs:
         shell: bash
         run: |
           npm audit --json > dependency-audit.json || test "$?" -eq 1
-          node -e 'const a=require("./dependency-audit.json");if(a.error)throw Error(JSON.stringify(a.error));console.log(JSON.stringify(a,null,2))'
+          node -e 'const a=require("./dependency-audit.json");if(a.error)throw Error(JSON.stringify(a.error));console.log(JSON.stringify(a,null,2));if(a.metadata.vulnerabilities.critical)throw Error("Critical build dependency vulnerability")'
           npm audit --omit=dev --audit-level=high
 
       - name: Build native web payload
