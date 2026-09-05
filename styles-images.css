@@ -16,3 +16,12 @@
 .hero .mini-label{margin-bottom:10px!important}.hero h1{font-size:43px!important;margin-bottom:24px!important}
 .hero-copy{padding:24px 0 48px!important}
 }
+
+/* Homepage mobile hotfix: the inline homepage stylesheet is loaded after this file and also uses !important.
+   Use a deliberately more specific selector so the image reservation cannot be reset to 500px. */
+@media(max-width:600px){
+html body main#top section.hero{padding-top:clamp(190px,45.82vw,250px)!important;min-height:0!important;max-height:none!important}
+html body main#top section.hero>.hero-scene{height:clamp(190px,45.82vw,250px)!important;background-size:100% auto!important;background-position:center top!important}
+html body main#top section.hero>.hero-shade{height:clamp(190px,45.82vw,250px)!important}
+html body main#top section.hero .hero-inner{min-height:0!important;max-height:none!important;display:block!important}
+}
