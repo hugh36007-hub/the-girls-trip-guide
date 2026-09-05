@@ -19,6 +19,7 @@ const BUNDLES={
     '/girls-mobile-evidence-grid.js?v=2',
     '/girls-media-readiness.js?v=2',
     '/girls-direct-photo-viewer.js?v=4',
+    '/girls-gallery-no-zoom.js?v=1',
     '/girls-media-flow-refinement.js?v=1',
     '/girls-media-social.js?v=1',
     '/evidence-intro-dismiss.js?v=1',
