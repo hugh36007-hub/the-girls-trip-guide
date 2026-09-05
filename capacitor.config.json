@@ -3,8 +3,6 @@
   "appName": "The Girls Trip Guide",
   "webDir": "mobile-web",
   "server": {
-    "hostname": "thegirlstripguide.com",
-    "iosScheme": "https",
     "androidScheme": "https"
   },
   "ios": {
@@ -14,16 +12,20 @@
   },
   "android": {
     "allowMixedContent": false,
-    "captureInput": true,
-    "webContentsDebuggingEnabled": false
+    "captureInput": false,
+    "webContentsDebuggingEnabled": false,
+    "backgroundColor": "#070507"
   },
   "plugins": {
     "App": {
       "disableBackButtonHandler": false
     },
+    "CapacitorHttp": {
+      "enabled": true
+    },
     "Keyboard": {
       "resize": "body",
-      "resizeOnFullScreen": true
+      "resizeOnFullScreen": false
     },
     "SplashScreen": {
       "launchAutoHide": false,
@@ -33,7 +35,7 @@
       "androidScaleType": "CENTER_CROP"
     },
     "StatusBar": {
-      "overlaysWebView": true,
+      "overlaysWebView": false,
       "style": "LIGHT",
       "backgroundColor": "#070507"
     }

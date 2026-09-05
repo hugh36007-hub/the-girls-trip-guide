@@ -38,25 +38,7 @@
             <key>UISceneDelegateClassName</key>
             <string>$(PRODUCT_MODULE_NAME).SceneDelegate</string>
             <key>UISceneStoryboardFile</key>
-            <string>Main</string>
-        	<key>NSCameraUsageDescription</key>
-	<string>Add photos and videos to your private trip.</string>
-	<key>NSMicrophoneUsageDescription</key>
-	<string>Record sound when adding a video to your private trip.</string>
-	<key>NSPhotoLibraryUsageDescription</key>
-	<string>Select photos and videos to add to your private trip.</string>
-	<key>NSPhotoLibraryAddUsageDescription</key>
-	<string>Save trip photos and videos to your library when you choose.</string>
-	<key>CFBundleURLTypes</key>
-	<array>
-		<dict>
-			<key>CFBundleURLName</key>
-			<string>com.storystone.thegirlstripguide</string>
-			<key>CFBundleURLSchemes</key>
-			<array><string>thegirlstripguide</string></array>
-		</dict>
-	</array>
-</dict>
+            <string>Main</string></dict>
       </array>
     </dict>
 	</dict>
@@ -81,11 +63,30 @@
 		<string>UIInterfaceOrientationLandscapeLeft</string>
 		<string>UIInterfaceOrientationLandscapeRight</string>
 	</array>
-	<key>UIViewControllerBasedStatusBarAppearance</key>
-	<true/>
+	<key>NSCameraUsageDescription</key>
+	<string>Add photos and videos to your private trip.</string>
+	<key>NSMicrophoneUsageDescription</key>
+	<string>Record sound when adding a video to your private trip.</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>Select photos and videos to add to your private trip.</string>
+	<key>NSPhotoLibraryAddUsageDescription</key>
+	<string>Save trip photos and videos to your library when you choose.</string>
+	<key>CFBundleURLTypes</key>
+	<array>
+		<dict>
+			<key>CFBundleURLName</key>
+			<string>com.storystone.thegirlstripguide</string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>thegirlstripguide</string>
+			</array>
+		</dict>
+	</array>
 	<key>UIViewControllerBasedStatusBarAppearance</key>
 	<false/>
 	<key>UIStatusBarStyle</key>
 	<string>UIStatusBarStyleLightContent</string>
+	<key>ITSAppUsesNonExemptEncryption</key>
+	<false/>
 </dict>
 </plist>

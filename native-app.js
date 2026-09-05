@@ -391,7 +391,7 @@
     installNetworkBanner();
     installKeyboardHandling();
 
-    await safeCall(() => StatusBar?.setOverlaysWebView({ overlay: true }));
+    await safeCall(() => StatusBar?.setOverlaysWebView({ overlay: capacitor.getPlatform?.() !== 'android' }));
     await safeCall(() => StatusBar?.setStyle({ style: 'LIGHT' }));
     await safeCall(() => StatusBar?.setBackgroundColor({ color: '#070507' }));
 

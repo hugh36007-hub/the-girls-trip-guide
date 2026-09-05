@@ -15,17 +15,11 @@ jobs:
   signed-release:
     runs-on: ubuntu-24.04
     timeout-minutes: 30
-    env:
-      ANDROID_UPLOAD_KEYSTORE_PATH: /tmp/gtg-upload-key.jks
-      ANDROID_UPLOAD_KEYSTORE_BASE64: ${{ secrets.GTG_ANDROID_UPLOAD_KEYSTORE_BASE64 }}
-      ANDROID_UPLOAD_KEYSTORE_PASSWORD: ${{ secrets.GTG_ANDROID_UPLOAD_KEYSTORE_PASSWORD }}
-      ANDROID_UPLOAD_KEY_ALIAS: ${{ secrets.GTG_ANDROID_UPLOAD_KEY_ALIAS }}
-      ANDROID_UPLOAD_KEY_PASSWORD: ${{ secrets.GTG_ANDROID_UPLOAD_KEY_PASSWORD }}
 
     steps:
       - uses: actions/checkout@v4
         with:
-          ref: native-app-isolated
+          ref: ${{ github.sha }}
           fetch-depth: 0
 
       - uses: actions/setup-node@v4
@@ -37,7 +31,57 @@ jobs:
           distribution: temurin
           java-version: '21'
 
+      - name: Install pinned native toolchain
+        run: npm ci
+
+      - name: Audit dependencies
+        shell: bash
+        run: |
+          npm audit --json > dependency-audit.json || test "$?" -eq 1
+          node -e 'const a=require("./dependency-audit.json");if(a.error)throw Error(JSON.stringify(a.error));console.log(JSON.stringify(a,null,2))'
+          npm audit --omit=dev --audit-level=high
+
+      - name: Build native web payload
+        run: npm run mobile:prepare
+
+      - name: Sync Android project
+        run: |
+          test -d android || npx cap add android
+          npx cap sync android
+          node scripts/configure-native-platforms.mjs
+
+      - name: Generate approved Android branding
+        run: |
+          mkdir -p native-assets
+          cp assets/images/gtg-pwa-512.svg native-assets/icon.svg
+          cp assets/images/gtg-pwa-maskable.svg native-assets/icon-foreground.svg
+          cp assets/images/gtg-pwa-512.svg native-assets/splash.svg
+          npx capacitor-assets generate --android --assetPath native-assets --iconBackgroundColor '#070507' --splashBackgroundColor '#070507'
+
+      - name: Run native contract tests
+        run: npm run test:native
+
+      - name: Run release guards
+        run: |
+          node tests/release-contract.test.cjs
+          node tests/girls-feature-parity.test.cjs
+          node tests/girls-product-parity-ui.test.cjs
+          node tests/girls-pwa-security-contract.test.cjs
+          node tests/retest-100.cjs
+
+      - name: Verify Android package identity
+        run: |
+          grep -Fq 'applicationId "com.storystone.thegirlstripguide"' android/app/build.gradle
+          grep -Fq '"appId": "com.storystone.thegirlstripguide"' capacitor.config.json
+
       - name: Validate and materialize upload key
+        env:
+          ANDROID_UPLOAD_KEYSTORE_PATH: /tmp/gtg-upload-key.jks
+          ANDROID_UPLOAD_KEYSTORE_BASE64: ${{ secrets.GTG_ANDROID_UPLOAD_KEYSTORE_BASE64 }}
+          ANDROID_UPLOAD_KEYSTORE_PASSWORD: ${{ secrets.GTG_ANDROID_UPLOAD_KEYSTORE_PASSWORD }}
+          ANDROID_UPLOAD_KEY_ALIAS: ${{ secrets.GTG_ANDROID_UPLOAD_KEY_ALIAS }}
+          ANDROID_UPLOAD_KEY_PASSWORD: ${{ secrets.GTG_ANDROID_UPLOAD_KEY_PASSWORD }}
+    
         shell: bash
         run: |
           python3 - <<'PY'
@@ -78,47 +122,23 @@ jobs:
             -alias "$ANDROID_UPLOAD_KEY_ALIAS" \
             >/dev/null
 
-      - name: Install pinned native toolchain
-        run: npm ci
-
-      - name: Build native web payload
-        run: npm run mobile:prepare
-
-      - name: Sync Android project
-        run: |
-          test -d android || npx cap add android
-          npx cap sync android
-          node scripts/configure-native-platforms.mjs
-
-      - name: Generate approved Android branding
-        run: |
-          mkdir -p native-assets
-          cp assets/images/gtg-pwa-512.svg native-assets/icon.svg
-          cp assets/images/gtg-pwa-maskable.svg native-assets/icon-foreground.svg
-          cp assets/images/gtg-pwa-512.svg native-assets/splash.svg
-          npx capacitor-assets generate --android --assetPath native-assets --iconBackgroundColor '#070507' --splashBackgroundColor '#070507'
-
-      - name: Run native contract tests
-        run: npm run test:native
-
-      - name: Run release guards
-        run: |
-          node tests/release-contract.test.cjs
-          node tests/girls-feature-parity.test.cjs
-          node tests/girls-product-parity-ui.test.cjs
-          node tests/girls-pwa-security-contract.test.cjs
-          node tests/retest-100.cjs
-
-      - name: Verify Android package identity
-        run: |
-          grep -Fq 'applicationId "com.storystone.thegirlstripguide"' android/app/build.gradle
-          grep -Fq '"appId": "com.storystone.thegirlstripguide"' capacitor.config.json
-
       - name: Build signed release AAB
+        env:
+          ANDROID_UPLOAD_KEYSTORE_PATH: /tmp/gtg-upload-key.jks
+          ANDROID_UPLOAD_KEYSTORE_PASSWORD: ${{ secrets.GTG_ANDROID_UPLOAD_KEYSTORE_PASSWORD }}
+          ANDROID_UPLOAD_KEY_ALIAS: ${{ secrets.GTG_ANDROID_UPLOAD_KEY_ALIAS }}
+          ANDROID_UPLOAD_KEY_PASSWORD: ${{ secrets.GTG_ANDROID_UPLOAD_KEY_PASSWORD }}
+    
         working-directory: android
         run: ./gradlew bundleRelease
 
       - name: Verify AAB signature
+        env:
+          ANDROID_UPLOAD_KEYSTORE_PATH: /tmp/gtg-upload-key.jks
+          ANDROID_UPLOAD_KEYSTORE_PASSWORD: ${{ secrets.GTG_ANDROID_UPLOAD_KEYSTORE_PASSWORD }}
+          ANDROID_UPLOAD_KEY_ALIAS: ${{ secrets.GTG_ANDROID_UPLOAD_KEY_ALIAS }}
+          ANDROID_UPLOAD_KEY_PASSWORD: ${{ secrets.GTG_ANDROID_UPLOAD_KEY_PASSWORD }}
+    
         shell: bash
         run: |
           AAB='android/app/build/outputs/bundle/release/app-release.aab'
@@ -145,6 +165,11 @@ jobs:
           test "$EXPECTED_SHA256" = "$ACTUAL_SHA256"
           echo 'Signed Android App Bundle verified against the configured upload key.'
 
+      - name: Record exact release provenance
+        run: |
+          test "$(git rev-parse HEAD)" = "$GITHUB_SHA"
+          node scripts/release-provenance.mjs
+
       - name: Verify no signing material entered the repository
         run: |
           test -z "$(git status --porcelain -- '*.jks' '*.keystore')"
@@ -154,10 +179,24 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: girls-trip-guide-android-release-signed
-          path: android/app/build/outputs/bundle/release/app-release.aab
+          path: |
+            android/app/build/outputs/bundle/release/app-release.aab
+            release-provenance.json
           if-no-files-found: error
           retention-days: 14
 
+      - name: Upload dependency audit
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: dependency-audit
+          path: dependency-audit.json
+          if-no-files-found: warn
+          retention-days: 14
+
       - name: Remove upload key
+        env:
+          ANDROID_UPLOAD_KEYSTORE_PATH: /tmp/gtg-upload-key.jks
+    
         if: always()
         run: rm -f "$ANDROID_UPLOAD_KEYSTORE_PATH"
