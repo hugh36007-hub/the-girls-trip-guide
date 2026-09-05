@@ -8,6 +8,7 @@ on:
       - '.github/workflows/android-signed-release.yml'
       - 'package.json'
       - 'package-lock.json'
+      - 'capacitor.config.json'
   workflow_dispatch:
 
 permissions:
