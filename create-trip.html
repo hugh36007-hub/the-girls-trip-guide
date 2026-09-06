@@ -47,5 +47,8 @@
 <script defer src="/girls-role-aware-dock.js?v=2"></script>
 <script defer src="/girls-performance-loader.js?v=1"></script>
 <script defer src="/girls-pwa-register.js?v=1"></script>
+<script>
+(()=>{const app=document.getElementById('app');if(!app)return;const refine=()=>{const card=app.querySelector('.auth-screen .auth-card');if(!card)return;const p=card.querySelector(':scope>p');if(p&&p.textContent.includes('One private place for the plan, money, group and the evidence.'))p.textContent='One private place for the plan, money, group and travel documents. Full Trip adds the GALS and shared media.';};new MutationObserver(refine).observe(app,{childList:true,subtree:true});refine();})();
+</script>
 </body>
 </html>
