@@ -55,6 +55,27 @@ async function mediaDeletePreflight(mediaId){
   return true;
 }
 
+/* Entry screen escape: Plan your trip is a full page, so provide an explicit close control back to the public site. */
+function ensureAuthClose(){
+  const card=document.querySelector('.auth-screen .auth-card');
+  if(!card||!card.querySelector('[data-a="signin"]')||card.querySelector('.auth-close-home'))return;
+  if(!document.getElementById('gtg-auth-close-style')){
+    const style=document.createElement('style');
+    style.id='gtg-auth-close-style';
+    style.textContent='.auth-card{position:relative}.auth-close-home{position:absolute;top:16px;right:16px;width:42px;height:42px;display:grid;place-items:center;border:1px solid rgba(255,79,163,.34);border-radius:50%;background:rgba(7,5,7,.72);color:#fff;text-decoration:none;font:300 30px/1 Arial,sans-serif;z-index:3;transition:border-color .15s,background .15s}.auth-close-home:hover,.auth-close-home:focus-visible{border-color:#ff4fa3;background:rgba(255,79,163,.12);outline:none}@media(max-width:600px){.auth-close-home{top:13px;right:13px;width:38px;height:38px;font-size:27px}}';
+    document.head.appendChild(style);
+  }
+  const close=document.createElement('a');
+  close.className='auth-close-home';
+  close.href='/';
+  close.setAttribute('aria-label','Close and return to The Girls Trip Guide');
+  close.textContent='×';
+  card.appendChild(close);
+}
+const authCloseObserver=new MutationObserver(ensureAuthClose);
+authCloseObserver.observe(document.documentElement,{childList:true,subtree:true});
+ensureAuthClose();
+
 const protectedSelector='[data-a="setMediaHero"],[data-a="removeHero"],[data-delete-media],[data-a="deleteVaultMedia"]';
 document.addEventListener('click',async event=>{
   const target=event.target.closest?.(protectedSelector);if(!target)return;
