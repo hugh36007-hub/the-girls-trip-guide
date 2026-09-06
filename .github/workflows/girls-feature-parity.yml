@@ -35,6 +35,7 @@ jobs:
           node --check girls-trip-social.js
           node --check girls-chat-sheet.js
           node --check girls-product-parity.js
+          node --check girls-member-view-parity.js
           node --check girls-inner-page-polish.js
           node --check girls-document-audience.js
           node --check girls-hero-vault-ux.js
@@ -67,6 +68,7 @@ jobs:
           node --check tests/girls-media-readiness.test.mjs
           node --check tests/girls-home-thumbnail-prime.test.mjs
           node --check tests/girls-home-chat-expand.test.cjs
+          node --check tests/girls-member-view-parity.test.cjs
           node --check tests/girls-media-social-contract.test.cjs
           node --check tests/girls-media-flow-refinement.test.mjs
           node --check tests/girls-poll-nudge.test.mjs
@@ -108,6 +110,8 @@ jobs:
         run: node tests/hero-control-contract.test.cjs
       - name: Role-aware dock contract
         run: node tests/role-aware-dock.test.cjs
+      - name: Girls member view parity contract
+        run: node tests/girls-member-view-parity.test.cjs
       - name: Cross-tab session and owner guard
         run: node tests/girls-session-guard.test.cjs
       - name: Premium media UX contract
