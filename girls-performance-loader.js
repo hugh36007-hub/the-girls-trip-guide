@@ -8,7 +8,7 @@ const BUNDLES={
   onboarding:['/girls-batch1-parity-safe-v2.js?v=20260907-2','/girls-convince-copy-v2.js?v=20260907-1'],
   parity:['/girls-product-parity.js?v=1'],
   shell:['/girls-section-layout.js?v=1','/girls-inner-page-polish.js?v=1'],
-  plan:['/girls-document-audience.css?v=1'],
+  plan:['/girls-document-audience.js?v=1'],
   money:['/girls-payment-nudge.js?v=2'],
   group:['/girls-trip-social.js?v=2','/girls-chat-sheet.js?v=3','/girls-conversation-inbox.js?v=1','/conversation-header-align.js?v=1','/girls-poll-nudge.js?v=1'],
   evidence:[
