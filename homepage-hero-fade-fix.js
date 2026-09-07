@@ -14,13 +14,13 @@ const apply=()=>{
 @media(min-width:601px){
   body main#top .hero .hero-shade{
     background:linear-gradient(90deg,
-      rgba(255,250,252,.98) 0%,
-      rgba(255,250,252,.95) 15%,
-      rgba(255,250,252,.82) 24%,
-      rgba(255,250,252,.52) 31%,
-      rgba(255,250,252,.20) 37%,
-      rgba(255,250,252,.05) 41%,
-      rgba(255,250,252,0) 44%
+      rgba(255,255,255,1) 0%,
+      rgba(255,255,255,1) 30%,
+      rgba(255,255,255,.96) 32%,
+      rgba(255,255,255,.78) 35%,
+      rgba(255,255,255,.45) 38%,
+      rgba(255,255,255,.18) 40%,
+      rgba(255,255,255,0) 42%
     )!important;
   }
   body main#top .hero .hero-copy{
