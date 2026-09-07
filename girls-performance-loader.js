@@ -4,7 +4,7 @@
 if(window.__GTG_PERFORMANCE_LOADER__)return;window.__GTG_PERFORMANCE_LOADER__=true;
 
 const BUNDLES={
-  appTheme:['/logged-in-light-theme.js?v=20260907-3','/logged-in-light-polish.js?v=20260907-1','/logged-in-light-theme-final-fix.js?v=20260907-1','/logged-in-stat-icons.js?v=20260907-1'],
+  appTheme:['/logged-in-light-theme.js?v=20260907-3','/logged-in-light-polish.js?v=20260907-1','/logged-in-light-theme-final-fix.js?v=20260907-1','/logged-in-stat-icons.js?v=20260907-2'],
   parity:['/girls-product-parity.js?v=1'],
   shell:['/girls-section-layout.js?v=1','/girls-inner-page-polish.js?v=1'],
   plan:['/girls-document-audience.js?v=1'],
