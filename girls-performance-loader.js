@@ -4,6 +4,7 @@
 if(window.__GTG_PERFORMANCE_LOADER__)return;window.__GTG_PERFORMANCE_LOADER__=true;
 
 const BUNDLES={
+  appTheme:['/logged-in-light-theme.js?v=20260907-2'],
   parity:['/girls-product-parity.js?v=1'],
   shell:['/girls-section-layout.js?v=1','/girls-inner-page-polish.js?v=1'],
   plan:['/girls-document-audience.js?v=1'],
@@ -62,6 +63,9 @@ async function loadRoute(route){
  if(route==='group')await loadBundle('group');
  if(route==='evidence')await loadBundle('evidence');
 }
+
+/* The logged-in colour system is critical UI, not a deferred enhancement. */
+void loadBundle('appTheme');
 
 function afterDashboard(callback,delay=0){
  const run=()=>setTimeout(()=>{if(visible())callback()},delay);
