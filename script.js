@@ -11,8 +11,9 @@ const briefingRefine='/briefing-page-refinement.js?v=20260907-4';
 const appLight='/logged-in-light-theme.js?v=20260907-1';
 const mobilePublic='/mobile-front-of-house-fixes.js?v=20260907-2';
 const homeFade='/homepage-hero-fade-fix.js?v=20260907-2';
+const batch1='/girls-batch1-public.js?v=20260907-2';
 if(document.readyState==='loading'){
-  document.write(`<script src="${core}"><\/script><script src="${theme}"><\/script><script src="${heroSurface}"><\/script><script src="${situation}"><\/script><script src="${heroContrast}"><\/script><script src="${freeVsFull}"><\/script><script src="${galsRefine}"><\/script><script src="${briefingRefine}"><\/script><script src="${appLight}"><\/script><script src="${mobilePublic}"><\/script><script src="${homeFade}"><\/script>`);
+  document.write(`<script src="${core}"><\/script><script src="${theme}"><\/script><script src="${heroSurface}"><\/script><script src="${situation}"><\/script><script src="${heroContrast}"><\/script><script src="${freeVsFull}"><\/script><script src="${galsRefine}"><\/script><script src="${briefingRefine}"><\/script><script src="${appLight}"><\/script><script src="${mobilePublic}"><\/script><script src="${homeFade}"><\/script><script src="${batch1}"><\/script>`);
   return;
 }
 const a=document.createElement('script');
@@ -58,6 +59,12 @@ a.addEventListener('load',()=>{
                     const hf=document.createElement('script');
                     hf.src=homeFade;
                     hf.async=false;
+                    hf.addEventListener('load',()=>{
+                      const p=document.createElement('script');
+                      p.src=batch1;
+                      p.async=false;
+                      document.head.appendChild(p);
+                    });
                     document.head.appendChild(hf);
                   });
                   document.head.appendChild(m);
