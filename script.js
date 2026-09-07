@@ -3,7 +3,7 @@
 const core='/script-core.js?v=20260907-1';
 const theme='/sitewide-light.js?v=20260907-1';
 const situation='/situation-image-fix.js?v=20260907-2';
-const heroContrast='/the-gals-hero-contrast-fix.js?v=20260907-1';
+const heroContrast='/the-gals-hero-contrast-fix.js?v=20260907-2';
 const freeVsFull='/free-vs-full-refinement.js?v=20260907-1';
 if(document.readyState==='loading'){
   document.write(`<script src="${core}"><\/script><script src="${theme}"><\/script><script src="${situation}"><\/script><script src="${heroContrast}"><\/script><script src="${freeVsFull}"><\/script>`);
