@@ -29,11 +29,10 @@ Deno.serve(async(req)=>{
     if(!tripError&&trip?.product_key!=='girls')return redirect(new URL('/create-trip?invite=invalid',site).toString())
     if(tripError)throw tripError
 
-    const target=new URL('/create-trip',site)
-    target.searchParams.set('trip_id',member.trip_id)
-    target.searchParams.set('action','plan')
-    target.searchParams.set('invite','accepted')
-    const {data:linkData,error:linkError}=await db.auth.admin.generateLink({type:'magiclink',email:member.email,options:{redirectTo:target.toString()}})
+    // The auth callback itself returns to a neutral page on our own origin.
+    // The exact invited trip is persisted there before the magic-link round trip.
+    const authReturn=new URL('/invite-return.html',site)
+    const {data:linkData,error:linkError}=await db.auth.admin.generateLink({type:'magiclink',email:member.email,options:{redirectTo:authReturn.toString()}})
     if(linkError)throw linkError
     const actionLink=linkData?.properties?.action_link
     const userId=linkData?.user?.id
@@ -44,9 +43,6 @@ Deno.serve(async(req)=>{
     if(confirmError)throw confirmError
     await db.from('audit_events').insert({trip_id:member.trip_id,actor_id:userId,event_type:'invite_accepted',entity_type:'trip_member',entity_id:member.id})
 
-    // Handoff through our own origin first so the exact invited trip is persisted
-    // before the Supabase magic-link round trip. This prevents an existing session
-    // or a multi-trip test account from falling into the wrong trip.
     const handoff=new URL('/invite-auth.html',site)
     handoff.searchParams.set('trip_id',member.trip_id)
     handoff.hash=`magic=${encodeURIComponent(actionLink)}`
