@@ -25,3 +25,54 @@ html body main#top section.hero>.hero-scene{height:clamp(190px,45.82vw,250px)!im
 html body main#top section.hero>.hero-shade{height:clamp(190px,45.82vw,250px)!important}
 html body main#top section.hero .hero-inner{min-height:0!important;max-height:none!important;display:block!important}
 }
+
+/* Homepage light theme — 7 Sep 2026. Scope is deliberately limited to the homepage. */
+html:has(body .full-arrangement),body:has(.full-arrangement){background:#fff!important;color:#191316!important}
+body:has(.full-arrangement) .site-header{background:rgba(255,255,255,.97)!important;border-bottom:1px solid rgba(25,19,22,.08)!important;box-shadow:0 8px 24px rgba(57,22,39,.05)!important}
+body:has(.full-arrangement) .site-header .brand.site-logo{background:#fff!important}
+body:has(.full-arrangement) .site-header .nav-links a{color:#191316!important}
+body:has(.full-arrangement) .site-header .nav-links a:hover,body:has(.full-arrangement) .site-header .nav-links a.active{color:#ed2f8b!important}
+body:has(.full-arrangement) .site-header .menu-button{color:#191316!important}
+body:has(.full-arrangement) .site-header .mobile-plan-link{background:#fff!important;color:#ed2f8b!important}
+body:has(.full-arrangement) .site-header .mobile-drawer{background:#fff!important;border-color:rgba(255,79,163,.22)!important;box-shadow:0 18px 34px rgba(57,22,39,.12)!important}
+body:has(.full-arrangement) .site-header .mobile-drawer a{color:#191316!important;border-bottom-color:rgba(25,19,22,.08)!important}
+body:has(.full-arrangement) .hero{background:#fff!important}
+body:has(.full-arrangement) .hero-shade{background:linear-gradient(90deg,rgba(255,255,255,.99) 0%,rgba(255,255,255,.96) 27%,rgba(255,255,255,.82) 39%,rgba(255,255,255,.42) 53%,rgba(255,255,255,.08) 67%,rgba(255,255,255,0) 100%)!important}
+body:has(.full-arrangement) .hero-copy{color:#191316!important}
+body:has(.full-arrangement) .hero .mini-label{color:#ed2f8b!important}
+body:has(.full-arrangement) .hero h1{color:#111!important;text-shadow:none!important}
+body:has(.full-arrangement) .hero h1 span{color:#ed2f8b!important;text-shadow:none!important}
+body:has(.full-arrangement) .hero-intro{color:rgba(25,19,22,.88)!important}
+body:has(.full-arrangement) .hero-intro strong{color:#111!important}
+body:has(.full-arrangement) .hero-note,body:has(.full-arrangement) .hero-join{color:rgba(25,19,22,.68)!important}
+body:has(.full-arrangement) .hero-note strong{color:#191316!important}
+body:has(.full-arrangement) .hero .pill-outline{border-color:rgba(237,47,139,.58)!important;background:rgba(255,255,255,.82)!important;color:#ed2f8b!important}
+body:has(.full-arrangement) .hero .hero-how-cta{background:rgba(255,255,255,.86)!important;color:#ed2f8b!important;border-color:rgba(237,47,139,.55)!important}
+body:has(.full-arrangement) .paper-rip{background:#fff!important}
+body:has(.full-arrangement) .full-arrangement{background:#fff!important;color:#191316!important}
+body:has(.full-arrangement) .full-arrangement-card{background:radial-gradient(circle at 84% 18%,rgba(255,79,163,.065),transparent 31%),linear-gradient(180deg,#fff,#fffbfd)!important;border-color:rgba(237,47,139,.38)!important;box-shadow:0 24px 60px rgba(101,36,68,.10)!important}
+body:has(.full-arrangement) .full-arrangement h2{color:#191316!important}
+body:has(.full-arrangement) .full-arrangement h2 span,body:has(.full-arrangement) .full-arrangement-kicker,body:has(.full-arrangement) .full-arrangement-price>strong{color:#ed2f8b!important}
+body:has(.full-arrangement) .full-arrangement-copy{color:rgba(25,19,22,.76)!important}
+body:has(.full-arrangement) .full-arrangement-benefits span{color:rgba(25,19,22,.88)!important}
+body:has(.full-arrangement) .full-arrangement-price{border-color:rgba(237,47,139,.24)!important}
+body:has(.full-arrangement) .full-arrangement-price small{color:rgba(25,19,22,.64)!important}
+body:has(.full-arrangement) .gals-tease{color:rgba(25,19,22,.78)!important}
+body:has(.full-arrangement) .gals-tease strong{color:#191316!important}
+body:has(.full-arrangement) .gals-tease-button{background:#fff!important;color:#ed2f8b!important;border-color:rgba(237,47,139,.55)!important}
+body:has(.full-arrangement) .footer{background:#fff8fc!important;color:#191316!important;border-top:1px solid rgba(237,47,139,.12)!important}
+body:has(.full-arrangement) .footer .brand.site-logo,body:has(.full-arrangement) .footer .footer-branding .brand.site-logo{background:#fff8fc!important}
+body:has(.full-arrangement) .footer h3{color:#191316!important}
+body:has(.full-arrangement) .footer a:not(.brand){color:rgba(25,19,22,.72)!important}
+body:has(.full-arrangement) .footer .footer-branding p,body:has(.full-arrangement) .footer p{color:rgba(25,19,22,.62)!important}
+body:has(.full-arrangement) .footer-bottom{border-top-color:rgba(25,19,22,.10)!important;color:rgba(25,19,22,.48)!important}
+@media(max-width:600px){
+html:has(body .full-arrangement),html body:has(.full-arrangement){background:#fff!important}
+html body:has(.full-arrangement) main#top section.hero{background:#fff!important}
+html body:has(.full-arrangement) main#top section.hero>.hero-shade{background:linear-gradient(180deg,rgba(255,255,255,0) 76%,rgba(255,255,255,.22) 89%,rgba(255,255,255,.96) 100%)!important}
+html body:has(.full-arrangement) main#top section.hero .hero-inner{background:#fff!important}
+html body:has(.full-arrangement) main#top section.hero .hero-copy{background:#fff!important;color:#191316!important}
+html body:has(.full-arrangement) main#top section.hero .hero-intro,html body:has(.full-arrangement) main#top section.hero .hero-intro+.hero-intro{color:rgba(25,19,22,.82)!important}
+html body:has(.full-arrangement) main#top section.hero .hero-note,html body:has(.full-arrangement) main#top section.hero .hero-join{color:rgba(25,19,22,.66)!important}
+html body:has(.full-arrangement) main#top section.hero .paper-rip{background:#fff!important}
+}
