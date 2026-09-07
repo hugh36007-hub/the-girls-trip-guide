@@ -6,8 +6,9 @@ const situation='/situation-image-fix.js?v=20260907-2';
 const heroContrast='/the-gals-hero-contrast-fix.js?v=20260907-2';
 const freeVsFull='/free-vs-full-refinement.js?v=20260907-1';
 const galsRefine='/gals-page-refinement.js?v=20260907-1';
+const briefingRefine='/briefing-page-refinement.js?v=20260907-1';
 if(document.readyState==='loading'){
-  document.write(`<script src="${core}"><\/script><script src="${theme}"><\/script><script src="${situation}"><\/script><script src="${heroContrast}"><\/script><script src="${freeVsFull}"><\/script><script src="${galsRefine}"><\/script>`);
+  document.write(`<script src="${core}"><\/script><script src="${theme}"><\/script><script src="${situation}"><\/script><script src="${heroContrast}"><\/script><script src="${freeVsFull}"><\/script><script src="${galsRefine}"><\/script><script src="${briefingRefine}"><\/script>`);
   return;
 }
 const a=document.createElement('script');
@@ -33,6 +34,12 @@ a.addEventListener('load',()=>{
           const f=document.createElement('script');
           f.src=galsRefine;
           f.async=false;
+          f.addEventListener('load',()=>{
+            const g=document.createElement('script');
+            g.src=briefingRefine;
+            g.async=false;
+            document.head.appendChild(g);
+          });
           document.head.appendChild(f);
         });
         document.head.appendChild(e);
