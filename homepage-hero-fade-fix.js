@@ -15,13 +15,16 @@ const apply=()=>{
   body main#top .hero .hero-shade{
     background:linear-gradient(90deg,
       rgba(255,250,252,.98) 0%,
-      rgba(255,250,252,.94) 18%,
-      rgba(255,250,252,.80) 28%,
-      rgba(255,250,252,.50) 37%,
-      rgba(255,250,252,.18) 46%,
-      rgba(255,250,252,.04) 52%,
-      rgba(255,250,252,0) 57%
+      rgba(255,250,252,.95) 15%,
+      rgba(255,250,252,.82) 24%,
+      rgba(255,250,252,.52) 31%,
+      rgba(255,250,252,.20) 37%,
+      rgba(255,250,252,.05) 41%,
+      rgba(255,250,252,0) 44%
     )!important;
+  }
+  body main#top .hero .hero-copy{
+    max-width:520px!important;
   }
 }
 `;
