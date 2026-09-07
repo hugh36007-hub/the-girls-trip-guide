@@ -8,7 +8,7 @@ style.id='briefing-page-refinement';
 style.textContent=`
 /* Briefing — scoped light-theme refinement */
 html.gtg-white-site body .hero{background:#080508!important;color:#fff!important}
-html.gtg-white-site body .hero:after{background:linear-gradient(90deg,rgba(5,3,5,.78) 0%,rgba(5,3,5,.64) 20%,rgba(5,3,5,.36) 38%,rgba(5,3,5,.10) 58%,rgba(5,3,5,0) 76%)!important}
+html.gtg-white-site body .hero:after{background:linear-gradient(90deg,rgba(5,3,5,.66) 0%,rgba(5,3,5,.50) 20%,rgba(5,3,5,.25) 40%,rgba(5,3,5,.08) 55%,rgba(5,3,5,0) 69%)!important}
 html.gtg-white-site body .hero .eyebrow{color:#ff4fa3!important}
 html.gtg-white-site body .hero h1{color:#fff!important;text-shadow:0 2px 12px rgba(0,0,0,.34)!important}
 html.gtg-white-site body .hero h1 span{color:#ff4fa3!important}
@@ -34,7 +34,7 @@ html.gtg-white-site body .closing h2{color:#191316!important;text-shadow:0 2px 1
 html.gtg-white-site body .closing p{color:#55454d!important}
 
 @media(max-width:700px){
- html.gtg-white-site body .hero:after{background:linear-gradient(180deg,rgba(5,3,5,0) 0%,rgba(5,3,5,0) 48%,rgba(5,3,5,.16) 55%,rgba(5,3,5,.88) 64%,#050305 100%)!important}
+ html.gtg-white-site body .hero:after{background:linear-gradient(180deg,rgba(5,3,5,0) 0%,rgba(5,3,5,0) 48%,rgba(5,3,5,.12) 55%,rgba(5,3,5,.74) 66%,#050305 100%)!important}
  html.gtg-white-site body .brief-row{padding:26px 0!important}
  html.gtg-white-site body .rule-card{padding:14px 15px!important}
  html.gtg-white-site body .closing{padding:48px 18px 54px!important}
