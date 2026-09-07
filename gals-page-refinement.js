@@ -8,6 +8,7 @@ style.id='gals-page-refinement';
 style.textContent=`
 /* GALS page — scoped white-theme refinement */
 html.gtg-white-site body .hero{background:radial-gradient(circle at 78% 15%,rgba(255,79,163,.22),transparent 28%),linear-gradient(180deg,#100910,#070507)!important;color:#fff!important}
+html.gtg-white-site body .hero:after{background:linear-gradient(90deg,rgba(7,5,7,.64) 0%,rgba(7,5,7,.48) 22%,rgba(7,5,7,.24) 42%,rgba(7,5,7,.08) 56%,rgba(7,5,7,0) 69%)!important}
 html.gtg-white-site body .hero h1{color:#fff!important;text-shadow:0 2px 12px rgba(0,0,0,.32)!important}
 html.gtg-white-site body .hero h1 span{color:#ff4fa3!important}
 html.gtg-white-site body .hero .hero-kicker{color:#ff82c0!important}
@@ -58,6 +59,7 @@ html.gtg-white-site body .closing p{color:#55454d!important}
 html.gtg-white-site body .closing .price-note{color:#6b5962!important}
 
 @media(max-width:700px){
+ html.gtg-white-site body .hero:after{background:linear-gradient(0deg,#070507 0%,rgba(7,5,7,.88) 36%,rgba(7,5,7,.24) 66%,rgba(7,5,7,0) 100%)!important}
  html.gtg-white-site body .strip-item{padding:13px 12px!important}
  html.gtg-white-site body .team{padding:34px 0 42px!important}
  html.gtg-white-site body .team-head{margin-bottom:20px!important}
