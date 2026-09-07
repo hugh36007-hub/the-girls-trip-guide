@@ -4,7 +4,7 @@
 if(window.__GTG_PERFORMANCE_LOADER__)return;window.__GTG_PERFORMANCE_LOADER__=true;
 
 const BUNDLES={
-  appTheme:['/logged-in-light-theme.js?v=20260907-2'],
+  appTheme:['/logged-in-light-theme.js?v=20260907-3','/logged-in-light-polish.js?v=20260907-1'],
   parity:['/girls-product-parity.js?v=1'],
   shell:['/girls-section-layout.js?v=1','/girls-inner-page-polish.js?v=1'],
   plan:['/girls-document-audience.js?v=1'],
@@ -85,10 +85,10 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
 window.addEventListener('popstate',()=>{const route=action();void loadRoute(route);if(route!=='overview')idle(()=>void loadBundle('parity'))});
 
 document.addEventListener('pointerdown',event=>{
- const target=event.target.closest?.('[data-tab],[data-a],[data-action],[data-trip-social-tab],[data-parity-comms],[data-role-expense],[data-role-upload]');if(!target)return;
+ const target=event.target.closest?.('[data-tab],[data-a],[data-action],[data-trip-social-tab],[data-parity-comms],[data-role-money],[data-role-upload]');if(!target)return;
  const tab=target.dataset.tab||'';const a=target.dataset.a||target.dataset.action||'';
  if(['plan','money','group','evidence'].includes(tab)){void loadRoute(tab);void loadBundle('parity')}
- if(target.matches('[data-role-expense]')||a==='addExpense')void loadRoute('money');
+ if(target.matches('[data-role-money]')||a==='addExpense')void loadRoute('money');
  if(target.matches('[data-role-upload]')||['upload','vault','vaultUpload'].includes(a)){void loadRoute('evidence');void loadBundle('upload')}
  if(a==='addDocument')void loadRoute('plan');
  if(a==='drawer')void loadBundle('drawer');
