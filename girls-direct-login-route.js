@@ -73,7 +73,15 @@ function routeIfReady(){
 document.addEventListener('submit',event=>{
   const form=event.target;
   if(!(form instanceof HTMLFormElement)||form.id!=='otpForm')return;
-  const intent=form.querySelector('[name="intent"]')?.value||'signin';
+  const intentInput=form.querySelector('[name="intent"]');
+  if(inviteTarget()){
+    /* Secure email invite already supplies the name and trip. Never ask for
+       those again after the OTP is verified. */
+    if(intentInput)intentInput.value='signin';
+    arm();
+    return;
+  }
+  const intent=intentInput?.value||'signin';
   if(intent==='signin')arm();else clearDirect();
 },true);
 
