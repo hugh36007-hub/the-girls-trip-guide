@@ -2,7 +2,7 @@
 'use strict';
 const core='/script-core.js?v=20260907-1';
 const theme='/sitewide-light.js?v=20260907-1';
-const situation='/situation-image-fix.js?v=20260907-1';
+const situation='/situation-image-fix.js?v=20260907-2';
 if(document.readyState==='loading'){
   document.write(`<script src="${core}"><\/script><script src="${theme}"><\/script><script src="${situation}"><\/script>`);
   return;
