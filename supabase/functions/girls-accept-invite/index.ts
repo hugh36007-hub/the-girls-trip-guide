@@ -25,23 +25,34 @@ Deno.serve(async(req)=>{
     const supplied=await sha256(token)
     if(!member||!member.invite_token_hash||supplied!==member.invite_token_hash)return redirect(new URL('/create-trip?invite=invalid',site).toString())
     if(member.invite_token_expires_at&&new Date(member.invite_token_expires_at).getTime()<Date.now())return redirect(new URL('/create-trip?invite=expired',site).toString())
-    const {data:trip,error:tripError}=await db.from('trips').select('name,invite_code,product_key').eq('id',member.trip_id).single();if(!tripError&&trip?.product_key!=='girls')return redirect(new URL('/create-trip?invite=invalid',site).toString())
+    const {data:trip,error:tripError}=await db.from('trips').select('name,invite_code,product_key').eq('id',member.trip_id).single()
+    if(!tripError&&trip?.product_key!=='girls')return redirect(new URL('/create-trip?invite=invalid',site).toString())
     if(tripError)throw tripError
+
     const target=new URL('/create-trip',site)
-    target.searchParams.set('trip_id',member.trip_id);target.searchParams.set('action','plan');target.searchParams.set('invite','accepted')
+    target.searchParams.set('trip_id',member.trip_id)
+    target.searchParams.set('action','plan')
+    target.searchParams.set('invite','accepted')
     const {data:linkData,error:linkError}=await db.auth.admin.generateLink({type:'magiclink',email:member.email,options:{redirectTo:target.toString()}})
     if(linkError)throw linkError
     const actionLink=linkData?.properties?.action_link
     const userId=linkData?.user?.id
     if(!actionLink||!userId)throw new Error('Could not create secure access link')
+
     const now=new Date().toISOString()
     const {error:confirmError}=await db.from('trip_members').update({user_id:userId,status:'confirmed',opened_at:now,confirmed_at:now,invite_token_hash:null,invite_token_expires_at:null,updated_at:now}).eq('id',member.id)
     if(confirmError)throw confirmError
     await db.from('audit_events').insert({trip_id:member.trip_id,actor_id:userId,event_type:'invite_accepted',entity_type:'trip_member',entity_id:member.id})
-    return redirect(actionLink)
+
+    // Handoff through our own origin first so the exact invited trip is persisted
+    // before the Supabase magic-link round trip. This prevents an existing session
+    // or a multi-trip test account from falling into the wrong trip.
+    const handoff=new URL('/invite-auth.html',site)
+    handoff.searchParams.set('trip_id',member.trip_id)
+    handoff.hash=`magic=${encodeURIComponent(actionLink)}`
+    return redirect(handoff.toString())
   }catch(error){
     console.error('girls-accept-invite failed',error)
     return page('Invitation unavailable','<div class="eyebrow">Invitation unavailable</div><h1>That link did not work.</h1><p>Ask the organiser to send a fresh invitation.</p>',500)
   }
 })
-
