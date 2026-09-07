@@ -1,5 +1,6 @@
 (()=>{
 'use strict';
+if('serviceWorker' in navigator){navigator.serviceWorker.getRegistration('/').then(reg=>reg?.update()).catch(()=>{});}
 const core='/script-core.js?v=20260907-1';
 const theme='/sitewide-light.js?v=20260907-2';
 const heroSurface='/hero-surface-correction.js?v=20260907-1';
