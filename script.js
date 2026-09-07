@@ -9,8 +9,9 @@ const freeVsFull='/free-vs-full-refinement.js?v=20260907-1';
 const galsRefine='/gals-page-refinement.js?v=20260907-2';
 const briefingRefine='/briefing-page-refinement.js?v=20260907-3';
 const appLight='/logged-in-light-theme.js?v=20260907-1';
+const mobilePublic='/mobile-front-of-house-fixes.js?v=20260907-1';
 if(document.readyState==='loading'){
-  document.write(`<script src="${core}"><\/script><script src="${theme}"><\/script><script src="${heroSurface}"><\/script><script src="${situation}"><\/script><script src="${heroContrast}"><\/script><script src="${freeVsFull}"><\/script><script src="${galsRefine}"><\/script><script src="${briefingRefine}"><\/script><script src="${appLight}"><\/script>`);
+  document.write(`<script src="${core}"><\/script><script src="${theme}"><\/script><script src="${heroSurface}"><\/script><script src="${situation}"><\/script><script src="${heroContrast}"><\/script><script src="${freeVsFull}"><\/script><script src="${galsRefine}"><\/script><script src="${briefingRefine}"><\/script><script src="${appLight}"><\/script><script src="${mobilePublic}"><\/script>`);
   return;
 }
 const a=document.createElement('script');
@@ -48,6 +49,12 @@ a.addEventListener('load',()=>{
                 const h=document.createElement('script');
                 h.src=appLight;
                 h.async=false;
+                h.addEventListener('load',()=>{
+                  const m=document.createElement('script');
+                  m.src=mobilePublic;
+                  m.async=false;
+                  document.head.appendChild(m);
+                });
                 document.head.appendChild(h);
               });
               document.head.appendChild(g);
