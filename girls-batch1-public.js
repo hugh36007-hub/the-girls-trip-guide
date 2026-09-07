@@ -24,7 +24,7 @@ const style=document.createElement('style');style.id='gtg-batch1-public-css';sty
 .full-arrangement-benefits{grid-template-columns:1fr 1fr!important}
 .full-arrangement-benefits span:last-child{grid-column:1/-1}
 .gtg-batch1-compare{display:inline-flex!important;align-items:center;justify-content:center;margin-top:12px!important;text-decoration:none}
-.gtg-batch1-set-up-note{margin:12px auto 0;max-width:290px;color:rgba(255,255,255,.55);font-size:11px;line-height:1.45}
+.gtg-batch1-set-up-note{margin:12px auto 0;max-width:290px;color:#74686f;font-size:11px;line-height:1.45}
 @media(max-width:600px){.full-arrangement-benefits{grid-template-columns:1fr!important}.full-arrangement-benefits span:last-child{grid-column:auto}.gtg-batch1-set-up-note{font-size:10.5px}}
 `;document.head.appendChild(style);
 apply();new MutationObserver(apply).observe(document.documentElement,{childList:true,subtree:true});
