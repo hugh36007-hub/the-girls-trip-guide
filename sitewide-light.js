@@ -35,7 +35,7 @@ if(PUBLIC_PATHS.has(currentPath)){
   document.querySelectorAll('main > section').forEach(section=>{
     const cls=(section.className||'').toString().toLowerCase();
     const bg=getComputedStyle(section).backgroundImage||'';
-    const photographic=bg.includes('url(')||cls.includes('plan-hero')||cls.includes('product-hero')||cls.includes('hero-shell');
+    const photographic=bg.includes('url(')||cls.includes('plan-hero')||cls.includes('product-hero')||cls.includes('hero-shell')||!!section.querySelector('img.hero-image');
     if(!photographic)section.classList.add('gtg-light-surface');
   });
 }
