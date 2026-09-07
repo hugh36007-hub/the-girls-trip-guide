@@ -11,7 +11,7 @@ const galsRefine='/gals-page-refinement.js?v=20260907-2';
 const briefingRefine='/briefing-page-refinement.js?v=20260907-5';
 const appLight='/logged-in-light-theme.js?v=20260907-1';
 const mobilePublic='/mobile-front-of-house-fixes.js?v=20260907-2';
-const homeFade='/homepage-hero-fade-fix.js?v=20260907-5';
+const homeFade='/homepage-hero-fade-fix.js?v=20260907-6';
 if(document.readyState==='loading'){
   document.write(`<script src="${core}"><\/script><script src="${theme}"><\/script><script src="${heroSurface}"><\/script><script src="${situation}"><\/script><script src="${heroContrast}"><\/script><script src="${freeVsFull}"><\/script><script src="${galsRefine}"><\/script><script src="${briefingRefine}"><\/script><script src="${appLight}"><\/script><script src="${mobilePublic}"><\/script><script src="${homeFade}"><\/script>`);
   return;
