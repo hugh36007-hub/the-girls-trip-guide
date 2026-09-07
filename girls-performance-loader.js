@@ -24,7 +24,8 @@ const BUNDLES={
     '/girls-media-flow-refinement.js?v=1',
     '/girls-media-social.js?v=1',
     '/evidence-intro-dismiss.js?v=1',
-    '/video-thumbnail-fix.js?v=1'
+    '/video-thumbnail-fix.js?v=1',
+    '/girls-evidence-light-corner-fix.js?v=20260907-1'
   ],
   drawer:['/girls-free-entitlement-guard.js?v=1','/trip-export-menu-guard.js?v=1','/trip-export.js?v=1'],
   home:['/girls-home-thumbnail-prime.js?v=1'],
