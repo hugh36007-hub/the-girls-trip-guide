@@ -26,7 +26,8 @@ html.gtg-white-site body .num,html.gtg-white-site body .section-kicker{color:#ed
 html.gtg-white-site body .rule-card{background:linear-gradient(180deg,#fff 0%,#fffafd 100%)!important;border:1.5px solid rgba(255,79,163,.38)!important;box-shadow:0 14px 32px rgba(63,28,46,.065)!important;color:#191316!important}
 html.gtg-white-site body .rule-card b{color:#191316!important}
 html.gtg-white-site body .rule-card>span:not(.rule-fallback){color:#55454d!important}
-html.gtg-white-site body .rule-icon{border-color:rgba(255,79,163,.34)!important;background:#fff5f9!important;box-shadow:0 8px 20px rgba(63,28,46,.045)!important}
+html.gtg-white-site body .rule-icon{border-color:rgba(255,79,163,.34)!important;background:#fff5f9!important;box-shadow:0 8px 20px rgba(63,28,46,.045)!important;overflow:hidden!important;padding:7px!important}
+html.gtg-white-site body .rule-icon img{width:100%!important;height:100%!important;object-fit:contain!important;object-position:center!important;transform:none!important;display:block!important}
 
 html.gtg-white-site body .closing{padding:68px 20px 74px!important;background:#fff!important;border-top:1px solid rgba(255,79,163,.15)!important}
 html.gtg-white-site body .closing-script{color:#ed2f8b!important}
@@ -37,6 +38,8 @@ html.gtg-white-site body .closing p{color:#55454d!important}
  html.gtg-white-site body .hero:after{background:linear-gradient(180deg,rgba(5,3,5,0) 0%,rgba(5,3,5,0) 48%,rgba(5,3,5,.12) 55%,rgba(5,3,5,.74) 66%,#050305 100%)!important}
  html.gtg-white-site body .brief-row{padding:26px 0!important}
  html.gtg-white-site body .rule-card{padding:14px 15px!important}
+ html.gtg-white-site body .rule-icon{padding:5px!important}
+ html.gtg-white-site body .rule-icon img{object-fit:contain!important;transform:none!important}
  html.gtg-white-site body .closing{padding:48px 18px 54px!important}
 }
 `;
