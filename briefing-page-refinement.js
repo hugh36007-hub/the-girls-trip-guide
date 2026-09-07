@@ -26,8 +26,9 @@ html.gtg-white-site body .num,html.gtg-white-site body .section-kicker{color:#ed
 html.gtg-white-site body .rule-card{background:linear-gradient(180deg,#fff 0%,#fffafd 100%)!important;border:1.5px solid rgba(255,79,163,.38)!important;box-shadow:0 14px 32px rgba(63,28,46,.065)!important;color:#191316!important}
 html.gtg-white-site body .rule-card b{color:#191316!important}
 html.gtg-white-site body .rule-card>span:not(.rule-fallback){color:#55454d!important}
-html.gtg-white-site body .rule-icon{width:68px!important;height:68px!important;margin:0 auto 14px!important;border:1px solid rgba(255,79,163,.34)!important;border-radius:16px!important;background:#fff5f9!important;box-shadow:0 8px 20px rgba(63,28,46,.045)!important;overflow:visible!important;padding:0!important;display:flex!important;align-items:center!important;justify-content:center!important}
-html.gtg-white-site body .rule-icon img{width:54px!important;height:54px!important;object-fit:contain!important;object-position:center!important;transform:none!important;display:block!important;border-radius:10px!important}
+html.gtg-white-site body .rule-icon{width:76px!important;height:76px!important;margin:0 auto 15px!important;border:1.5px solid rgba(255,79,163,.38)!important;border-radius:19px!important;background:#fff7fb!important;box-shadow:0 8px 22px rgba(237,47,139,.07)!important;overflow:hidden!important;padding:0!important;display:grid!important;place-items:center!important}
+html.gtg-white-site body .rule-icon img,html.gtg-white-site body .rule-icon .rule-fallback{display:none!important}
+html.gtg-white-site body .rule-icon svg{width:42px!important;height:42px!important;display:block!important;fill:none!important;stroke:#ed2f8b!important;stroke-width:1.8!important;stroke-linecap:round!important;stroke-linejoin:round!important}
 
 html.gtg-white-site body .closing{padding:68px 20px 74px!important;background:#fff!important;border-top:1px solid rgba(255,79,163,.15)!important}
 html.gtg-white-site body .closing-script{color:#ed2f8b!important}
@@ -38,10 +39,20 @@ html.gtg-white-site body .closing p{color:#55454d!important}
  html.gtg-white-site body .hero:after{background:linear-gradient(180deg,rgba(5,3,5,0) 0%,rgba(5,3,5,0) 48%,rgba(5,3,5,.12) 55%,rgba(5,3,5,.74) 66%,#050305 100%)!important}
  html.gtg-white-site body .brief-row{padding:26px 0!important}
  html.gtg-white-site body .rule-card{padding:14px 15px!important}
- html.gtg-white-site body .rule-icon{width:58px!important;height:58px!important;margin:0!important;border-radius:14px!important}
- html.gtg-white-site body .rule-icon img{width:46px!important;height:46px!important;object-fit:contain!important;object-position:center!important;transform:none!important;border-radius:9px!important}
+ html.gtg-white-site body .rule-icon{width:60px!important;height:60px!important;margin:0!important;border-radius:15px!important}
+ html.gtg-white-site body .rule-icon svg{width:34px!important;height:34px!important}
  html.gtg-white-site body .closing{padding:48px 18px 54px!important}
 }
 `;
 document.head.appendChild(style);
+
+const icons=[
+`<svg viewBox="0 0 48 48" aria-hidden="true"><rect x="8" y="14" width="32" height="23" rx="3"/><path d="M9 17l15 11 15-11"/><path d="M18.5 13.5l2.1-4.1 3.4 2.8 3.4-2.8 2.1 4.1"/></svg>`,
+`<svg viewBox="0 0 48 48" aria-hidden="true"><path d="M24 41s12-9.4 12-21a12 12 0 1 0-24 0c0 11.6 12 21 12 21z"/><circle cx="19" cy="20" r="3"/><circle cx="29" cy="20" r="3"/><path d="M14.5 29c.8-4.1 3.2-6 6.3-6 1.2 0 2.3.3 3.2.9 1-.6 2-.9 3.2-.9 3.1 0 5.5 1.9 6.3 6"/></svg>`,
+`<svg viewBox="0 0 48 48" aria-hidden="true"><rect x="9" y="9" width="25" height="31" rx="3"/><path d="M16 9V6h11v3"/><path d="M15 18l3 3 5-6"/><path d="M15 28l3 3 5-6"/><rect x="30" y="26" width="10" height="14" rx="2"/><path d="M33 26v-3h4v3"/></svg>`
+];
+const installIcons=()=>{
+  document.querySelectorAll('.rules .rule-icon').forEach((el,i)=>{if(icons[i])el.innerHTML=icons[i]});
+};
+if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',installIcons,{once:true});else installIcons();
 })();
