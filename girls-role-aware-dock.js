@@ -91,7 +91,7 @@ document.addEventListener('pointerdown',event=>{const dock=event.target.closest?
 
 let normaliseQueued=false;
 function scheduleNormalise(delay=0){if(normaliseQueued)return;normaliseQueued=true;setTimeout(()=>{normaliseQueued=false;normaliseDock()},delay)}
-const app=document.getElementById('app');if(app)new MutationObserver(()=>scheduleNormalise(0)).observe(app,{childList:true,subtree:false});
+const app=document.getElementById('app');if(app)new MutationObserver(()=>scheduleNormalise(0)).observe(app,{childList:true});
 window.addEventListener('popstate',()=>scheduleNormalise(20));
 document.addEventListener('click',e=>{if(e.target.closest?.('[data-tab]'))setTimeout(()=>scheduleNormalise(0),30)},true);
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',()=>scheduleNormalise(0),{once:true});else scheduleNormalise(0);
