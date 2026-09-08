@@ -78,6 +78,11 @@ if(!window.__GTG_LEGAL_FETCH_PATCH__){
  };
 }
 
+/* Poll state must exist before the first normalise() call. The previous ordering
+   entered the temporal dead zone for `pending` and then left two observers
+   repeatedly throwing on every DOM mutation. */
+let client=null,pending=[],latestOpen=null,voted=new Set(),pollBusy=false,lastPollRefresh=0,pollChannel=null,pollTrip='';
+
 function isFree(){return /free trip/i.test(document.querySelector('.hero-card .eyebrow')?.textContent||'')}
 function replaceExact(selector,from,to){document.querySelectorAll(selector).forEach(el=>{if(el.textContent.trim()===from)el.textContent=to})}
 function decorateStats(){document.querySelectorAll('.stat-row .stat[data-tab]').forEach(stat=>{const kind=stat.dataset.tab;if(!STAT_ICONS[kind]||stat.querySelector('.gtg-stat-icon'))return;const icon=document.createElement('span');icon.className='gtg-stat-icon';icon.setAttribute('aria-hidden','true');icon.innerHTML=STAT_ICONS[kind];stat.prepend(icon);stat.classList.add('gtg-stat-iconised')})}
@@ -115,7 +120,6 @@ new MutationObserver(()=>{if(queued)return;queued=true;requestAnimationFrame(()=
 normalise();
 
 /* Trip-wide poll discovery: latest open Free poll persists after voting; pending polls badge the Group tab. */
-let client=null,pending=[],latestOpen=null,voted=new Set(),pollBusy=false,lastPollRefresh=0,pollChannel=null,pollTrip='';
 const db=()=>client||(client=window.supabase?.createClient?.(SUPA,KEY,{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true}}));
 const tripId=()=>new URL(location.href).searchParams.get('trip_id')||'';
 function syncBadge(){
