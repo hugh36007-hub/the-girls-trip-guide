@@ -9,6 +9,7 @@ const BUNDLES={
   appTheme:[
     '/logged-in-light-theme.js?v=20260908-4',
     '/logged-in-light-polish.js?v=20260908-4',
+    '/girls-compact-inner-header.js?v=20260908-1',
     '/logged-in-light-theme-final-fix.js?v=20260907-1',
     '/logged-in-stat-icons.js?v=20260907-2',
     '/girls-direct-login-route.js?v=20260907-2',
