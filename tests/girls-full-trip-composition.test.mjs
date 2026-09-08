@@ -1,0 +1,40 @@
+import {spawn} from 'node:child_process';
+import fs from 'node:fs';
+import os from 'node:os';
+import path from 'node:path';
+import assert from 'node:assert/strict';
+import {fileURLToPath,pathToFileURL} from 'node:url';
+
+const root=path.resolve(path.dirname(fileURLToPath(import.meta.url)),'..');
+const chrome=[process.env.CHROME_BIN,process.env.CHROME_PATH,'/usr/bin/google-chrome','/usr/bin/google-chrome-stable','/opt/google/chrome/chrome','/usr/bin/chromium','/usr/bin/chromium-browser'].filter(Boolean).find(fs.existsSync);
+assert(chrome,'Chrome/Chromium required');
+const port=10020+Math.floor(Math.random()*80),profile=fs.mkdtempSync(path.join(os.tmpdir(),'gtg-composition-')),pagePath=path.join(os.tmpdir(),`gtg-composition-${Date.now()}.html`);
+fs.writeFileSync(pagePath,'<!doctype html><meta name="viewport" content="width=device-width,initial-scale=1"><body><div id="app"></div><div id="drawerRoot"></div><div id="modalRoot"></div><div id="toast"></div></body>');
+let stderr='';
+const proc=spawn(chrome,['--headless=new','--no-sandbox','--disable-gpu','--disable-dev-shm-usage','--disable-background-networking','--disable-component-update','--disable-extensions','--no-first-run','--no-default-browser-check','--remote-debugging-address=127.0.0.1',`--user-data-dir=${profile}`,`--remote-debugging-port=${port}`,`${pathToFileURL(pagePath).href}?trip_id=t1&action=overview`],{stdio:['ignore','ignore','pipe']});
+proc.stderr?.on('data',d=>stderr=(stderr+String(d)).slice(-8000));
+const wait=ms=>new Promise(resolve=>setTimeout(resolve,ms));
+async function target(){for(let i=0;i<600;i++){if(proc.exitCode!==null)throw Error(`Chrome exited before DevTools started (code ${proc.exitCode}). ${stderr}`);try{const r=await fetch(`http://127.0.0.1:${port}/json`);if(r.ok){const pages=await r.json(),page=pages.find(x=>x.type==='page')||pages[0];if(page)return page}}catch{}await wait(100)}throw Error(`Chrome unavailable after 60s. ${stderr}`)}
+function connect(url){return new Promise((resolve,reject)=>{const ws=new WebSocket(url),pending=new Map();let id=0;ws.onopen=()=>resolve({call(method,params={}){return new Promise((res,rej)=>{const n=++id;pending.set(n,{res,rej});ws.send(JSON.stringify({id:n,method,params}))})},close(){ws.close()}});ws.onerror=reject;ws.onmessage=event=>{const msg=JSON.parse(event.data);if(msg.id&&pending.has(msg.id)){const p=pending.get(msg.id);pending.delete(msg.id);msg.error?p.rej(Error(msg.error.message)):p.res(msg.result)}}})}
+async function evaluate(client,expression){const r=await client.call('Runtime.evaluate',{expression,returnByValue:true,awaitPromise:true});if(r.exceptionDetails)throw Error(r.exceptionDetails.exception?.description||r.exceptionDetails.text);return r.result.value}
+
+const baseHero=mode=>`<main class="dashboard" data-home-composition="${mode}"><div class="shell"><section class="hero-card"><div class="hero-meta"><div><div class="eyebrow">${mode==='full'?'Full Trip':'Free Trip'}</div><h1>Germany<br><span>2026</span></h1><p>28 Sept 2026 — 30 Sept 2026</p></div><div class="trip-stamp"><b>Private trip</b><span>2 confirmed</span></div></div></section><div class="stat-row"><button class="stat" data-tab="group"><b>2</b></button></div></div></main>`;
+
+try{
+ const page=await target(),client=await connect(page.webSocketDebuggerUrl);await client.call('Runtime.enable');await client.call('Emulation.setDeviceMetricsOverride',{width:390,height:844,deviceScaleFactor:3,mobile:false});
+ await evaluate(client,`window.supabase={createClient:()=>{const rows={trips:[{id:'t1',name:'Test 1b',destination:'Germany',start_date:'2026-09-28',end_date:'2026-09-30'}],trip_members:[{id:'m1',name:'Hugh',user_id:'u1'}],trip_chat_messages:[],trip_polls:[{id:'p1',question:'Sea or surf?',status:'open',closes_at:null,created_at:new Date().toISOString()}],trip_poll_options:[{id:'o1',poll_id:'p1',label:'Sea',sort_order:1}],trip_poll_votes:[],media:[]};function query(table){const result={data:rows[table]||[],error:null};const q={data:result.data,error:null,select(){return q},eq(){return q},in(){return q},order(){return q},limit(){return Promise.resolve(result)},single(){return Promise.resolve({data:result.data[0]||null,error:null})},then(resolve,reject){return Promise.resolve(result).then(resolve,reject)}};return q}return{from:query,auth:{getUser:async()=>({data:{user:{id:'u1'}}})},storage:{from:()=>({createSignedUrl:async()=>({data:{signedUrl:''},error:null})})},channel(){const c={on(){return c},subscribe(){return c}};return c},removeChannel(){}}}};document.getElementById('app').innerHTML=${JSON.stringify(baseHero('full'))};`);
+ for(const file of ['girls-home-hero-layout-match.js','girls-live-dashboard-hero.js','girls-home-social-hub-v3.js'])await evaluate(client,fs.readFileSync(path.join(root,file),'utf8'));
+ await wait(500);
+ const full=await evaluate(client,`({hero:document.querySelectorAll('.live-snapshot-hero').length,date:document.querySelectorAll('.live-date-card').length,legacyDate:document.querySelectorAll('.trip-stamp,.gtg-trip-stamp-final').length,countdown:document.querySelectorAll('.gtg-countdown').length,message:document.querySelectorAll('.live-message-card').length,freeChat:document.querySelectorAll('.gtg-home-chat-strip').length,polls:document.querySelectorAll('.gtg-home-poll-v3,.gtg-home-score-v3').length})`);
+ assert.deepEqual(full,{hero:1,date:1,legacyDate:0,countdown:0,message:1,freeChat:0,polls:0},'Full Home must have one exclusive hero/date/message composition');
+
+ await evaluate(client,`document.getElementById('app').innerHTML=${JSON.stringify(baseHero('free'))};`);await wait(700);
+ const free=await evaluate(client,`({hero:document.querySelectorAll('.live-snapshot-hero').length,date:document.querySelectorAll('.trip-stamp,.gtg-trip-stamp-final').length,countdown:document.querySelectorAll('.gtg-countdown').length,message:document.querySelectorAll('.live-message-card').length,chat:document.querySelectorAll('.gtg-home-chat-strip').length,polls:document.querySelectorAll('.gtg-home-poll-v3,.gtg-home-score-v3').length})`);
+ assert.equal(free.hero,0);assert.equal(free.date,1);assert.equal(free.countdown,1);assert.equal(free.message,0);assert.equal(free.chat,1);assert.equal(free.polls,1,'Free Home must own exactly one active poll component');
+
+ await evaluate(client,`document.getElementById('app').innerHTML='<main class="dashboard"><section class="panel active" data-panel="group"><div class="section-head"><div></div><div class="actions"><button data-parity-comms>GALS communications</button></div></div><section data-parity-block="group"><div class="gtg-plan-tools"><button data-parity-comms>GALS communications</button></div></section></section></main>';`);
+ await evaluate(client,fs.readFileSync(path.join(root,'girls-inner-page-polish.js'),'utf8'));await wait(120);
+ const group=await evaluate(client,`({count:document.querySelectorAll('[data-panel="group"] [data-parity-comms]').length,inActions:document.querySelectorAll('[data-panel="group"] .section-head .actions [data-parity-comms]').length})`);
+ assert.deepEqual(group,{count:1,inActions:1},'Group must retain exactly one GALS action in the header');
+ console.log('PASS Girls composition: exclusive Free/Full Home renderers and one Group GALS action');client.close();
+}finally{proc.kill('SIGKILL');try{fs.rmSync(profile,{recursive:true,force:true})}catch{}try{fs.rmSync(pagePath,{force:true})}catch{}}

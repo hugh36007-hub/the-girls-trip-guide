@@ -4,25 +4,45 @@ on:
   pull_request:
     paths:
       - 'girls-live-dashboard-hero.js'
+      - 'girls-app-v2.js'
+      - 'girls-home-hero-layout-match.js'
+      - 'girls-home-social-hub-v3.js'
       - 'girls-critical-style-loader.js'
       - 'girls-date-flow.js'
+      - 'girls-performance-loader.js'
+      - 'girls-product-parity.js'
+      - 'girls-inner-page-polish.js'
+      - 'girls-mobile-evidence-grid.js'
       - 'create-trip.html'
       - 'girls-pwa-register.js'
       - 'sw.js'
       - 'scripts/girls-final-refinement-contract.mjs'
       - 'tests/girls-live-dashboard-hero.test.cjs'
+      - 'tests/girls-full-trip-composition.test.mjs'
+      - 'tests/girls-full-trip-ui-regression.test.cjs'
+      - 'tests/girls-mobile-evidence-grid.test.mjs'
       - '.github/workflows/girls-live-dashboard-hero.yml'
   push:
     branches: [main]
     paths:
       - 'girls-live-dashboard-hero.js'
+      - 'girls-app-v2.js'
+      - 'girls-home-hero-layout-match.js'
+      - 'girls-home-social-hub-v3.js'
       - 'girls-critical-style-loader.js'
       - 'girls-date-flow.js'
+      - 'girls-performance-loader.js'
+      - 'girls-product-parity.js'
+      - 'girls-inner-page-polish.js'
+      - 'girls-mobile-evidence-grid.js'
       - 'create-trip.html'
       - 'girls-pwa-register.js'
       - 'sw.js'
       - 'scripts/girls-final-refinement-contract.mjs'
       - 'tests/girls-live-dashboard-hero.test.cjs'
+      - 'tests/girls-full-trip-composition.test.mjs'
+      - 'tests/girls-full-trip-ui-regression.test.cjs'
+      - 'tests/girls-mobile-evidence-grid.test.mjs'
       - '.github/workflows/girls-live-dashboard-hero.yml'
 
 jobs:
@@ -37,3 +57,9 @@ jobs:
         run: node --check girls-live-dashboard-hero.js
       - name: URL-constructor and mount-loop regression
         run: node tests/girls-live-dashboard-hero.test.cjs
+      - name: Free and Full Home DOM composition
+        run: node tests/girls-full-trip-ui-regression.test.cjs
+      - name: Free and Full Home browser composition
+        run: node tests/girls-full-trip-composition.test.mjs
+      - name: Paid empty Evidence and populated grid
+        run: node tests/girls-mobile-evidence-grid.test.mjs

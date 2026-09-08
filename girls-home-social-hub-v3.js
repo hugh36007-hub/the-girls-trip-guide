@@ -16,6 +16,7 @@ const tripId=()=>new globalThis.URL(location.href).searchParams.get('trip_id')||
 const action=()=>new globalThis.URL(location.href).searchParams.get('action')||'overview';
 const isHome=()=>action()==='overview'&&Boolean(document.querySelector('.dashboard'));
 const hero=()=>document.querySelector('.dashboard .shell > .hero-card')||document.querySelector('.dashboard .hero-card');
+const isFreeHome=()=>document.querySelector('.dashboard')?.dataset.homeComposition==='free';
 const rel=v=>{const ms=Date.now()-new Date(v||0).getTime();if(!Number.isFinite(ms)||ms<0)return'';const m=Math.floor(ms/60000);if(m<1)return'now';if(m<60)return`${m}m ago`;const h=Math.floor(m/60);if(h<24)return`${h}h ago`;return`${Math.floor(h/24)}d ago`};
 const full=v=>{try{return new Date(v).toLocaleString('en-GB',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'})}catch{return''}};
 const memberName=id=>members.find(m=>m.id===id)?.name||'Group member';
@@ -34,7 +35,7 @@ html.gtg-home-chat-v3-open,body.gtg-home-chat-v3-open{overflow:hidden!important;
 
 function clearHome(){document.querySelectorAll('.gtg-home-chat-strip,.gtg-home-poll-v3,.gtg-home-score-v3,.gtg-home-poll-v2,.gtg-home-score-v2').forEach(n=>n.remove());document.querySelectorAll('.hero-card.gtg-has-home-chat').forEach(n=>n.classList.remove('gtg-has-home-chat'))}
 function mountShell(){
- const h=hero();if(!h||!tripId()||!isHome())return false;
+ const h=hero();if(!h||!tripId()||!isHome()||!isFreeHome()){clearHome();return false}
  h.classList.add('gtg-has-home-chat');
  let chat=h.querySelector('.gtg-home-chat-strip');if(!chat){chat=document.createElement('button');chat.type='button';chat.className='gtg-home-chat-strip loading';chat.dataset.gtgHomeChatV3='1';chat.innerHTML='<span class="avatar">G</span><span class="copy"><b>Group chat</b><p>Loading conversation…</p></span><time></time>';h.appendChild(chat)}
  let poll=document.querySelector('.gtg-home-poll-v3');if(!poll){poll=document.createElement('section');poll.className='gtg-home-poll-v3 loading';poll.innerHTML='<small>Group decision</small><h3>Checking for active polls…</h3>';h.after(poll)}
@@ -67,12 +68,12 @@ function renderPoll(state){
  if(!box){box=document.createElement('section');box.className='gtg-home-poll-v3';h.after(box)}box.classList.remove('loading');box.innerHTML=`<small>Vote needed</small><h3>${esc(prompt.poll.question)}</h3><div class="opts">${prompt.options.map(o=>`<button type="button" data-gtg-v3-vote="${esc(prompt.poll.id)}" data-option="${esc(o.id)}">${esc(o.label)}</button>`).join('')}</div>`;
 }
 async function loadHome(){
- if(!isHome()||!tripId()){clearHome();return}
+ if(!isHome()||!tripId()||!isFreeHome()){clearHome();return}
  if(!mountShell())return;
  const token=++loadToken,id=tripId();
  try{
-  const x=await context();if(!x||token!==loadToken||x.id!==tripId())return;mountedTrip=id;
-  const [chat,poll]=await Promise.all([latestChat(x),activePoll(x)]);if(token!==loadToken||id!==tripId()||!isHome())return;
+  const x=await context();if(!x||token!==loadToken||x.id!==tripId()||!isFreeHome()){clearHome();return}mountedTrip=id;
+  const [chat,poll]=await Promise.all([latestChat(x),activePoll(x)]);if(token!==loadToken||id!==tripId()||!isHome()||!isFreeHome()){clearHome();return}
   renderChat(chat);renderPoll(poll);subscribe(x);
  }catch(err){if(token!==loadToken)return;console.warn('Girls Home social load failed',err);const chat=hero()?.querySelector('.gtg-home-chat-strip');if(chat){chat.classList.remove('loading');chat.innerHTML='<span class="avatar">G</span><span class="copy"><b>Group chat</b><p>Could not load conversation. Tap to retry.</p></span><time></time>'}const poll=document.querySelector('.gtg-home-poll-v3');if(poll){poll.classList.remove('loading');poll.innerHTML='<small>Group decision</small><h3>Polls could not be loaded.</h3>'}}
 }
@@ -95,7 +96,7 @@ async function fillFeed(force=true){if(!overlay)return;const feed=overlay.queryS
 async function openChat(){if(overlay)return;const x=await context().catch(()=>null);if(!x)return;lock();overlay=document.createElement('section');overlay.className='gtg-home-chat-v3';overlay.innerHTML=`<div class="gtg-home-chat-v3-toolbar" data-gtg-v3-drag><span class="gtg-home-chat-v3-grab"></span><span></span><div class="gtg-home-chat-v3-title"><strong>Group chat</strong><small>${esc(document.querySelector('.trip-title strong')?.textContent||'The trip')}</small></div><button type="button" class="gtg-home-chat-v3-close" data-gtg-v3-close aria-label="Close chat">×</button></div><div class="gtg-home-chat-v3-feed" data-gtg-v3-feed><div class="gtg-home-chat-v3-empty">Loading chat…</div></div><form class="gtg-home-chat-v3-form" data-gtg-v3-form><textarea name="message" maxlength="1000" required placeholder="Message the group…"></textarea><button type="submit">Send</button></form>`;document.body.appendChild(overlay);syncViewport();await fillFeed(true)}
 function closeChat(){if(!overlay)return;const old=overlay;overlay=null;old.style.setProperty('--gtg-chat-v3-drag',`${Math.max(innerHeight,500)}px`);setTimeout(()=>old.remove(),200);dragging=false;unlock()}
 
-function boot(){installStyles();if(isHome()&&tripId()){mountShell();void loadHome()}else clearHome()}
+function boot(){installStyles();if(isHome()&&tripId()&&isFreeHome()){mountShell();void loadHome()}else clearHome()}
 const app=document.getElementById('app');if(app)new MutationObserver(()=>{if(isHome()&&tripId()){mountShell();void loadHome()}else clearHome()}).observe(app,{childList:true,subtree:false});
 window.addEventListener('popstate',()=>{members=[];mountedTrip='';loadToken++;setTimeout(boot,0)});window.addEventListener('pageshow',boot);document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible')boot()});
 

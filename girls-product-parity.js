@@ -109,8 +109,9 @@ function moneyEnhance(){
 function groupEnhance(){
  if(tab()!=='group')return;const root=sectionRoot();if(!root)return;
  const pending=Math.max(0,state.members.length-confirmedCount());
+ const hasComms=Boolean(root.querySelector('.section-head .actions [data-parity-comms],.section-head .actions [data-parity-reminders]'));
  const block=document.createElement('section');block.dataset.parityBlock='group';block.className='gtg-group-summary';
- block.innerHTML=`<div class="gtg-overview-strip"><span><b>${confirmedCount()}/${state.members.length}</b><small>Confirmed</small></span><span><b>${pending}</b><small>Invites pending</small></span><span><b>${passportCount()}/${state.members.length}</b><small>Passports checked</small></span><span><b>${state.paid?state.mediaCount:'—'}</b><small>Uploads</small></span></div>${state.owner?'<div class="gtg-plan-tools"><button class="btn primary" data-parity-existing="invite">+ Invite</button>'+ (state.paid?'<button class="btn" data-parity-comms>GALS communications</button>':'<button class="btn" data-parity-reminders>Trip reminders</button>')+'</div>':`<article class="card gtg-readonly"><div class="eyebrow">Member view</div><b>Read only</b><p>The organiser controls names, passports, invitations and official trip details.</p></article>`}`;
+ block.innerHTML=`<div class="gtg-overview-strip"><span><b>${confirmedCount()}/${state.members.length}</b><small>Confirmed</small></span><span><b>${pending}</b><small>Invites pending</small></span><span><b>${passportCount()}/${state.members.length}</b><small>Passports checked</small></span><span><b>${state.paid?state.mediaCount:'—'}</b><small>Uploads</small></span></div>${state.owner?'<div class="gtg-plan-tools"><button class="btn primary" data-parity-existing="invite">+ Invite</button>'+ (hasComms?'':state.paid?'<button class="btn" data-parity-comms>GALS communications</button>':'<button class="btn" data-parity-reminders>Trip reminders</button>')+'</div>':`<article class="card gtg-readonly"><div class="eyebrow">Member view</div><b>Read only</b><p>The organiser controls names, passports, invitations and official trip details.</p></article>`}`;
  root.prepend(block)
 }
 

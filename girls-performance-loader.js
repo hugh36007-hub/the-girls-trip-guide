@@ -17,8 +17,8 @@ const BUNDLES={
     '/girls-home-shell-parity.js?v=20260908-1'
   ],
   onboarding:['/girls-batch1-parity-safe-v2.js?v=20260907-2','/girls-convince-copy-v2.js?v=20260907-1'],
-  parity:['/girls-product-parity.js?v=2'],
-  shell:['/girls-section-layout.js?v=1','/girls-inner-page-polish.js?v=1'],
+  parity:['/girls-product-parity.js?v=3'],
+  shell:['/girls-section-layout.js?v=1','/girls-inner-page-polish.js?v=2'],
   planDocuments:[DOC_SRC],
   money:['/girls-payment-nudge.js?v=2'],
   groupCore:[
@@ -36,7 +36,7 @@ const BUNDLES={
     '/girls-media-ux-plus.js?v=2',
     '/girls-evidence-parity.js?v=2',
     '/girls-media-quality-fix.js?v=4',
-    '/girls-mobile-evidence-grid.js?v=2',
+    '/girls-mobile-evidence-grid.js?v=3',
     '/girls-media-readiness.js?v=2',
     '/girls-direct-photo-viewer.js?v=4',
     '/girls-gallery-no-zoom.js?v=1',

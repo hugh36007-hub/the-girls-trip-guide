@@ -44,7 +44,7 @@ for(const href of ['/mobile-viewport-lock.css?v=2','/girls-final-refinement.css?
   assert(critical.includes(href),`critical loader must activate ${href}`);
 }
 assert(critical.includes('/live-dashboard-hero.css?v=6'),'final Home stylesheet must be activated by the first private startup script');
-assert(critical.includes('/girls-live-dashboard-hero.js?v=7'),'final Home transformer must be registered before girls-app-v2 can render');
+assert(critical.includes('/girls-live-dashboard-hero.js?v=8'),'final Home transformer must be registered before girls-app-v2 can render');
 assert(!fs.readFileSync('girls-date-flow.js','utf8').includes('girls-live-dashboard-hero.js'),'legacy date flow must not load a second Home transformer');
 assert(critical.includes("cloneNode(true)" )&&critical.includes('gtg-first-paint-cover'),'parsed private loading shell must remain as one stable paint cover during hydration');
 assert(critical.includes("hero.classList.contains('live-snapshot-hero')"),'paid overview cover must remain until the final Home shell exists');

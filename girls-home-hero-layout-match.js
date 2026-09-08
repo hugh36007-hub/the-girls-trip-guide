@@ -62,12 +62,14 @@ document.head.appendChild(css);
 function dateUtc(v){const m=String(v||'').match(/^(\d{4})-(\d{2})-(\d{2})/);return m?Date.UTC(+m[1],+m[2]-1,+m[3]):NaN}
 function daysTo(v){const start=dateUtc(v),now=new Date(),today=Date.UTC(now.getFullYear(),now.getMonth(),now.getDate());return Number.isFinite(start)?Math.max(0,Math.round((start-today)/86400000)):null}
 function fmt(v){const m=String(v||'').match(/^(\d{4})-(\d{2})-(\d{2})/);if(!m)return'TBC';return new Date(Date.UTC(+m[1],+m[2]-1,+m[3],12)).toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric',timeZone:'UTC'})}
+function isFreeHome(hero){return hero?.closest('.dashboard')?.dataset.homeComposition==='free'}
+function clearFreeHome(hero){if(!hero)return;hero.classList.remove('gtg-boys-layout');hero.querySelector('.gtg-countdown')?.remove();hero.querySelector('.gtg-trip-stamp-final')?.remove()}
 async function getTrip(id){if(cachedTrip?.id===id)return cachedTrip;const q=db();if(!q)return null;const {data,error}=await q.from('trips').select('id,name,destination,start_date,end_date').eq('id',id).eq('product_key','girls').single();if(error)throw error;cachedTrip=data||null;return cachedTrip}
 async function sync(){
  const u=new URL(location.href),action=u.searchParams.get('action')||'overview',tripId=u.searchParams.get('trip_id')||'';if(action!=='overview'||!tripId||working)return;
- const hero=document.querySelector('.dashboard .hero-card');if(!hero)return;working=true;
+ const hero=document.querySelector('.dashboard .hero-card');if(!hero)return;if(!isFreeHome(hero)){clearFreeHome(hero);return}working=true;
  try{
-  const trip=await getTrip(tripId);if(!trip)return;hero.classList.add('gtg-boys-layout');
+  const trip=await getTrip(tripId);if(!trip||!hero.isConnected||!isFreeHome(hero)){clearFreeHome(hero);return}hero.classList.add('gtg-boys-layout');
   const copy=hero.querySelector('.hero-meta>div:first-child'),h1=copy?.querySelector('h1'),p=copy?.querySelector('p');
   const year=String(trip.start_date||'').slice(0,4);if(h1)h1.innerHTML=`${String(trip.destination||'Trip').toUpperCase()}${year?` <span>${year}</span>`:''}`;
   const count=document.querySelector('.stat[data-tab="group"] b')?.textContent?.trim()||'';if(p)p.textContent=`${trip.name}${count?` · ${count} group`:''}`;

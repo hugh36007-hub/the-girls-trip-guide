@@ -67,7 +67,7 @@ async function mount(){
   if(mountBusy){mountQueued=true;return;}
   const hero=document.querySelector('.dashboard .hero-card');
   if(!hero||hero.dataset.liveSnapshot==='1')return;
-  const paid=[...hero.querySelectorAll('.eyebrow')].some(x=>/full trip/i.test(x.textContent||''));if(!paid)return;
+  if(hero.closest('.dashboard')?.dataset.homeComposition!=='full')return;
   const tripId=new globalThis.URL(location.href).searchParams.get('trip_id');if(!tripId)return;
   const titleSource=hero.querySelector('.hero-meta>div:first-child');if(!titleSource)return;
 
