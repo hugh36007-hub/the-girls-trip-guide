@@ -23,6 +23,13 @@ const css=document.createElement('style');css.id='gtg-home-hero-layout-match-css
  .dashboard .hero-card.gtg-boys-layout .hero-meta h1{font-size:48px!important}
  .dashboard .hero-card.gtg-boys-layout .hero-meta>div:first-child{left:24px!important;top:78px!important;max-width:64%!important}
 }
+/* Narrow phones such as 390px iPhones need a smaller single-line destination/year title.
+   The date card is already compact; this prevents the title from running underneath it. */
+@media(max-width:400px){
+ .dashboard .hero-card.gtg-boys-layout .hero-meta>div:first-child{left:22px!important;max-width:calc(100% - 154px)!important}
+ .dashboard .hero-card.gtg-boys-layout .hero-meta h1{font-size:40px!important;letter-spacing:-.04em!important;white-space:nowrap!important}
+ .dashboard .hero-card.gtg-boys-layout .hero-meta>div:first-child>p{font-size:12px!important}
+}
 @media(max-width:700px) and (max-height:700px){
  .dashboard .hero-card.gtg-boys-layout{min-height:300px!important}
  .dashboard .hero-card.gtg-boys-layout .hero-meta>div:first-child{top:66px!important}
