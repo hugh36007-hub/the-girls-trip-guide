@@ -2,6 +2,8 @@
 'use strict';
 const clean=p=>{let x=(p||'/').replace(/\/+$/,'')||'/';if(x==='/index.html')return '/';return x.replace(/\.html$/,'')};
 if(clean(location.pathname)!=='/create-trip')return;
+const BRAND_SRC='/assets/images/girls-trip-guide-logo.webp';
+const BRAND_ALT='The Girls Trip Guide — Good Plans. Better Stories.';
 
 function goHome(){
   const existing=document.querySelector('nav.dock [data-tab="overview"],.stat-row [data-tab="overview"]');
@@ -13,11 +15,11 @@ function ensureBrand(){
   let brand=inner.querySelector('.brand');
   if(!brand){
     brand=document.createElement('button');brand.type='button';brand.className='brand gtg-light-brand';brand.setAttribute('aria-label','Trip home');
-    brand.innerHTML='<img src="/assets/images/hero-trans.png" alt="The Girls Trip Guide — Good Plans. Better Stories.">';
+    brand.innerHTML=`<img src="${BRAND_SRC}" alt="${BRAND_ALT}">`;
     brand.addEventListener('click',goHome);
     inner.prepend(brand);
   }
-  const img=brand.querySelector('img');if(img){img.src='/assets/images/hero-trans.png';img.alt='The Girls Trip Guide — Good Plans. Better Stories.';}
+  const img=brand.querySelector('img');if(img){if(img.getAttribute('src')!==BRAND_SRC)img.src=BRAND_SRC;if(img.alt!==BRAND_ALT)img.alt=BRAND_ALT;}
 }
 
 const style=document.createElement('style');style.id='gtg-logged-in-light-polish';style.textContent=`
@@ -138,6 +140,6 @@ html.gtg-app-light .gtg-reminder-preview p{color:#33282d!important}
 document.head.appendChild(style);
 
 ensureBrand();
-const app=document.getElementById('app');if(app)new MutationObserver(()=>ensureBrand()).observe(app,{childList:true,subtree:true});
+const app=document.getElementById('app');if(app)new MutationObserver(ensureBrand).observe(app,{childList:true,subtree:false});
 window.addEventListener('popstate',()=>requestAnimationFrame(ensureBrand));
 })();
