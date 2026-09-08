@@ -5,6 +5,24 @@ if(window.__GTG_CRITICAL_STYLE_LOADER__)return;window.__GTG_CRITICAL_STYLE_LOADE
 
 const route=()=>new URL(location.href).searchParams.get('action')||'overview';
 const currentRoute=route();
+
+/* Home startup polish is CSS-only by design. Do not mutate the app DOM here: this
+   loader already observes #app later and DOM writes from that observer can self-trigger. */
+if(currentRoute==='overview'){
+ const startupStyle=document.createElement('style');
+ startupStyle.id='gtg-safe-home-startup-polish';
+ startupStyle.textContent=`
+  .dashboard[aria-busy="true"] .hero-card>img,
+  #gtg-first-paint-cover .hero-card>img{visibility:hidden!important}
+  .dashboard[aria-busy="true"] .hero-card,
+  #gtg-first-paint-cover .hero-card{background:radial-gradient(circle at 18% 18%,rgba(255,79,163,.10),transparent 34%),linear-gradient(145deg,#160d15,#0b080b)!important}
+  .appbar .brand img{display:none!important}
+  .appbar .brand::before{content:'The Girls Trip Guide ♡';display:block;white-space:nowrap;font:800 17px/1 'Barlow Condensed',sans-serif;letter-spacing:-.015em;text-transform:uppercase;color:#191316}
+  @media(max-width:600px){.appbar .brand::before{font-size:15px}}
+ `;
+ document.head.appendChild(startupStyle);
+}
+
 const styles=[
  '/mobile-viewport-lock.css?v=2',
  '/girls-action-feedback.css?v=1',
