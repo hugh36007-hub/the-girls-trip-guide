@@ -1,6 +1,21 @@
 /* Girls session guard: keep rendered trip permissions aligned with the live Supabase account. */
 (() => {
 'use strict';
+
+/* Home social is a core trip surface, not a late performance enhancement.
+   Start v3 immediately from the direct session path and suppress the older deferred v2. */
+window.__GTG_HOME_SOCIAL_HUB_V2__=true;
+(()=>{
+  if(window.__GTG_HOME_SOCIAL_V3_BOOTSTRAP__)return;
+  window.__GTG_HOME_SOCIAL_V3_BOOTSTRAP__=true;
+  if(document.querySelector('script[data-gtg-home-social-v3]'))return;
+  const script=document.createElement('script');
+  script.src='/girls-home-social-hub-v3.js?v=20260908-2';
+  script.async=false;
+  script.dataset.gtgHomeSocialV3='1';
+  document.head.appendChild(script);
+})();
+
 const SUPA='https://vtcmvwixfqyxqghibsla.supabase.co';
 const KEY='sb_publishable_qBQzJjFxSToEGxPJEcmskg_GNd4M4cP';
 let client=null,renderedUserId,checking=false,reloading=false;
