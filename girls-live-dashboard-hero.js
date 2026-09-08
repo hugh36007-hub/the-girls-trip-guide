@@ -6,11 +6,11 @@ if(!document.querySelector('link[data-live-dashboard-hero]')){
   link.rel='stylesheet';link.href='/live-dashboard-hero.css?v=5';link.dataset.liveDashboardHero='1';
   document.head.appendChild(link);
 }
-const URL='https://vtcmvwixfqyxqghibsla.supabase.co';
+const SUPABASE_URL='https://vtcmvwixfqyxqghibsla.supabase.co';
 const KEY='sb_publishable_qBQzJjFxSToEGxPJEcmskg_GNd4M4cP';
-let client=null,rotateTimer=0,mountBusy=false,mountQueued=false;
+let client=null,rotateTimer=0,mountBusy=false,mountQueued=false,mountScheduled=false;
 const esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]||c));
-function db(){if(!client&&window.supabase?.createClient)client=window.supabase.createClient(URL,KEY,{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true}});return client}
+function db(){if(!client&&window.supabase?.createClient)client=window.supabase.createClient(SUPABASE_URL,KEY,{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true}});return client}
 
 async function photoUrls(tripId){
   const q=db();if(!q||!tripId)return[];
@@ -55,19 +55,24 @@ function buildShell(hero,titleSource){
   return photo.querySelector('.live-photo-open');
 }
 
-function requestMount(){if(mountBusy){mountQueued=true;return;}queueMicrotask(()=>void mount())}
+function requestMount(){
+  if(mountBusy){mountQueued=true;return;}
+  if(mountScheduled)return;
+  mountScheduled=true;
+  queueMicrotask(()=>{mountScheduled=false;void mount().catch(error=>console.error('Girls live dashboard hero failed to mount.',error))});
+}
 
 async function mount(){
   if(mountBusy){mountQueued=true;return;}
   const hero=document.querySelector('.dashboard .hero-card');
   if(!hero||hero.dataset.liveSnapshot==='1')return;
   const paid=[...hero.querySelectorAll('.eyebrow')].some(x=>/full trip/i.test(x.textContent||''));if(!paid)return;
-  const tripId=new URL(location.href).searchParams.get('trip_id');if(!tripId)return;
+  const tripId=new globalThis.URL(location.href).searchParams.get('trip_id');if(!tripId)return;
   const titleSource=hero.querySelector('.hero-meta>div:first-child');if(!titleSource)return;
 
   mountBusy=true;mountQueued=false;
-  const photoOpen=buildShell(hero,titleSource);
   try{
+    const photoOpen=buildShell(hero,titleSource);
     const urls=await photoUrls(tripId).catch(error=>{console.warn('Girls latest trip photos unavailable.',error);return[]});
     if(!hero.isConnected)return;
     if(urls[0])photoOpen.innerHTML=`<img src="${esc(urls[0])}" alt="Latest trip photo" decoding="async">`;

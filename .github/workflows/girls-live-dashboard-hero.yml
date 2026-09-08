@@ -1,0 +1,27 @@
+name: Girls live dashboard hero safety
+
+on:
+  pull_request:
+    paths:
+      - 'girls-live-dashboard-hero.js'
+      - 'tests/girls-live-dashboard-hero.test.cjs'
+      - '.github/workflows/girls-live-dashboard-hero.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'girls-live-dashboard-hero.js'
+      - 'tests/girls-live-dashboard-hero.test.cjs'
+      - '.github/workflows/girls-live-dashboard-hero.yml'
+
+jobs:
+  verify-live-dashboard-hero:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Runtime syntax
+        run: node --check girls-live-dashboard-hero.js
+      - name: URL-constructor and mount-loop regression
+        run: node tests/girls-live-dashboard-hero.test.cjs
