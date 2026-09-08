@@ -13,7 +13,8 @@ const BUNDLES={
     '/logged-in-light-theme-final-fix.js?v=20260907-1',
     '/logged-in-stat-icons.js?v=20260907-2',
     '/girls-direct-login-route.js?v=20260907-2',
-    '/girls-resend-invite-fix.js?v=20260907-1'
+    '/girls-resend-invite-fix.js?v=20260907-1',
+    '/girls-home-shell-parity.js?v=20260908-1'
   ],
   onboarding:['/girls-batch1-parity-safe-v2.js?v=20260907-2','/girls-convince-copy-v2.js?v=20260907-1'],
   parity:['/girls-product-parity.js?v=2'],
