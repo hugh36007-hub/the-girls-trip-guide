@@ -8,7 +8,7 @@ const theme=document.querySelector('meta[name="theme-color"]');if(theme)theme.se
 const scheme=document.querySelector('meta[name="color-scheme"]');if(scheme)scheme.setAttribute('content','light');
 
 document.querySelectorAll('.brand img').forEach(img=>{
-  img.src='/assets/images/hero-trans.png';
+  img.src='/assets/images/girls-trip-guide-logo.webp';
   img.alt='The Girls Trip Guide — Good Plans. Better Stories.';
   img.style.background='transparent';
 });
