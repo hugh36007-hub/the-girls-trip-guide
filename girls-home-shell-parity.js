@@ -46,7 +46,7 @@ function sync(){
  if(!home)return;
  const img=appbar.querySelector('.brand img');
  if(img){
-   img.src='/assets/images/girls-trip-guide-logo.png';
+   img.src='/assets/images/girls-trip-guide-logo.webp';
    img.alt='The Girls Trip Guide';
    img.removeAttribute('width');img.removeAttribute('height');
  }
