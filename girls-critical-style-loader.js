@@ -10,7 +10,7 @@ const styles=[
  '/girls-final-refinement.css?v=1',
  '/girls-date-focus-fix.css?v=1',
  '/live-dashboard-hero.css?v=6',
- '/girls-free-reminders-parity.css?v=20260908-4'
+ '/girls-free-reminders-parity.css?v=20260908-5'
 ];
 for(const href of styles){
  if(document.querySelector(`link[rel="stylesheet"][href="${href}"]`))continue;
@@ -20,7 +20,7 @@ for(const href of styles){
 }
 
 function loadFinalHome(){
- for(const src of ['/girls-live-dashboard-hero.js?v=6','/girls-live-chat-sync.js?v=3','/girls-home-refinements.js?v=1','/girls-parity-refresh-20260904.js?v=1','/girls-member-view-parity.js?v=1','/girls-free-reminders-parity.js?v=20260908-4']){
+ for(const src of ['/girls-live-dashboard-hero.js?v=6','/girls-live-chat-sync.js?v=3','/girls-home-refinements.js?v=1','/girls-parity-refresh-20260904.js?v=1','/girls-member-view-parity.js?v=1','/girls-free-reminders-parity.js?v=20260908-5']){
    if(document.querySelector(`script[src="${src}"]`))continue;
    const script=document.createElement('script');script.src=src;script.async=false;script.dataset.gtgCriticalHome='1';document.head.appendChild(script);
  }
