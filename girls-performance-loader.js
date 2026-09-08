@@ -44,7 +44,9 @@ const BUNDLES={
     '/girls-media-social.js?v=1',
     '/evidence-intro-dismiss.js?v=1',
     '/video-thumbnail-fix.js?v=1',
-    '/girls-evidence-light-corner-fix.js?v=20260907-1'
+    '/girls-evidence-light-corner-fix.js?v=20260907-1',
+    '/girls-free-evidence-upsell-restore.js?v=20260908-1',
+    '/girls-convince-copy-v2.js?v=20260907-1'
   ],
   reminders:[REMINDER_SRC],
   drawer:['/girls-free-entitlement-guard.js?v=1','/trip-export-menu-guard.js?v=1','/trip-export.js?v=1'],
