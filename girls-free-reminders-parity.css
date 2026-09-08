@@ -9,7 +9,6 @@ body.gtg-reminder-scroll-lock{
   width:100%!important;
   overflow:hidden!important;
   overscroll-behavior:none!important;
-  touch-action:none!important;
 }
 
 #modalRoot.gtg-reminder-experience{
