@@ -70,8 +70,10 @@ style.textContent=`
   .dashboard .hero-card .gtg-home-score-v3{
     left:12px!important;
     bottom:80px!important;
-    width:min(250px,calc(100% - 24px))!important;
-    max-width:250px!important;
+    /* Reserve the complete right-hand date column plus a visible gutter.
+       This avoids the iPhone-width corner collision while remaining fluid. */
+    width:min(232px,calc(100% - 160px))!important;
+    max-width:232px!important;
     padding:8px 10px!important;
   }
   .dashboard .hero-card .gtg-home-score-v3 h3{font-size:13px!important;margin:3px 0 4px!important}
@@ -81,7 +83,10 @@ style.textContent=`
   }
 }
 @media(max-width:380px){
-  .dashboard .hero-card .gtg-home-score-v3{width:min(225px,calc(100% - 24px))!important;max-width:225px!important}
+  .dashboard .hero-card .gtg-home-score-v3{
+    width:calc(100% - 158px)!important;
+    max-width:218px!important;
+  }
 }
 `;
 document.head.appendChild(style);
