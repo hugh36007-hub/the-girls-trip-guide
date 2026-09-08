@@ -17,7 +17,7 @@ window.__GTG_HOME_SOCIAL_HUB_V2__=true;
   }
   if(!document.querySelector('script[data-gtg-home-score-fit]')){
     const fit=document.createElement('script');
-    fit.src='/girls-home-scoreboard-fit.js?v=20260908-1';
+    fit.src='/girls-home-scoreboard-fit.js?v=20260908-2';
     fit.async=false;
     fit.dataset.gtgHomeScoreFit='1';
     document.head.appendChild(fit);
