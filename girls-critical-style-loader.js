@@ -1,17 +1,20 @@
-/* Girls critical startup: keep one stable private shell visible until the final view is ready. */
+/* Girls critical startup: load only what the current private route needs. */
 (()=>{
 'use strict';
 if(window.__GTG_CRITICAL_STYLE_LOADER__)return;window.__GTG_CRITICAL_STYLE_LOADER__=true;
+
+const route=()=>new URL(location.href).searchParams.get('action')||'overview';
+const currentRoute=route();
 const styles=[
  '/mobile-viewport-lock.css?v=2',
  '/girls-action-feedback.css?v=1',
  '/girls-drawer-fix.css?v=1',
  '/girls-hero-vault-ux.css?v=1',
  '/girls-final-refinement.css?v=1',
- '/girls-date-focus-fix.css?v=1',
- '/live-dashboard-hero.css?v=6',
- '/girls-free-reminders-parity.css?v=20260908-6'
+ '/girls-date-focus-fix.css?v=1'
 ];
+if(currentRoute==='overview')styles.push('/live-dashboard-hero.css?v=6');
+
 for(const href of styles){
  if(document.querySelector(`link[rel="stylesheet"][href="${href}"]`))continue;
  const link=document.createElement('link');link.rel='stylesheet';link.href=href;link.dataset.gtgPerfStyle='1';
@@ -19,26 +22,48 @@ for(const href of styles){
  document.head.appendChild(link);
 }
 
-function loadFinalHome(){
- for(const src of ['/girls-live-dashboard-hero.js?v=6','/girls-live-chat-sync.js?v=3','/girls-home-refinements.js?v=1','/girls-parity-refresh-20260904.js?v=1','/girls-member-view-parity.js?v=1','/girls-free-reminders-parity.js?v=20260908-6']){
+function loadScripts(sources,kind){
+ for(const src of sources){
    if(document.querySelector(`script[src="${src}"]`))continue;
-   const script=document.createElement('script');script.src=src;script.async=false;script.dataset.gtgCriticalHome='1';document.head.appendChild(script);
+   const script=document.createElement('script');script.src=src;script.async=false;script.dataset.gtgCritical=kind;document.head.appendChild(script);
  }
 }
 
+function loadRouteCritical(){
+ /* Role restrictions apply everywhere in the signed-in trip app. */
+ loadScripts(['/girls-member-view-parity.js?v=1'],'global');
+ if(currentRoute!=='overview')return;
+
+ /* Home is the only route that needs the live hero/social stack at first paint.
+    v3 is authoritative; the obsolete Home social v2 is deliberately not loaded. */
+ loadScripts([
+   '/home-social-platform-guard.js?v=20260908-2',
+   '/girls-home-hero-background.js?v=20260908-2',
+   '/girls-home-hero-layout-match.js?v=20260908-2',
+   '/girls-live-dashboard-hero.js?v=6',
+   '/girls-live-chat-sync.js?v=3',
+   '/girls-home-refinements.js?v=1',
+   '/girls-home-social-hub-v3.js?v=20260908-2',
+   '/girls-home-scoreboard-fit.js?v=20260908-2',
+   '/girls-parity-refresh-20260904.js?v=2'
+ ],'home');
+}
+
 function installStablePaintCover(){
+ /* The paint cover exists to prevent the Home hero multi-render/flicker. Inner routes
+    do not need a cloned full-page DOM sitting above the real application. */
+ if(currentRoute!=='overview')return;
  const app=document.getElementById('app');if(!app||document.getElementById('gtg-first-paint-cover'))return;
  const cover=app.cloneNode(true);cover.id='gtg-first-paint-cover';cover.setAttribute('aria-hidden','true');
  Object.assign(cover.style,{position:'fixed',inset:'0',zIndex:'2147483645',overflow:'auto',background:'#070507',pointerEvents:'none'});
  document.body.appendChild(cover);
  let released=false;
- const route=()=>new URL(location.href).searchParams.get('action')||'overview';
  const finalReady=()=>{
    if(app.querySelector('.auth-screen'))return true;
    const dashboard=app.querySelector('.dashboard:not([aria-busy="true"])');if(!dashboard)return false;
    const hero=dashboard.querySelector('.hero-card');if(!hero)return true;
    const paid=[...hero.querySelectorAll('.eyebrow')].some(node=>/full trip/i.test(node.textContent||''));
-   if(paid&&route()==='overview')return hero.classList.contains('live-snapshot-hero');
+   if(paid)return hero.classList.contains('live-snapshot-hero');
    return true;
  };
  const release=()=>{
@@ -50,8 +75,6 @@ function installStablePaintCover(){
  check();setTimeout(release,7000);
 }
 
-/* This defer script runs before girls-app-v2.js: freeze the parsed loading shell,
-   then pre-register the final Home transformer before secure data can render. */
 installStablePaintCover();
-loadFinalHome();
+loadRouteCritical();
 })();
