@@ -1,8 +1,8 @@
 /* Girls Free reminders: behavior only. Styling lives in girls-free-reminders-parity.css. */
 (()=>{
 'use strict';
-if(window.__GTG_FREE_REMINDERS_PARITY_V3__)return;
-window.__GTG_FREE_REMINDERS_PARITY_V3__=true;
+if(window.__GTG_FREE_REMINDERS_PARITY_V4__)return;
+window.__GTG_FREE_REMINDERS_PARITY_V4__=true;
 
 /* Remove the old dynamically injected stylesheet if an earlier cached script created it. */
 document.getElementById('gtg-free-reminders-parity-css')?.remove();
@@ -19,6 +19,8 @@ const REMINDERS=[
 
 let locked=false;
 let lockedScrollY=0;
+let appStyleSnapshot=null;
+let htmlScrollBehavior='';
 
 function isReminderModal(modal){
  return !!(modal?.querySelector?.('.gtg-reminders')&&/trip reminders|standard reminders/i.test(modal.textContent||''));
@@ -27,23 +29,73 @@ function isReminderModal(modal){
 function setScrollLock(on){
  if(on===locked)return;
  locked=on;
+ const html=document.documentElement;
+ const body=document.body;
+ const app=document.getElementById('app');
+
  if(on){
    lockedScrollY=window.scrollY||window.pageYOffset||0;
-   document.documentElement.classList.add('gtg-reminder-scroll-lock');
-   document.body?.classList.add('gtg-reminder-scroll-lock');
-   if(document.body){
-     document.body.dataset.gtgReminderScrollY=String(lockedScrollY);
-     document.body.style.top=`-${lockedScrollY}px`;
+   htmlScrollBehavior=html.style.scrollBehavior;
+   html.style.scrollBehavior='auto';
+   html.classList.add('gtg-reminder-scroll-lock');
+
+   /* Do not fix the body: modalRoot is a body sibling and must remain viewport-fixed.
+      Freeze only the underlying app at the exact visible scroll position. */
+   body?.classList.remove('gtg-reminder-scroll-lock');
+   if(body){
+     body.style.top='';
+     body.dataset.gtgReminderScrollY=String(lockedScrollY);
+   }
+
+   if(app){
+     appStyleSnapshot={
+       position:app.style.position,
+       top:app.style.top,
+       left:app.style.left,
+       right:app.style.right,
+       width:app.style.width,
+       pointerEvents:app.style.pointerEvents
+     };
+     app.style.position='fixed';
+     app.style.top=`-${lockedScrollY}px`;
+     app.style.left='0';
+     app.style.right='0';
+     app.style.width='100%';
+     app.style.pointerEvents='none';
+     app.dataset.gtgReminderBackgroundLocked='1';
    }
    return;
  }
- document.documentElement.classList.remove('gtg-reminder-scroll-lock');
- if(document.body){
-   document.body.classList.remove('gtg-reminder-scroll-lock');
-   document.body.style.top='';
-   delete document.body.dataset.gtgReminderScrollY;
+
+ html.classList.remove('gtg-reminder-scroll-lock');
+ html.style.scrollBehavior=htmlScrollBehavior;
+
+ if(body){
+   body.classList.remove('gtg-reminder-scroll-lock');
+   body.style.top='';
+   delete body.dataset.gtgReminderScrollY;
  }
- window.scrollTo(0,lockedScrollY);
+
+ if(app){
+   const previous=appStyleSnapshot||{};
+   app.style.position=previous.position||'';
+   app.style.top=previous.top||'';
+   app.style.left=previous.left||'';
+   app.style.right=previous.right||'';
+   app.style.width=previous.width||'';
+   app.style.pointerEvents=previous.pointerEvents||'';
+   delete app.dataset.gtgReminderBackgroundLocked;
+ }
+ appStyleSnapshot=null;
+
+ /* Restore the dashboard to the exact position it had before the reminder panel opened. */
+ requestAnimationFrame(()=>window.scrollTo(0,lockedScrollY));
+}
+
+function enforceBackgroundLock(){
+ if(!locked)return;
+ const current=window.scrollY||window.pageYOffset||0;
+ if(Math.abs(current-lockedScrollY)>0.5)window.scrollTo(0,lockedScrollY);
 }
 
 function addClose(modal){
@@ -133,6 +185,19 @@ if(root)new MutationObserver(sync).observe(root,{childList:true,subtree:true});
 document.addEventListener('click',event=>{
  if(event.target.closest?.('[data-parity-reminders],[data-parity-preview],[data-parity-close],[data-a="close"]'))setTimeout(sync,0);
 },true);
+
+/* Failsafe: even if a browser attempts scroll chaining, keep the dashboard pinned. */
+window.addEventListener('scroll',enforceBackgroundLock,{passive:true});
+document.addEventListener('wheel',event=>{
+ if(!locked)return;
+ const modalRoot=document.getElementById('modalRoot');
+ if(modalRoot&&!modalRoot.contains(event.target))event.preventDefault();
+},{capture:true,passive:false});
+document.addEventListener('touchmove',event=>{
+ if(!locked)return;
+ const modalRoot=document.getElementById('modalRoot');
+ if(modalRoot&&!modalRoot.contains(event.target))event.preventDefault();
+},{capture:true,passive:false});
 
 window.addEventListener('pagehide',()=>setScrollLock(false));
 sync();
