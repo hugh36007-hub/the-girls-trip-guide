@@ -1,16 +1,32 @@
-/* Girls performance: defer only route-specific and noncritical enhancements. */
+/* Girls performance: route-specific loading with no duplicate Home runtime. */
 (()=>{
 'use strict';
 if(window.__GTG_PERFORMANCE_LOADER__)return;window.__GTG_PERFORMANCE_LOADER__=true;
 
+const DOC_SRC='/girls-document-audience.js?v=20260908-2';
+const REMINDER_SRC='/girls-free-reminders-parity.js?v=20260908-7';
 const BUNDLES={
-  appTheme:['/logged-in-light-theme.js?v=20260907-3','/logged-in-light-polish.js?v=20260907-1','/logged-in-light-theme-final-fix.js?v=20260907-1','/logged-in-stat-icons.js?v=20260907-2','/girls-direct-login-route.js?v=20260907-2','/girls-resend-invite-fix.js?v=20260907-1','/home-social-platform-guard.js?v=20260907-1','/girls-home-social-hub-v2.js?v=20260908-1','/girls-home-hero-background.js?v=20260908-1','/girls-home-hero-layout-match.js?v=20260908-1'],
+  appTheme:[
+    '/logged-in-light-theme.js?v=20260907-3',
+    '/logged-in-light-polish.js?v=20260907-1',
+    '/logged-in-light-theme-final-fix.js?v=20260907-1',
+    '/logged-in-stat-icons.js?v=20260907-2',
+    '/girls-direct-login-route.js?v=20260907-2',
+    '/girls-resend-invite-fix.js?v=20260907-1'
+  ],
   onboarding:['/girls-batch1-parity-safe-v2.js?v=20260907-2','/girls-convince-copy-v2.js?v=20260907-1'],
-  parity:['/girls-product-parity.js?v=1'],
+  parity:['/girls-product-parity.js?v=2'],
   shell:['/girls-section-layout.js?v=1','/girls-inner-page-polish.js?v=1'],
-  plan:['/girls-document-audience.js?v=1'],
+  planDocuments:[DOC_SRC],
   money:['/girls-payment-nudge.js?v=2'],
-  group:['/girls-trip-social.js?v=2','/girls-chat-sheet.js?v=3','/girls-chat-visibility-stability-fix.js?v=20260907-1','/girls-conversation-inbox.js?v=1','/conversation-header-align.js?v=1','/girls-poll-nudge.js?v=1'],
+  groupCore:[
+    '/girls-trip-social.js?v=3',
+    '/girls-chat-sheet.js?v=4',
+    '/girls-chat-visibility-stability-fix.js?v=20260908-2',
+    '/girls-conversation-inbox.js?v=2',
+    '/conversation-header-align.js?v=2'
+  ],
+  groupPollExtras:['/girls-poll-nudge.js?v=2'],
   evidence:[
     '/girls-vault-contract-fix.js?v=1',
     '/girls-hidden-upload-choice.js?v=1',
@@ -28,18 +44,21 @@ const BUNDLES={
     '/video-thumbnail-fix.js?v=1',
     '/girls-evidence-light-corner-fix.js?v=20260907-1'
   ],
+  reminders:[REMINDER_SRC],
   drawer:['/girls-free-entitlement-guard.js?v=1','/trip-export-menu-guard.js?v=1','/trip-export.js?v=1'],
   home:['/girls-home-thumbnail-prime.js?v=1'],
   upload:['https://cdn.jsdelivr.net/npm/tus-js-client@4.3.1/dist/tus.min.js']
 };
 const STYLES={
   shell:['/girls-section-layout.css?v=1','/girls-product-parity.css?v=1','/girls-inner-page-polish.css?v=1'],
-  plan:['/girls-document-audience.css?v=1']
+  planDocuments:['/girls-document-audience.css?v=20260908-2'],
+  reminders:['/girls-free-reminders-parity.css?v=20260908-7']
 };
 const loaded=new Set(),pending=new Map(),loadedStyles=new Set(),pendingStyles=new Map();
 const visible=()=>document.visibilityState!=='hidden';
 const action=()=>new URL(location.href).searchParams.get('action')||'overview';
-const idle=cb=>{'requestIdleCallback'in window?requestIdleCallback(cb):setTimeout(cb,180)};
+const tripId=()=>new URL(location.href).searchParams.get('trip_id')||'';
+const idle=cb=>{'requestIdleCallback'in window?requestIdleCallback(cb,{timeout:1200}):setTimeout(cb,220)};
 
 function loadStyle(href){
  if(loadedStyles.has(href)||document.querySelector(`link[rel="stylesheet"][href="${href}"]`)){loadedStyles.add(href);return Promise.resolve()}
@@ -60,14 +79,16 @@ async function loadBundle(name){
 async function loadRoute(route){
  if(!['plan','money','group','evidence'].includes(route))return;
  await loadBundle('shell');
- if(route==='plan')await loadBundle('plan');
+ /* Document audience/access is intentionally interaction-loaded. Its previous deep
+    observer was doing work on every Plan DOM mutation even when documents were not used. */
  if(route==='money')await loadBundle('money');
- if(route==='group')await loadBundle('group');
+ if(route==='group')await loadBundle('groupCore');
  if(route==='evidence')await loadBundle('evidence');
 }
 
 void loadBundle('appTheme');
-void loadBundle('onboarding');
+/* Existing signed-in trips do not need the create/onboarding enhancement bundle. */
+if(!tripId())void loadBundle('onboarding');
 
 function afterDashboard(callback,delay=0){
  const run=()=>setTimeout(()=>{if(visible())callback()},delay);
@@ -79,23 +100,43 @@ function afterDashboard(callback,delay=0){
 function scheduleInitial(){
  const route=action();
  if(route!=='overview')afterDashboard(()=>void loadRoute(route),0);
- if(route==='group'||route==='evidence'||route==='plan'||route==='money')afterDashboard(()=>idle(()=>void loadBundle('parity')),600);
- if(route==='overview')afterDashboard(()=>setTimeout(()=>{if(visible()&&action()==='overview')idle(()=>void loadBundle('home'))},15000),0);
+ if(['group','evidence','plan','money'].includes(route))afterDashboard(()=>idle(()=>void loadBundle('parity')),700);
+ if(route==='overview')afterDashboard(()=>setTimeout(()=>{if(visible()&&action()==='overview')idle(()=>void loadBundle('home'))},12000),0);
 }
 
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',scheduleInitial,{once:true});else scheduleInitial();
 window.addEventListener('popstate',()=>{const route=action();void loadRoute(route);if(route!=='overview')idle(()=>void loadBundle('parity'))});
 
+/* Start route code on pointer intent, before the click navigation is processed. */
 document.addEventListener('pointerdown',event=>{
- const target=event.target.closest?.('[data-tab],[data-a],[data-action],[data-trip-social-tab],[data-parity-comms],[data-role-money],[data-role-upload]');if(!target)return;
+ const target=event.target.closest?.('[data-tab],[data-a],[data-action],[data-trip-social-tab],[data-gtg-social-tab],[data-parity-comms],[data-parity-reminders],[data-role-money],[data-role-upload]');if(!target)return;
  const tab=target.dataset.tab||'';const a=target.dataset.a||target.dataset.action||'';
  if(['plan','money','group','evidence'].includes(tab)){void loadRoute(tab);void loadBundle('parity')}
  if(target.matches('[data-role-money]')||a==='addExpense')void loadRoute('money');
  if(target.matches('[data-role-upload]')||['upload','vault','vaultUpload'].includes(a)){void loadRoute('evidence');void loadBundle('upload')}
- if(a==='addDocument')void loadRoute('plan');
+ if(a==='addDocument'||a==='openDocument')void loadBundle('planDocuments');
  if(a==='drawer')void loadBundle('drawer');
- if(tab==='group'||target.matches('[data-trip-social-tab],[data-parity-comms]'))void loadRoute('group');
+ if(tab==='group'||target.matches('[data-trip-social-tab],[data-gtg-social-tab],[data-parity-comms]'))void loadBundle('groupCore');
+ if(target.matches('[data-gtg-social-tab="polls"]'))void loadBundle('groupPollExtras');
+ if(target.matches('[data-parity-reminders]'))void loadBundle('reminders');
 },{capture:true,passive:true});
+
+/* Preserve first-tap behaviour for interaction-loaded modules. */
+document.addEventListener('click',event=>{
+ const addDocument=event.target.closest?.('[data-a="addDocument"]');
+ if(addDocument&&!loaded.has(DOC_SRC)){
+   event.preventDefault();event.stopImmediatePropagation();
+   const target=addDocument;
+   void loadBundle('planDocuments').then(()=>{if(target.isConnected)target.click()});
+   return;
+ }
+ const reminders=event.target.closest?.('[data-parity-reminders]');
+ if(reminders&&!loaded.has(REMINDER_SRC)){
+   event.preventDefault();event.stopImmediatePropagation();
+   const target=reminders;
+   void loadBundle('reminders').then(()=>{if(target.isConnected)target.click()});
+ }
+},{capture:true});
 
 let homeIntent=false;
 function loadHomeIntent(){if(homeIntent||action()!=='overview')return;homeIntent=true;void loadBundle('parity')}
