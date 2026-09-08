@@ -61,6 +61,11 @@ style.textContent=`
   font-size:7.5px!important;
   line-height:1!important;
 }
+/* When a result card is present, lift only the left title/meta copy slightly.
+   Keep the countdown and Trip Dates stack fixed in place. */
+.dashboard .hero-card:has(.gtg-home-score-v3) .hero-meta > :first-child{
+  transform:translateY(-10px)!important;
+}
 @media(max-width:700px){
   .dashboard .hero-card .gtg-home-score-v3{
     left:12px!important;
@@ -71,6 +76,9 @@ style.textContent=`
   }
   .dashboard .hero-card .gtg-home-score-v3 h3{font-size:13px!important;margin:3px 0 4px!important}
   .dashboard .hero-card .gtg-score-v3-row{margin-top:2px!important}
+  .dashboard .hero-card:has(.gtg-home-score-v3) .hero-meta > :first-child{
+    transform:translateY(-12px)!important;
+  }
 }
 @media(max-width:380px){
   .dashboard .hero-card .gtg-home-score-v3{width:min(225px,calc(100% - 24px))!important;max-width:225px!important}
