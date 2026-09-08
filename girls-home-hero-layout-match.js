@@ -23,12 +23,21 @@ const css=document.createElement('style');css.id='gtg-home-hero-layout-match-css
  .dashboard .hero-card.gtg-boys-layout .hero-meta h1{font-size:48px!important}
  .dashboard .hero-card.gtg-boys-layout .hero-meta>div:first-child{left:24px!important;top:78px!important;max-width:64%!important}
 }
-/* Narrow phones such as 390px iPhones need a smaller single-line destination/year title.
-   The date card is already compact; this prevents the title from running underneath it. */
-@media(max-width:400px){
- .dashboard .hero-card.gtg-boys-layout .hero-meta>div:first-child{left:22px!important;max-width:calc(100% - 154px)!important}
- .dashboard .hero-card.gtg-boys-layout .hero-meta h1{font-size:40px!important;letter-spacing:-.04em!important;white-space:nowrap!important}
- .dashboard .hero-card.gtg-boys-layout .hero-meta>div:first-child>p{font-size:12px!important}
+/* Narrow phones use a deliberate two-line title column instead of allowing the
+   destination/year to compete with the fixed countdown + date column. */
+@media(max-width:430px){
+ .dashboard .hero-card.gtg-boys-layout{min-height:340px!important}
+ .dashboard .hero-card.gtg-boys-layout .hero-meta>div:first-child{left:22px!important;top:70px!important;right:auto!important;width:calc(100% - 178px)!important;max-width:none!important}
+ .dashboard .hero-card.gtg-boys-layout .hero-meta h1{font-size:40px!important;line-height:.82!important;letter-spacing:-.035em!important;white-space:normal!important;overflow:visible!important}
+ .dashboard .hero-card.gtg-boys-layout .hero-meta h1 span{display:block!important;margin-top:4px!important;font-size:.90em!important;line-height:.82!important;white-space:nowrap!important}
+ .dashboard .hero-card.gtg-boys-layout .hero-meta>div:first-child>p{margin-top:12px!important;padding-left:9px!important;font-size:11.5px!important;line-height:1.25!important}
+ .dashboard .hero-card.gtg-boys-layout .gtg-countdown{top:13px!important;right:12px!important}
+ .dashboard .hero-card.gtg-boys-layout .trip-stamp,.dashboard .hero-card.gtg-boys-layout .gtg-trip-stamp-final{top:54px!important;right:12px!important;width:122px!important;max-width:122px!important}
+}
+@media(max-width:370px){
+ .dashboard .hero-card.gtg-boys-layout .hero-meta>div:first-child{left:20px!important;width:calc(100% - 168px)!important}
+ .dashboard .hero-card.gtg-boys-layout .hero-meta h1{font-size:36px!important}
+ .dashboard .hero-card.gtg-boys-layout .trip-stamp,.dashboard .hero-card.gtg-boys-layout .gtg-trip-stamp-final{width:116px!important;max-width:116px!important;padding:10px 9px!important}
 }
 @media(max-width:700px) and (max-height:700px){
  .dashboard .hero-card.gtg-boys-layout{min-height:300px!important}
@@ -40,6 +49,13 @@ const css=document.createElement('style');css.id='gtg-home-hero-layout-match-css
  .gtg-home-poll-v2 h3{margin:4px 0 7px!important;font-size:19px!important;line-height:1.15!important}
  .gtg-home-poll-v2 .opts{gap:6px!important}
  .gtg-home-poll-v2 .opts button{padding:8px 10px!important;min-height:34px!important}
+}
+/* Re-assert the narrow-phone title after short-height rules so width wins over
+   device-height-specific legacy sizing. */
+@media(max-width:430px) and (max-height:700px){
+ .dashboard .hero-card.gtg-boys-layout .hero-meta>div:first-child{top:62px!important;width:calc(100% - 174px)!important}
+ .dashboard .hero-card.gtg-boys-layout .hero-meta h1{font-size:37px!important;line-height:.82!important;white-space:normal!important}
+ .dashboard .hero-card.gtg-boys-layout .hero-meta h1 span{display:block!important;font-size:.90em!important}
 }
 `;
 document.head.appendChild(css);
