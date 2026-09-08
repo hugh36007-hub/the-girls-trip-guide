@@ -78,8 +78,10 @@ style.textContent=`
   }
   .dashboard .hero-card .gtg-home-score-v3 h3{font-size:13px!important;margin:3px 0 4px!important}
   .dashboard .hero-card .gtg-score-v3-row{margin-top:2px!important}
+  /* Give the poll a little more breathing room below the trip name/group line
+     without moving the poll toward the chat strip below it. */
   .dashboard .hero-card:has(.gtg-home-score-v3) .hero-meta > :first-child{
-    transform:translateY(-12px)!important;
+    transform:translateY(-18px)!important;
   }
 }
 @media(max-width:380px){
