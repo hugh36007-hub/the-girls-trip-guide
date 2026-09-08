@@ -7,7 +7,7 @@ const MAX_DOCUMENT=25*1024*1024;
 const ALLOWED_TYPES=new Set(['application/pdf','image/jpeg','image/png','image/webp','image/heic','image/heif']);
 let client=null,context=null,decorateTimer=0;
 
-const esc=value=>String(value??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot',"'":'&#39;'}[c]||c));
+const esc=value=>String(value??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]||c));
 const safeFile=name=>String(name||'document').normalize('NFKD').replace(/[^a-zA-Z0-9._-]+/g,'-').replace(/-+/g,'-').slice(-110)||'document';
 const tripId=()=>new URL(location.href).searchParams.get('trip_id')||'';
 function db(){if(!client){if(!window.supabase?.createClient)throw new Error('Secure services did not load.');client=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY,{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true}})}return client}
