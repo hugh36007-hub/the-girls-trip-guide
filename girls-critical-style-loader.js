@@ -58,7 +58,7 @@ function loadRouteCritical(){
    '/home-social-platform-guard.js?v=20260908-2',
    '/girls-home-hero-background.js?v=20260908-2',
    '/girls-home-hero-layout-match.js?v=20260908-3',
-   '/girls-live-dashboard-hero.js?v=6',
+   '/girls-live-dashboard-hero.js?v=7',
    '/girls-live-chat-sync.js?v=3',
    '/girls-home-refinements.js?v=1',
    '/girls-home-social-hub-v3.js?v=20260908-3',

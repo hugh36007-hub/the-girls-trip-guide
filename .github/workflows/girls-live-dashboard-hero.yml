@@ -4,12 +4,18 @@ on:
   pull_request:
     paths:
       - 'girls-live-dashboard-hero.js'
+      - 'girls-critical-style-loader.js'
+      - 'girls-date-flow.js'
+      - 'scripts/girls-final-refinement-contract.mjs'
       - 'tests/girls-live-dashboard-hero.test.cjs'
       - '.github/workflows/girls-live-dashboard-hero.yml'
   push:
     branches: [main]
     paths:
       - 'girls-live-dashboard-hero.js'
+      - 'girls-critical-style-loader.js'
+      - 'girls-date-flow.js'
+      - 'scripts/girls-final-refinement-contract.mjs'
       - 'tests/girls-live-dashboard-hero.test.cjs'
       - '.github/workflows/girls-live-dashboard-hero.yml'
 

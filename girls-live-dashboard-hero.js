@@ -1,6 +1,7 @@
 /* Full Trip Home: claim the final shell immediately, then hydrate photo/chat data in place. */
 (() => {
 'use strict';
+if(window.__GTG_LIVE_DASHBOARD_HERO__)return;window.__GTG_LIVE_DASHBOARD_HERO__=true;
 if(!document.querySelector('link[data-live-dashboard-hero]')){
   const link=document.createElement('link');
   link.rel='stylesheet';link.href='/live-dashboard-hero.css?v=5';link.dataset.liveDashboardHero='1';
