@@ -119,7 +119,7 @@ if(app)new MutationObserver(()=>{if(queued)return;queued=true;requestAnimationFr
 new MutationObserver(()=>{if(queued)return;queued=true;requestAnimationFrame(()=>{queued=false;normalise()})}).observe(document.body,{childList:true,subtree:true});
 normalise();
 
-/* Trip-wide poll discovery: latest open Free poll persists after voting; pending polls badge the Group tab. */
+/* Trip-wide poll discovery: pending polls badge the Group tab; Home owns its poll surface. */
 const db=()=>client||(client=window.supabase?.createClient?.(SUPA,KEY,{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true}}));
 const tripId=()=>new URL(location.href).searchParams.get('trip_id')||'';
 function syncBadge(){
@@ -130,7 +130,9 @@ function syncBadge(){
 function pollMarkup(p,count,hero,hasVoted){return hero?`<small>${hasVoted?'Poll open':count===1?'Vote needed':`${count} votes needed`}</small><strong>${esc(p.question)}</strong><em>${hasVoted?'View results ›':'Vote now ›'}</em>`:`<small>${count===1?'Vote needed':`${count} votes needed`}</small><strong>${esc(p.question)}</strong><span>${count===1?'A group poll is waiting for you.':'This is the latest group poll waiting for your vote.'}</span><em>Vote now ›</em>`}
 function syncAlert(){
  const hero=document.querySelector('.dashboard .hero-card'),stat=document.querySelector('.dashboard .stat-row'),free=isFree();
- if(free&&latestOpen&&hero){document.querySelectorAll('.gtg-poll-alert').forEach(x=>x.remove());let b=hero.querySelector('.gtg-poll-hero-alert');if(!b){b=document.createElement('button');b.type='button';b.className='gtg-poll-hero-alert';hero.appendChild(b)}const has=voted.has(String(latestOpen.id)),key=`${latestOpen.id}:${pending.length}:${has}:${latestOpen.question}`;if(b.dataset.state!==key){b.dataset.state=key;b.dataset.gtgPollDiscovery=latestOpen.id;b.innerHTML=pollMarkup(latestOpen,pending.length,true,has)}return}
+ const homeOwned=Boolean(window.__GTG_HOME_SOCIAL_HUB_V3__)&&(new URL(location.href).searchParams.get('action')||'overview')==='overview';
+ if(homeOwned){document.querySelectorAll('.gtg-poll-hero-alert,.gtg-poll-alert').forEach(x=>x.remove());return}
+ if(free&&pending.length&&hero){document.querySelectorAll('.gtg-poll-alert').forEach(x=>x.remove());const p=pending[0];let b=hero.querySelector('.gtg-poll-hero-alert');if(!b){b=document.createElement('button');b.type='button';b.className='gtg-poll-hero-alert';hero.appendChild(b)}const key=`${p.id}:${pending.length}:${p.question}`;if(b.dataset.state!==key){b.dataset.state=key;b.dataset.gtgPollDiscovery=p.id;b.innerHTML=pollMarkup(p,pending.length,true,false)}return}
  document.querySelectorAll('.gtg-poll-hero-alert').forEach(x=>x.remove());
  if(!free&&pending.length&&stat){let b=document.querySelector('.gtg-poll-alert');if(!b){b=document.createElement('button');b.type='button';b.className='gtg-poll-alert';stat.before(b)}const p=pending[0],key=`${p.id}:${pending.length}:${p.question}`;if(b.dataset.state!==key){b.dataset.state=key;b.dataset.gtgPollDiscovery=p.id;b.innerHTML=pollMarkup(p,pending.length,false,false)}}else document.querySelectorAll('.gtg-poll-alert').forEach(x=>x.remove())
 }

@@ -47,18 +47,24 @@ async function context(){
  return{q,id,user,h:hero()};
 }
 async function latestChat(x){const {data,error}=await x.q.from('trip_chat_messages').select('id,sender_user_id,sender_member_id,message,created_at').eq('trip_id',x.id).order('created_at',{ascending:false}).limit(1);if(error)throw error;return data?.[0]||null}
+function choosePollState(open,votes,userId){
+ const votedIds=new Set((votes||[]).filter(v=>v.voter_user_id===userId).map(v=>String(v.poll_id)));
+ return{prompt:(open||[]).find(p=>!votedIds.has(String(p.id)))||null,scoreboard:(open||[]).find(p=>votedIds.has(String(p.id)))||null};
+}
 async function activePoll(x){
  const {data:polls,error}=await x.q.from('trip_polls').select('id,question,status,closes_at,created_at').eq('trip_id',x.id).eq('status','open').order('created_at',{ascending:false}).limit(10);if(error)throw error;
- const poll=(polls||[]).find(p=>!p.closes_at||new Date(p.closes_at)>new Date());if(!poll)return null;
- const [{data:options,error:oe},{data:votes,error:ve}]=await Promise.all([x.q.from('trip_poll_options').select('id,poll_id,label,sort_order').eq('poll_id',poll.id).order('sort_order'),x.q.from('trip_poll_votes').select('poll_id,option_id,voter_user_id').eq('poll_id',poll.id)]);if(oe)throw oe;if(ve)throw ve;
- return{poll,options:options||[],votes:votes||[],voted:(votes||[]).some(v=>v.voter_user_id===x.user.id)};
+ const open=(polls||[]).filter(p=>!p.closes_at||new Date(p.closes_at)>new Date());if(!open.length)return null;
+ const ids=open.map(p=>p.id),[{data:options,error:oe},{data:votes,error:ve}]=await Promise.all([x.q.from('trip_poll_options').select('id,poll_id,label,sort_order').in('poll_id',ids).order('sort_order'),x.q.from('trip_poll_votes').select('poll_id,option_id,voter_user_id').in('poll_id',ids)]);if(oe)throw oe;if(ve)throw ve;
+ const selected=choosePollState(open,votes||[],x.user.id),hydrate=p=>p?{poll:p,options:(options||[]).filter(o=>o.poll_id===p.id),votes:(votes||[]).filter(v=>v.poll_id===p.id)}:null;
+ return{prompt:hydrate(selected.prompt),scoreboard:hydrate(selected.scoreboard)};
 }
 function renderChat(row){const h=hero(),card=h?.querySelector('.gtg-home-chat-strip');if(!card)return;card.classList.remove('loading');card.dataset.gtgHomeChatV3='1';card.innerHTML=row?`<span class="avatar">${esc(memberName(row.sender_member_id).slice(0,1).toUpperCase())}</span><span class="copy"><b>${esc(memberName(row.sender_member_id))}</b><p>${esc(row.message)}</p></span><time>${esc(rel(row.created_at))}</time>`:`<span class="avatar">G</span><span class="copy"><b>Group chat</b><p>No messages yet. Tap to start the chat.</p></span><time></time>`}
 function renderPoll(state){
  const h=hero();if(!h)return;h.querySelectorAll('.gtg-home-score-v3,.gtg-home-score-v2').forEach(n=>n.remove());
- let box=document.querySelector('.gtg-home-poll-v3');if(!state){box?.remove();return}
- if(state.voted){box?.remove();const total=state.votes.length,board=document.createElement('section');board.className='gtg-home-score-v3';board.innerHTML=`<small>Poll progress</small><h3>${esc(state.poll.question)}</h3>${state.options.map(o=>{const n=state.votes.filter(v=>v.option_id===o.id).length,p=total?Math.round(n/total*100):0;return`<div class="gtg-score-v3-row"><span>${esc(o.label)}</span><b>${n} · ${p}%</b><div class="gtg-score-v3-bar"><i style="width:${p}%"></i></div></div>`}).join('')}<div class="gtg-score-v3-total">${total} vote${total===1?'':'s'} so far</div>`;h.appendChild(board);return}
- if(!box){box=document.createElement('section');box.className='gtg-home-poll-v3';h.after(box)}box.classList.remove('loading');box.innerHTML=`<small>Vote needed</small><h3>${esc(state.poll.question)}</h3><div class="opts">${state.options.map(o=>`<button type="button" data-gtg-v3-vote="${esc(state.poll.id)}" data-option="${esc(o.id)}">${esc(o.label)}</button>`).join('')}</div>`;
+ let box=document.querySelector('.gtg-home-poll-v3');const prompt=state?.prompt||null,scoreboard=state?.scoreboard||null;
+ if(scoreboard){const total=scoreboard.votes.length,board=document.createElement('section');board.className='gtg-home-score-v3';board.innerHTML=`<small>Poll progress</small><h3>${esc(scoreboard.poll.question)}</h3>${scoreboard.options.map(o=>{const n=scoreboard.votes.filter(v=>v.option_id===o.id).length,p=total?Math.round(n/total*100):0;return`<div class="gtg-score-v3-row"><span>${esc(o.label)}</span><b>${n} · ${p}%</b><div class="gtg-score-v3-bar"><i style="width:${p}%"></i></div></div>`}).join('')}<div class="gtg-score-v3-total">${total} vote${total===1?'':'s'} so far</div>`;h.appendChild(board)}
+ if(!prompt){box?.remove();return}
+ if(!box){box=document.createElement('section');box.className='gtg-home-poll-v3';h.after(box)}box.classList.remove('loading');box.innerHTML=`<small>Vote needed</small><h3>${esc(prompt.poll.question)}</h3><div class="opts">${prompt.options.map(o=>`<button type="button" data-gtg-v3-vote="${esc(prompt.poll.id)}" data-option="${esc(o.id)}">${esc(o.label)}</button>`).join('')}</div>`;
 }
 async function loadHome(){
  if(!isHome()||!tripId()){clearHome();return}

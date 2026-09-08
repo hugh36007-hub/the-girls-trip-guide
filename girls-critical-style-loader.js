@@ -43,9 +43,9 @@ function loadRouteCritical(){
    '/girls-live-dashboard-hero.js?v=6',
    '/girls-live-chat-sync.js?v=3',
    '/girls-home-refinements.js?v=1',
-   '/girls-home-social-hub-v3.js?v=20260908-2',
+   '/girls-home-social-hub-v3.js?v=20260908-3',
    '/girls-home-scoreboard-fit.js?v=20260908-2',
-   '/girls-parity-refresh-20260904.js?v=3'
+   '/girls-parity-refresh-20260904.js?v=4'
  ],'home');
 }
 
