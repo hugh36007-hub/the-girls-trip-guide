@@ -13,6 +13,6 @@ assert.deepEqual(JSON.parse(JSON.stringify(helper([polls[0]],[{poll_id:'new',vot
 assert.deepEqual(JSON.parse(JSON.stringify(helper(polls,[{poll_id:'old',voter_user_id:'me'}],'me'))),{prompt:polls[0],scoreboard:polls[1]},'new unvoted poll must coexist with the existing voted scoreboard');
 assert(parity.includes('if(homeOwned){document.querySelectorAll(\'.gtg-poll-hero-alert,.gtg-poll-alert\')'),'parity layer must yield Home poll ownership to social hub v3');
 assert(!parity.includes('if(free&&latestOpen&&hero)'),'parity layer must never render a voted latest poll as a hero alert');
-assert(loader.includes('/girls-home-social-hub-v3.js?v=20260908-3'));
+assert(loader.includes('/girls-home-social-hub-v3.js?v=20260908-4'));
 assert(loader.includes('/girls-parity-refresh-20260904.js?v=4'));
 console.log('PASS Girls Home poll ownership covers prompt-only, scoreboard-only and mixed states');
