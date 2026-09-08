@@ -4,11 +4,11 @@
 if(window.__GTG_PERFORMANCE_LOADER__)return;window.__GTG_PERFORMANCE_LOADER__=true;
 
 const BUNDLES={
-  appTheme:['/logged-in-light-theme.js?v=20260907-3','/logged-in-light-polish.js?v=20260907-1','/logged-in-light-theme-final-fix.js?v=20260907-1','/logged-in-stat-icons.js?v=20260907-2','/girls-direct-login-route.js?v=20260907-2','/girls-resend-invite-fix.js?v=20260907-1','/home-social-platform-guard.js?v=20260907-1','/girls-home-social-hub-v2.js?v=20260908-1','/girls-home-hero-background.js?v=20260908-1'],
+  appTheme:['/logged-in-light-theme.js?v=20260907-3','/logged-in-light-polish.js?v=20260907-1','/logged-in-light-theme-final-fix.js?v=20260907-1','/logged-in-stat-icons.js?v=20260907-2','/girls-direct-login-route.js?v=20260907-2','/girls-resend-invite-fix.js?v=20260907-1','/home-social-platform-guard.js?v=20260907-1','/girls-home-social-hub-v2.js?v=20260908-1','/girls-home-hero-background.js?v=20260908-1','/girls-home-hero-layout-match.js?v=20260908-1'],
   onboarding:['/girls-batch1-parity-safe-v2.js?v=20260907-2','/girls-convince-copy-v2.js?v=20260907-1'],
   parity:['/girls-product-parity.js?v=1'],
   shell:['/girls-section-layout.js?v=1','/girls-inner-page-polish.js?v=1'],
-  plan:['/girls-document-audience.js?v=1'],
+  plan:['/girls-document-audience.css?v=1'],
   money:['/girls-payment-nudge.js?v=2'],
   group:['/girls-trip-social.js?v=2','/girls-chat-sheet.js?v=3','/girls-chat-visibility-stability-fix.js?v=20260907-1','/girls-conversation-inbox.js?v=1','/conversation-header-align.js?v=1','/girls-poll-nudge.js?v=1'],
   evidence:[
@@ -66,7 +66,6 @@ async function loadRoute(route){
  if(route==='evidence')await loadBundle('evidence');
 }
 
-/* Critical app styling plus the safe onboarding/parity bridge. */
 void loadBundle('appTheme');
 void loadBundle('onboarding');
 
