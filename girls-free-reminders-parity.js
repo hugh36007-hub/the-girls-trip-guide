@@ -62,7 +62,7 @@ function normaliseRows(list){
  const buttons=[...list.querySelectorAll(':scope > button')].slice(0,REMINDERS.length);
  buttons.forEach((button,index)=>{
    const row=REMINDERS[index];
-   if(!row)return;
+   if(!row||button.dataset.gtgReminderRow==='1')return;
    button.dataset.gtgReminderRow='1';
    button.innerHTML=`<span class="gtg-reminder-code">${row.code}</span><div class="gtg-reminder-copy"><b>${row.title}</b><small>${row.trigger}</small></div><em class="gtg-reminder-status">Included</em>`;
  });
