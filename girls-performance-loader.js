@@ -7,8 +7,8 @@ const DOC_SRC='/girls-document-audience.js?v=20260908-2';
 const REMINDER_SRC='/girls-free-reminders-parity.js?v=20260908-7';
 const BUNDLES={
   appTheme:[
-    '/logged-in-light-theme.js?v=20260907-3',
-    '/logged-in-light-polish.js?v=20260907-1',
+    '/logged-in-light-theme.js?v=20260908-4',
+    '/logged-in-light-polish.js?v=20260908-4',
     '/logged-in-light-theme-final-fix.js?v=20260907-1',
     '/logged-in-stat-icons.js?v=20260907-2',
     '/girls-direct-login-route.js?v=20260907-2',
