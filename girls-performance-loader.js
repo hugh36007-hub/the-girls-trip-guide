@@ -29,9 +29,7 @@ const BUNDLES={
     '/conversation-header-align.js?v=2'
   ],
   groupPollExtras:['/girls-poll-nudge.js?v=2'],
-  evidenceShared:[
-    '/evidence-intro-dismiss.js?v=3'
-  ],
+  evidenceShared:['/evidence-intro-dismiss.js?v=3'],
   evidenceFull:[
     '/girls-vault-contract-fix.js?v=2',
     '/girls-hidden-upload-choice.js?v=1',
@@ -106,6 +104,17 @@ async function openEvidence(target=null){
  target.dataset.gtgEvidenceReady='1';
  target.click();
 }
+async function openHome(target=null){
+ if(isFull()){
+   document.documentElement.classList.add('gtg-home-route-pending');
+   await window.GTGCritical?.ensureHomeAssets?.();
+ }
+ await loadBundle('home');
+ document.documentElement.classList.remove('gtg-home-route-pending');
+ if(!target?.isConnected)return;
+ target.dataset.gtgHomeReady='1';
+ target.click();
+}
 
 void loadBundle('appTheme');
 if(!tripId())void loadBundle('onboarding');
@@ -126,12 +135,13 @@ function scheduleInitial(){
 }
 
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',scheduleInitial,{once:true});else scheduleInitial();
-window.addEventListener('popstate',()=>{const route=action();if(route==='evidence')void openEvidence();else void loadRoute(route);if(route!=='overview')idle(()=>void loadBundle('parity'))});
+window.addEventListener('popstate',()=>{const route=action();if(route==='evidence')void openEvidence();else if(route==='overview')void openHome();else void loadRoute(route);if(route!=='overview')idle(()=>void loadBundle('parity'))});
 
 document.addEventListener('pointerdown',event=>{
  const target=event.target.closest?.('[data-tab],[data-a],[data-action],[data-trip-social-tab],[data-gtg-social-tab],[data-parity-comms],[data-parity-reminders],[data-role-money],[data-role-upload]');if(!target)return;
  const tab=target.dataset.tab||'';const a=target.dataset.a||target.dataset.action||'';
  if(['plan','money','group','evidence'].includes(tab)){void loadRoute(tab);void loadBundle('parity')}
+ if(tab==='overview'&&isFull())void window.GTGCritical?.ensureHomeAssets?.();
  if(target.matches('[data-role-money]')||a==='addExpense')void loadRoute('money');
  if(isFull()&&(target.matches('[data-role-upload]')||['upload','vault','vaultUpload'].includes(a))){void loadRoute('evidence');void loadBundle('upload')}
  if(a==='addDocument'||a==='openDocument')void loadBundle('planDocuments');
@@ -142,6 +152,16 @@ document.addEventListener('pointerdown',event=>{
 },{capture:true,passive:true});
 
 document.addEventListener('click',event=>{
+ const homeTab=event.target.closest?.('[data-tab="overview"]');
+ if(homeTab&&isFull()){
+   if(homeTab.dataset.gtgHomeReady==='1'){
+     delete homeTab.dataset.gtgHomeReady;
+   }else{
+     event.preventDefault();event.stopImmediatePropagation();
+     void openHome(homeTab);
+     return;
+   }
+ }
  const evidenceTab=event.target.closest?.('[data-tab="evidence"]');
  if(evidenceTab&&isFull()){
    if(evidenceTab.dataset.gtgEvidenceReady==='1'){
@@ -178,5 +198,5 @@ function loadHomeIntent(){if(homeIntent||action()!=='overview')return;homeIntent
 window.addEventListener('scroll',()=>{if((window.scrollY||0)>40)loadHomeIntent()},{passive:true});
 document.addEventListener('keydown',event=>{if(event.key==='PageDown'||event.key==='End')loadHomeIntent()},{passive:true});
 
-window.GTGPerformance={loadBundle,loadRoute,openEvidence,composition};
+window.GTGPerformance={loadBundle,loadRoute,openEvidence,openHome,composition};
 })();
