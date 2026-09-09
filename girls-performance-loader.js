@@ -57,7 +57,7 @@ const BUNDLES={
 const STYLES={
   shell:['/girls-section-layout.css?v=1','/girls-product-parity.css?v=1','/girls-inner-page-polish.css?v=1'],
   planDocuments:['/girls-document-audience.css?v=20260908-2'],
-  evidenceFull:['/girls-evidence-core-grid.css?v=1'],
+  evidenceFull:['/girls-evidence-core-grid.css?v=2'],
   reminders:['/girls-free-reminders-parity.css?v=20260908-7']
 };
 const loaded=new Set(),pending=new Map(),loadedStyles=new Set(),pendingStyles=new Map();
