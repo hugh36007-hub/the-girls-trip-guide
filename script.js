@@ -15,30 +15,23 @@ const briefingMobile='/briefing-mobile-hero-fix.js?v=20260907-1';
 const homeFade='/homepage-hero-fade-fix.js?v=20260907-6';
 const batchPublic='/girls-batch1-public-safe.js?v=20260907-1';
 
-// Public informational pages must render the approved image mark even if a later
-// sitewide refinement script is delayed or exits early on a non-product route.
-const normalisePublicHeader=()=>{
+const forceApprovedHeader=()=>{
   const header=document.getElementById('siteHeader');
-  if(!header) return;
+  if(!header)return;
   const brand=header.querySelector('.brand');
   if(brand){
-    brand.classList.add('site-logo');
+    brand.className='brand site-logo';
+    brand.href='/';
     brand.setAttribute('aria-label','The Girls Trip Guide home');
-    brand.setAttribute('href','/');
-    if(!brand.querySelector('img')){
-      brand.innerHTML='<img src="/assets/images/girls-trip-guide-logo.webp" alt="The Girls Trip Guide — Good Plans. Better Stories." loading="eager" decoding="async">';
-    }
-    Object.assign(brand.style,{display:'inline-flex',alignItems:'center',justifyContent:'center',width:'120px',height:'72px',flex:'0 0 120px',marginRight:'auto',overflow:'hidden',background:'transparent'});
+    brand.innerHTML='<img src="/assets/images/girls-trip-guide-logo.webp" alt="The Girls Trip Guide — Good Plans. Better Stories." width="120" height="72" loading="eager" decoding="async">';
+    brand.style.cssText='display:flex!important;align-items:center!important;justify-content:flex-start!important;width:150px!important;height:72px!important;flex:0 0 150px!important;margin-right:auto!important;overflow:visible!important;background:transparent!important;';
     const img=brand.querySelector('img');
-    if(img) Object.assign(img.style,{display:'block',width:'120px',height:'auto',maxWidth:'none'});
-  }
-  const nav=document.getElementById('navLinks');
-  if(nav&&nav.children.length<5){
-    nav.innerHTML='<a href="/situation">So… what’s the plan?</a><a href="/the-gals#how-it-works">How It Works</a><a href="/free-vs-full">Free vs Full</a><a href="/gals">The GALS</a><a href="/briefing">The Briefing</a>';
+    if(img)img.style.cssText='display:block!important;width:140px!important;height:64px!important;object-fit:contain!important;object-position:left center!important;max-width:none!important;';
   }
 };
-normalisePublicHeader();
-if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',normalisePublicHeader,{once:true});
+forceApprovedHeader();
+document.addEventListener('DOMContentLoaded',forceApprovedHeader,{once:true});
+window.addEventListener('load',forceApprovedHeader,{once:true});
 
 const addInsightsFooterLink=()=>{
   const footer=document.querySelector('.footer');
@@ -108,7 +101,7 @@ a.addEventListener('load',()=>{
                         const bp=document.createElement('script');
                         bp.src=batchPublic;
                         bp.async=false;
-                        bp.addEventListener('load',()=>{normalisePublicHeader();addInsightsFooterLink();});
+                        bp.addEventListener('load',forceApprovedHeader,{once:true});
                         document.head.appendChild(bp);
                       });
                       document.head.appendChild(hf);
