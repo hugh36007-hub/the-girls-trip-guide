@@ -26,15 +26,15 @@ html.gtg-app-light .trip-title span{color:#79636e!important}
 html.gtg-app-light .icon-btn{background:#fff!important;border:1px solid rgba(255,79,163,.38)!important;color:#191316!important;box-shadow:0 7px 18px rgba(63,28,46,.05)!important}
 html.gtg-app-light .dashboard{background:transparent!important}
 
-/* Keep the photographic trip hero as the dark visual anchor. */
-html.gtg-app-light .hero-card{border:1.5px solid rgba(255,79,163,.36)!important;background:#120b11!important;box-shadow:0 20px 46px rgba(63,28,46,.11)!important;color:#fff!important}
-html.gtg-app-light .hero-card:after{background:linear-gradient(180deg,rgba(3,2,3,.02) 12%,rgba(5,3,5,.16) 46%,rgba(5,3,5,.83) 100%)!important}
-html.gtg-app-light .hero-meta,html.gtg-app-light .hero-meta h1{color:#fff!important}
-html.gtg-app-light .hero-meta h1 span,html.gtg-app-light .hero-card .eyebrow{color:#ff83c1!important}
-html.gtg-app-light .hero-meta p{color:rgba(255,255,255,.82)!important}
-html.gtg-app-light .trip-stamp{border:1px solid rgba(255,137,196,.62)!important;background:rgba(20,10,16,.76)!important;color:#fff!important;box-shadow:0 10px 26px rgba(0,0,0,.14)!important}
-html.gtg-app-light .trip-stamp b{color:#ff9dcc!important}
-html.gtg-app-light .trip-stamp span{color:#fff!important}
+/* Free/legacy hero styling only. Full Trip is owned exclusively by live-dashboard-hero.css. */
+html.gtg-app-light .hero-card:not(.live-snapshot-hero){border:1.5px solid rgba(255,79,163,.36)!important;background:#120b11!important;box-shadow:0 20px 46px rgba(63,28,46,.11)!important;color:#fff!important}
+html.gtg-app-light .hero-card:not(.live-snapshot-hero):after{background:linear-gradient(180deg,rgba(3,2,3,.02) 12%,rgba(5,3,5,.16) 46%,rgba(5,3,5,.83) 100%)!important}
+html.gtg-app-light .hero-card:not(.live-snapshot-hero) .hero-meta,html.gtg-app-light .hero-card:not(.live-snapshot-hero) .hero-meta h1{color:#fff!important}
+html.gtg-app-light .hero-card:not(.live-snapshot-hero) .hero-meta h1 span,html.gtg-app-light .hero-card:not(.live-snapshot-hero) .eyebrow{color:#ff83c1!important}
+html.gtg-app-light .hero-card:not(.live-snapshot-hero) .hero-meta p{color:rgba(255,255,255,.82)!important}
+html.gtg-app-light .hero-card:not(.live-snapshot-hero) .trip-stamp{border:1px solid rgba(255,137,196,.62)!important;background:rgba(20,10,16,.76)!important;color:#fff!important;box-shadow:0 10px 26px rgba(0,0,0,.14)!important}
+html.gtg-app-light .hero-card:not(.live-snapshot-hero) .trip-stamp b{color:#ff9dcc!important}
+html.gtg-app-light .hero-card:not(.live-snapshot-hero) .trip-stamp span{color:#fff!important}
 
 html.gtg-app-light .stat,
 html.gtg-app-light .card,
@@ -105,7 +105,7 @@ html.gtg-app-light .toast{background:#191316!important;color:#fff!important;box-
 @media(max-width:600px){
  html.gtg-app-light .appbar{background:rgba(255,255,255,.98)!important}
  html.gtg-app-light .brand img{height:52px!important;max-width:82px!important}
- html.gtg-app-light .hero-card{box-shadow:0 14px 32px rgba(63,28,46,.09)!important}
+ html.gtg-app-light .hero-card:not(.live-snapshot-hero){box-shadow:0 14px 32px rgba(63,28,46,.09)!important}
  html.gtg-app-light .stat,html.gtg-app-light .card{box-shadow:0 10px 24px rgba(63,28,46,.055)!important}
  html.gtg-app-light .dock{background:rgba(255,255,255,.98)!important}
 }
