@@ -41,7 +41,15 @@ Deno.serve(async req=>{
     const cutoff=new Date(Date.now()-4*60*60*1000).toISOString(),{data:recent,error:recentError}=await db.from('communications').select('id,created_at').eq('trip_id',tripId).eq('recipient_member_id',recipientMemberId).eq('trigger_code','T11').eq('reason','Manual payment nudge').gte('created_at',cutoff).order('created_at',{ascending:false}).limit(1);if(recentError)throw recentError;if(recent?.length)return json({error:'A payment nudge was already sent to this person recently. Try again later.'},429)
     const [{data:settings,error:settingsError},{data:entitlements,error:entitlementsError}]=await Promise.all([db.from('communication_settings').select('character_mode,enabled,payments').eq('trip_id',tripId).maybeSingle(),db.from('trip_entitlements').select('entitlement').eq('trip_id',tripId).eq('active',true).in('entitlement',['full_trip','full_comms'])]);if(settingsError)throw settingsError;if(entitlementsError)throw entitlementsError
     if(settings?.enabled===false||settings?.payments===false)return json({error:'Payment reminders are disabled for this trip.'},409)
-    const full=Boolean(entitlements?.length),mode=String(settings?.character_mode||'grace-auto'),resolved=full?resolveGirlsCommunication('T11',mode,{payment:new Intl.NumberFormat('en-GB',{style:'currency',currency:'GBP'}).format(position.amount),dueDay:'now'}):null,character=full?resolved.character:'system',message=full?(resolved.message||'A trip payment has been requested. Open the trip to review the amount and due date.'):'A trip payment has been requested. Open the trip to review the amount and due date.'
+    const full=Boolean(entitlements?.length)
+    const mode=String(settings?.character_mode||'grace-auto')
+    let character='system'
+    let message='A trip payment has been requested. Open the trip to review the amount and due date.'
+    if(full){
+      const resolved=resolveGirlsCommunication('T11',mode,{payment:new Intl.NumberFormat('en-GB',{style:'currency',currency:'GBP'}).format(position.amount),dueDay:'now'})
+      character=resolved.character
+      message=resolved.message||message
+    }
     const {data:comm,error:commError}=await db.from('communications').insert({trip_id:tripId,trigger_code:'T11',recipient_member_id:recipientMemberId,status:'held',essential:true,reason:'Manual payment nudge',scheduled_for:new Date().toISOString(),idempotency_key:`gtg-payment-nudge:${tripId}:${recipientMemberId}:${crypto.randomUUID()}`}).select('id').single();if(commError)throw commError;commId=comm.id
     const target=new URL('https://thegirlstripguide.com/create-trip');target.searchParams.set('trip_id',tripId);target.searchParams.set('action','money')
     const delivery=await deliver({to:position.member.email,character,title:'Payment request',message,tripName:trip.name,cta:'View payment',url:target.toString(),subject:`Payment request · ${trip.name}`,preheader:`${character==='system'?'The Girls Trip Guide':character.charAt(0).toUpperCase()+character.slice(1)} · Payment request`,idempotencyKey:`gtg-${commId}-${recipientMemberId}`})
