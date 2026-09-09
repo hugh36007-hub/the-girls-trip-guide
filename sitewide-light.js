@@ -2,7 +2,7 @@
 'use strict';
 const NEW_LOGO='/assets/images/hero-trans.png';
 const NEW_LOGO_ABS=`https://thegirlstripguide.com${NEW_LOGO}`;
-const PUBLIC_PATHS=new Set(['/','/situation','/the-gals','/free-vs-full','/gals','/briefing','/contact','/terms','/privacy','/cookie-policy','/refund-policy','/safety','/create-trip','/full-trip']);
+const PUBLIC_PATHS=new Set(['/','/situation','/the-gals','/free-vs-full','/gals','/briefing','/contact','/terms','/privacy','/cookie-policy','/refund-policy','/safety','/create-trip','/full-trip','/insights','/group-trip-photo-problem']);
 const clean=p=>{let x=(p||'/').replace(/\/+$/,'')||'/';if(x==='/index.html')return '/';return x.replace(/\.html$/,'')};
 const currentPath=clean(location.pathname);
 

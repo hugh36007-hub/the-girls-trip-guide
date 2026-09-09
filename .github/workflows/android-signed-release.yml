@@ -1,5 +1,5 @@
 name: Android signed release
-# Rebuild 1.0.2 after the 9 September 2026 reviewed main sync.
+# Rebuild 1.0.2 after the final 9 September 2026 reviewed main sync.
 
 on:
   push:
