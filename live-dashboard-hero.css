@@ -2,7 +2,7 @@
 .hero-card.live-snapshot-hero{
   --live-accent:#ed2f8b;
   height:auto!important;
-  min-height:0!important;
+  min-height:360px!important;
   padding:22px!important;
   display:grid!important;
   grid-template-columns:minmax(0,1.16fr) minmax(0,.84fr);
@@ -62,7 +62,7 @@
 @keyframes live-shell-pulse{0%,100%{background-position:0 0;opacity:.55}50%{background-position:100% 0;opacity:.9}}
 @media(prefers-reduced-motion:reduce){.live-data-loading i,.live-line{animation:none}}
 @media(max-width:700px){
-  .hero-card.live-snapshot-hero{padding:16px!important;gap:12px 11px;grid-template-columns:minmax(0,1.12fr) minmax(0,.88fr)}
+  .hero-card.live-snapshot-hero{min-height:340px!important;padding:16px!important;gap:12px 11px;grid-template-columns:minmax(0,1.12fr) minmax(0,.88fr)}
   .live-hero-title{padding:6px 2px 0 2px}
   .live-hero-title .eyebrow{font-size:8.5px!important}
   .live-hero-title h1{margin:15px 0 12px!important;font-size:clamp(36px,10vw,43px)!important;line-height:.86!important}
@@ -84,3 +84,4 @@
   .live-photo-add{font-size:6.5px;padding:7px 8px}
   .live-message-card,.live-date-card{padding:11px 10px}
 }
+@media(max-width:700px) and (max-height:700px){.hero-card.live-snapshot-hero{min-height:300px!important}}
