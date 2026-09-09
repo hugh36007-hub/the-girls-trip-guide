@@ -4,12 +4,15 @@
 if(window.__GTG_CRITICAL_STYLE_LOADER__)return;window.__GTG_CRITICAL_STYLE_LOADER__=true;
 const route=()=>new globalThis.URL(location.href).searchParams.get('action')||'overview';
 const home=()=>route()==='overview';
+const evidence=()=>route()==='evidence';
+if(evidence())document.documentElement.classList.add('gtg-evidence-route-pending');
 
 function installStartupPolish(){
  if(document.getElementById('gtg-safe-home-startup-polish'))return;
  const style=document.createElement('style');style.id='gtg-safe-home-startup-polish';style.textContent=`
 #gtg-first-paint-cover{position:fixed;inset:0;z-index:2147482500;overflow:auto;background:radial-gradient(circle at 14% 0,rgba(255,79,163,.055),transparent 30%),#fff;opacity:1;pointer-events:none;transition:opacity 140ms ease}
 #gtg-first-paint-cover.gtg-cover-leaving{opacity:0}
+.gtg-evidence-route-pending .dashboard[data-home-composition="full"] [data-panel="evidence"].active{visibility:hidden!important}
 @media(max-width:600px){#gtg-first-paint-cover .gtg-boot-hero,.gtg-boot-shell .gtg-boot-hero{min-height:340px!important}}
 @media(max-width:700px) and (max-height:700px){#gtg-first-paint-cover .gtg-boot-hero,.gtg-boot-shell .gtg-boot-hero{min-height:300px!important}}
 @media(prefers-reduced-motion:reduce){#gtg-first-paint-cover{transition:none!important}}
