@@ -14,6 +14,32 @@ const mobilePublic='/mobile-front-of-house-fixes.js?v=20260907-2';
 const briefingMobile='/briefing-mobile-hero-fix.js?v=20260907-1';
 const homeFade='/homepage-hero-fade-fix.js?v=20260907-6';
 const batchPublic='/girls-batch1-public-safe.js?v=20260907-1';
+
+// Public informational pages must render the approved image mark even if a later
+// sitewide refinement script is delayed or exits early on a non-product route.
+const normalisePublicHeader=()=>{
+  const header=document.getElementById('siteHeader');
+  if(!header) return;
+  const brand=header.querySelector('.brand');
+  if(brand){
+    brand.classList.add('site-logo');
+    brand.setAttribute('aria-label','The Girls Trip Guide home');
+    brand.setAttribute('href','/');
+    if(!brand.querySelector('img')){
+      brand.innerHTML='<img src="/assets/images/girls-trip-guide-logo.webp" alt="The Girls Trip Guide — Good Plans. Better Stories." loading="eager" decoding="async">';
+    }
+    Object.assign(brand.style,{display:'inline-flex',alignItems:'center',justifyContent:'center',width:'120px',height:'72px',flex:'0 0 120px',marginRight:'auto',overflow:'hidden',background:'transparent'});
+    const img=brand.querySelector('img');
+    if(img) Object.assign(img.style,{display:'block',width:'120px',height:'auto',maxWidth:'none'});
+  }
+  const nav=document.getElementById('navLinks');
+  if(nav&&nav.children.length<5){
+    nav.innerHTML='<a href="/situation">So… what’s the plan?</a><a href="/the-gals#how-it-works">How It Works</a><a href="/free-vs-full">Free vs Full</a><a href="/gals">The GALS</a><a href="/briefing">The Briefing</a>';
+  }
+};
+normalisePublicHeader();
+if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',normalisePublicHeader,{once:true});
+
 const addInsightsFooterLink=()=>{
   const footer=document.querySelector('.footer');
   if(!footer||footer.querySelector('a[href="/insights"],a[href="/insights.html"],a[href="insights.html"]')) return;
@@ -82,6 +108,7 @@ a.addEventListener('load',()=>{
                         const bp=document.createElement('script');
                         bp.src=batchPublic;
                         bp.async=false;
+                        bp.addEventListener('load',()=>{normalisePublicHeader();addInsightsFooterLink();});
                         document.head.appendChild(bp);
                       });
                       document.head.appendChild(hf);
