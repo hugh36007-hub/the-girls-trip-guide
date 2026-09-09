@@ -12,7 +12,7 @@ const chrome=[process.env.CHROME_BIN,process.env.CHROME_PATH,'/usr/bin/google-ch
 assert(chrome,'Chrome/Chromium required');
 
 assert.match(critical,/if\(evidence\(\)\)document\.documentElement\.classList\.add\('gtg-evidence-route-pending'\)/,'direct Evidence must install the pre-paint gate');
-assert.match(critical,/gtg-evidence-route-pending[\s\S]*data-home-composition=\\"full\\"[\s\S]*data-panel=\\"evidence\\"/,'direct gate must be Full-only');
+assert(critical.includes('.gtg-evidence-route-pending .dashboard[data-home-composition="full"] [data-panel="evidence"].active'),'direct gate must be Full-only');
 assert.match(loader,/async function openEvidence\(target=null\)/,'one async Evidence entry function must own readiness');
 assert.match(loader,/await loadRoute\('evidence'\)[\s\S]*classList\.remove\('gtg-evidence-route-pending'\)/,'Evidence must load before the direct gate is released');
 assert.match(loader,/evidenceTab&&isFull\(\)/,'Full Evidence clicks must use the readiness gate');
