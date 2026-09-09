@@ -4,7 +4,7 @@
 if(window.__GTG_LIVE_DASHBOARD_HERO__)return;window.__GTG_LIVE_DASHBOARD_HERO__=true;
 if(!document.querySelector('link[data-live-dashboard-hero]')){
   const link=document.createElement('link');
-  link.rel='stylesheet';link.href='/live-dashboard-hero.css?v=9';link.dataset.liveDashboardHero='1';
+  link.rel='stylesheet';link.href='/live-dashboard-hero.css?v=10';link.dataset.liveDashboardHero='1';
   document.head.appendChild(link);
 }
 const SUPABASE_URL='https://vtcmvwixfqyxqghibsla.supabase.co';
