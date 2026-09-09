@@ -27,4 +27,4 @@
 
   globalThis.GTGNativeUrl = Object.freeze({ normalise });
 })();
-// Rebuild trigger: 2026-09-09 hardened invitation callbacks.
+// Rebuild trigger: 2026-09-09 hardened invitation payload complete.
