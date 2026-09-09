@@ -36,11 +36,11 @@ assert.doesNotMatch(dateFlow,/girls-live-dashboard-hero\.js/,'the legacy date fl
 assert.match(html,/girls-critical-style-loader\.js\?v=20260909-5/,'the private shell must cache-bust the core-owned Full Home loader');
 assert.match(html,/girls-app-v2\.js\?v=5/,'the private shell must cache-bust the core renderer');
 assert.match(html,/girls-hero-vault-ux\.js\?v=4/,'the private shell must cache-bust the retired legacy hero control path');
-assert.match(html,/girls-performance-loader\.js\?v=6/,'the private shell must retain the single-owner Evidence loader');
+assert.match(html,/girls-performance-loader\.js\?v=7/,'the private shell must retain the single-owner Evidence loader');
 assert.match(html,/girls-pwa-register\.js\?v=4/,'the private shell must refresh PWA registration code');
 assert.match(html,/class="gtg-boot-shell"/,'the private shell must use the isolated light startup skeleton');
 assert.doesNotMatch(html,/gtg-boot-shell[\s\S]*girls-trip-guide-logo\.webp/,'the startup skeleton must not render the old square logo');
-assert.match(sw,/gtg-pwa-v17/,'the core-owned Full Home renderer must advance the offline cache generation');
+assert.match(sw,/gtg-pwa-v18/,'the current Full Home composition must use the latest offline cache generation');
 assert.match(heroCss,/\.live-message-card\{[^}]*background:linear-gradient\(145deg,#fffafd,#fbe7f1\)/,'the message preview must use the light blush surface');
 assert.match(heroCss,/\.live-photo-frame\{[^}]*background:linear-gradient\(145deg,#fffafd,#fce9f3\)/,'the empty photo preview must use the light blush surface');
 assert.doesNotMatch(heroCss,/\.live-message-card\{[^}]*#21141d/,'the legacy near-black message surface must not return');
