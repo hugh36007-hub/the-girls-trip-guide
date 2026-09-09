@@ -23,8 +23,8 @@ for(const copy of ['Two separate galleries','visible to everyone confirmed on th
 assert(!guide.includes('max-width: 700px'),'Guide must behave consistently on mobile and desktop');
 assert(!vaultUx.includes('data-vault-privacy-note'),'Permanent duplicate privacy note must be removed');
 
-assert(loader.includes('/evidence-intro-dismiss.js?v=2'),'Guide cache version not bumped');
-assert(html.includes('/girls-app-v2.js?v=4')&&html.includes('/girls-hero-vault-ux.js?v=3')&&html.includes('/girls-performance-loader.js?v=4'),'Updated scripts must be cache-busted');
-assert(sw.includes("gtg-pwa-v13"),'PWA cache generation not bumped');
+assert(loader.includes('/evidence-intro-dismiss.js?v=3'),'Guide cache version not current');
+assert(html.includes('/girls-app-v2.js?v=6')&&html.includes('/girls-hero-vault-ux.js?v=4')&&html.includes('/girls-performance-loader.js?v=10'),'Updated scripts must be cache-busted');
+assert(sw.includes("gtg-pwa-v23"),'PWA cache generation not bumped');
 
 console.log('Girls Hidden Gallery discretion contract PASS');

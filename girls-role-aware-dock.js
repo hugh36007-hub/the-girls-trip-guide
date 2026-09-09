@@ -10,14 +10,10 @@ const ICONS={
   group:svg('<circle cx="9" cy="9" r="2.6"/><circle cx="16.5" cy="10" r="2"/><path d="M4.5 18c.5-3 2.2-4.5 4.5-4.5s4 1.5 4.5 4.5"/><path d="M14 14.5c2.8-.5 5 .8 5.5 3.5"/>'),
   evidence:svg('<path d="M7.2 6.5 8.5 4.7h7l1.3 1.8h2.4A1.8 1.8 0 0 1 21 8.3v9A1.8 1.8 0 0 1 19.2 19H4.8A1.8 1.8 0 0 1 3 17.2v-9a1.8 1.8 0 0 1 1.8-1.8h2.4Z"/><circle cx="12" cy="12.5" r="3.3"/>')
 };
-let rememberedRole='';
-
 function dockButton(dock,tab){return dock.querySelector(`button[data-tab="${tab}"]`)}
 function tripRole(){
-  const dock=document.querySelector('nav.dock');if(!dock)return '';
-  const roleText=`${document.querySelector('.trip-title span')?.textContent||''} ${document.querySelector('.appbar')?.textContent||''}`;
-  if(document.querySelector('[data-panel="money"] [data-a="addExpense"]')||/\b(organiser|owner)\b/i.test(roleText)||dockButton(dock,'money'))rememberedRole='owner';
-  return rememberedRole||'member';
+  const role=document.querySelector('.dashboard')?.dataset.tripRole||'';
+  return role==='owner'||role==='member'?role:'';
 }
 function ownerMoneyButton(){
   const b=document.createElement('button');b.type='button';b.dataset.tab='money';b.dataset.roleMoney='1';b.setAttribute('aria-label','Money');return b;

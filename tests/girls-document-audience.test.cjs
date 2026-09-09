@@ -19,9 +19,9 @@ for(const token of [
 
 assert(!html.includes('/girls-document-audience.js?v=1'),'document audience runtime must not execute on Home startup');
 assert(!html.includes('/girls-document-audience.css?v=1'),'document audience styles must not load on Home startup');
-assert(loader.includes('/girls-document-audience.js?v=1'),'Plan route must retain document audience runtime');
-assert(loader.includes('/girls-document-audience.css?v=1'),'Plan route must retain document audience styles');
-assert(loader.includes("if(route==='plan')await loadBundle('plan')"),'document audience must load with Plan route');
+assert(loader.includes("const DOC_SRC='/girls-document-audience.js?v=20260908-2'"),'Plan route must retain the current document audience runtime');
+assert(loader.includes('/girls-document-audience.css?v=20260908-2'),'Plan route must retain the current document audience styles');
+assert(loader.includes("if(route==='plan')await loadBundle('planDocuments')"),'document audience must load with Plan route');
 
 for(const token of [
   'documents_visibility_check',

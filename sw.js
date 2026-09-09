@@ -1,4 +1,4 @@
-const CACHE_VERSION='gtg-pwa-v22';
+const CACHE_VERSION='gtg-pwa-v23';
 const STATIC_CACHE=`${CACHE_VERSION}-static`;
 const PAGE_CACHE=`${CACHE_VERSION}-pages`;
 const APP_SHELL=['/create-trip','/create-trip.html','/manifest.webmanifest','/girls-app.css?v=20260909-1','/girls-critical-style-loader.js?v=20260909-6','/live-dashboard-hero.css?v=10','/assets/images/gtg-pwa-192.svg?v=1','/assets/images/girls-trip-guide-logo.webp'];

@@ -93,6 +93,7 @@ async function loadEvidence(){
 async function loadRoute(route){
  if(!['plan','money','group','evidence'].includes(route))return;
  await loadBundle('shell');
+ if(route==='plan')await loadBundle('planDocuments');
  if(route==='money')await loadBundle('money');
  if(route==='group')await loadBundle('groupCore');
  if(route==='evidence')await loadEvidence();
