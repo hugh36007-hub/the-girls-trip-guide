@@ -48,6 +48,7 @@ function finalReady(){
  const stats=dashboard.querySelectorAll(':scope .stat-row>.stat');if(stats.length!==4)return false;
  if(mode==='full'){
   if(!hero.matches('.live-snapshot-hero[data-live-snapshot="1"]'))return false;
+  if(hero.dataset.fullHeroOwner!=='live-dashboard-hero')return false;
   if(hero.querySelectorAll(':scope>.live-hero-title').length!==1)return false;
   if(hero.querySelectorAll(':scope>.live-date-card').length!==1)return false;
   if(hero.querySelectorAll(':scope>.live-message-card').length!==1)return false;
@@ -62,8 +63,8 @@ function finalReady(){
 function removeCover(){if(cover?.isConnected)cover.remove();cover=null}
 function release(){
  if(released||!finalReady())return;released=true;window.__GTG_FIRST_PAINT_DONE__=true;observer?.disconnect();observer=null;
- if(!cover){return}
- const reduce=matchMedia?.('(prefers-reduced-motion: reduce)')?.matches;if(reduce){removeCover();return}
+ if(!cover)return;
+ const reduce=globalThis.matchMedia?.('(prefers-reduced-motion: reduce)')?.matches;if(reduce){removeCover();return}
  cover.classList.add('gtg-cover-leaving');
  const finish=()=>{clearTimeout(releaseTimer);removeCover()};cover.addEventListener('transitionend',finish,{once:true});releaseTimer=setTimeout(finish,190);
 }
