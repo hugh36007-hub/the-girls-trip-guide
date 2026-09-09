@@ -18,5 +18,8 @@ assert.match(evidence,/classList\.toggle\('gtg-mobile-media-grid',hasMedia\)/,'m
 assert.match(evidence,/gtg-mobile-media-empty/,'empty Evidence must have an explicit transparent state');
 assert.match(parity,/const hasComms=Boolean/,'Group parity must detect an existing promoted communications action');
 assert.match(polish,/all\.forEach\(button=>\{if\(button!==keep\)button\.remove\(\)\}\)/,'Group polish must remove duplicate communications actions');
+const switchTab=app.match(/function switchTab\(tab\)\{([^}]|\}(?!\nfunction))*\}/)?.[0]||'';
+assert.match(switchTab,/classList\.toggle\('active'/,'ordinary tab switching must reuse the existing rendered dashboard');
+assert.doesNotMatch(switchTab,/renderDashboard\(/,'ordinary Plan/Money/Group/Evidence → Home switching must not rerender the dashboard');
 
 console.log('Girls Full Trip UI regression contract: PASS');
