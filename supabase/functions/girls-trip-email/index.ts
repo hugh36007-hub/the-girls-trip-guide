@@ -45,10 +45,6 @@ Deno.serve(async req=>{
     if(entitlementsError)throw entitlementsError
     const full=Boolean(entitlements?.length)
     const mode=full?String(settings?.character_mode||'grace-auto'):'grace-auto'
-    const resolvedInvite=resolveGirlsCommunication('T03',mode)
-    const inviteCharacter=resolvedInvite.character||'grace'
-    const inviteSubject=resolvedInvite.subject||"You've been invited."
-    const inviteMessage=resolvedInvite.message||"You've been invited. Confirm whether you're in, then read the plan before adding another screenshot to the evidence pile."
 
     let member:any=null,me:any=null
     if(requestedMemberId){
@@ -96,18 +92,22 @@ Deno.serve(async req=>{
     join.searchParams.set('member',member.id)
     join.searchParams.set('token',raw)
     join.searchParams.set('confirm','1')
-    const first=titleName(name).split(' ')[0]||''
-    const accessCopy=wasConfirmed||resend
-    const sender=characterName(inviteCharacter)
-    const payload=accessCopy
-      ?{to:email,character:inviteCharacter,title:'Your trip link is ready.',message:`Hey ${first}, here’s a fresh secure link for ${trip.name}. It opens the correct trip directly.`,tripName:trip.destination||trip.name,cta:'OPEN THE TRIP',url:join.toString(),subject:`Your trip link · ${trip.name}`,preheader:`${sender} · Fresh secure access to ${trip.name}`,idempotencyKey:`gtg-invite-${commId}`}
-      :{to:email,character:inviteCharacter,title:inviteSubject,message:inviteMessage,tripName:trip.destination||trip.name,cta:'JOIN THE TRIP',url:join.toString(),subject:`${inviteSubject} · ${trip.name}`,preheader:`${sender} · ${inviteSubject}`,idempotencyKey:`gtg-invite-${commId}`}
+    const accessCopy=wasConfirmed
+    const voiceTrigger=accessCopy?'T06':'T03'
+    const resolvedEmail=resolveGirlsCommunication(voiceTrigger,mode)
+    const emailCharacter=resolvedEmail.character||'grace'
+    const emailSubject=resolvedEmail.subject||(accessCopy?"Good. You're in.":"You've been invited.")
+    const emailMessage=resolvedEmail.message||(accessCopy
+      ?"Good. You're in. Open the trip and read the current plan."
+      :"You've been invited. Confirm whether you're in, then read the plan before adding another screenshot to the evidence pile.")
+    const sender=characterName(emailCharacter)
+    const payload={to:email,character:emailCharacter,title:emailSubject,message:emailMessage,tripName:trip.destination||trip.name,cta:accessCopy?'OPEN THE TRIP':'JOIN THE TRIP',url:join.toString(),subject:emailSubject,preheader:`${sender} · ${emailSubject}`,idempotencyKey:`gtg-invite-${commId}`}
 
     const delivery=(async()=>{
       try{
         const result=await deliver(payload)
-        if(result.suppressed){await db.from('communications').update({status:'cancelled',reason:`Recipient suppressed: ${result.reason||'delivery blocked'}`,attempt_count:1,last_attempt_at:new Date().toISOString(),last_error:null,character:inviteCharacter}).eq('id',commId);return}
-        await db.from('communications').update({status:'sent',sent_at:new Date().toISOString(),provider:'resend',provider_message_id:result.id,attempt_count:1,last_attempt_at:new Date().toISOString(),last_error:null,character:inviteCharacter}).eq('id',commId)
+        if(result.suppressed){await db.from('communications').update({status:'cancelled',reason:`Recipient suppressed: ${result.reason||'delivery blocked'}`,attempt_count:1,last_attempt_at:new Date().toISOString(),last_error:null,character:emailCharacter}).eq('id',commId);return}
+        await db.from('communications').update({status:'sent',sent_at:new Date().toISOString(),provider:'resend',provider_message_id:result.id,attempt_count:1,last_attempt_at:new Date().toISOString(),last_error:null,character:emailCharacter}).eq('id',commId)
         await db.from('communications').update({status:'cancelled',reason:'Superseded by delivered invitation',last_error:null}).eq('trip_id',tripId).eq('recipient_member_id',member.id).eq('trigger_code','T03').in('status',['girls_ready','girls_scheduled','girls_failed']).neq('id',commId)
       }catch(e){
         console.error('Girls invitation background delivery failed',e instanceof Error?e.message:String(e))
@@ -116,7 +116,7 @@ Deno.serve(async req=>{
     })()
     EdgeRuntime.waitUntil(delivery)
 
-    return json({ok:true,member,communicationId:commId,sent:false,queued:true,resend:accessCopy})
+    return json({ok:true,member,communicationId:commId,sent:false,queued:true,resend:resend||wasConfirmed})
   }catch(e){
     console.error(e)
     return json({error:e instanceof Error?e.message:'Invitation failed'},500)
