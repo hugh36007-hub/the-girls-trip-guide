@@ -18,15 +18,15 @@ function installStartupPolish(){
 }
 
 const styles=['/mobile-viewport-lock.css?v=2','/girls-action-feedback.css?v=1','/girls-drawer-fix.css?v=1','/girls-hero-vault-ux.css?v=1','/girls-final-refinement.css?v=1','/girls-date-focus-fix.css?v=1'];
-if(home())styles.push('/live-dashboard-hero.css?v=8');
+if(home())styles.push('/live-dashboard-hero.css?v=9');
 for(const href of styles){if(document.querySelector(`link[rel="stylesheet"][href="${href}"]`))continue;const link=document.createElement('link');link.rel='stylesheet';link.href=href;link.dataset.gtgCritical='1';document.head.appendChild(link)}
 
 const scripts=home()?[
  '/home-social-platform-guard.js?v=20260908-2',
  '/girls-home-hero-layout-match.js?v=20260909-1',
- '/girls-live-dashboard-hero.js?v=10',
+ '/girls-live-dashboard-hero.js?v=11',
  '/girls-live-chat-sync.js?v=3',
- '/girls-home-refinements.js?v=1',
+ '/girls-home-refinements.js?v=2',
  '/girls-home-social-hub-v3.js?v=20260908-4',
  '/girls-home-scoreboard-fit.js?v=20260908-3',
  '/girls-parity-refresh-20260904.js?v=4'
@@ -53,8 +53,9 @@ function finalReady(){
   if(hero.dataset.fullHeroOwner!=='live-dashboard-hero')return false;
   if(hero.querySelectorAll(':scope>.live-hero-title').length!==1)return false;
   if(hero.querySelectorAll(':scope>.live-date-card').length!==1)return false;
-  if(hero.querySelectorAll(':scope>.live-message-card').length!==1)return false;
-  if(hero.querySelectorAll(':scope>.live-photo-block').length!==1)return false;
+  const snapshot=hero.querySelector(':scope>.live-snapshot-bottom');if(!snapshot)return false;
+  if(snapshot.querySelectorAll(':scope>.live-message-card').length!==1)return false;
+  if(snapshot.querySelectorAll(':scope>.live-photo-block').length!==1)return false;
   return true;
  }
  if(!hero.classList.contains('gtg-boys-layout'))return false;
