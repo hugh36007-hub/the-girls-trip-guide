@@ -4,7 +4,6 @@ on:
   push:
     branches:
       - main
-      - native-app-isolated
       - release/girls-feature-parity-20260828
       - release/girls-product-parity-completion-20260828
       - feature/girls-document-audience-20260828
@@ -26,8 +25,6 @@ jobs:
       - uses: denoland/setup-deno@v2
         with:
           deno-version: v2.x
-      - name: Install pinned JavaScript dependencies
-        run: npm ci
       - name: JavaScript syntax
         run: |
           node --check girls-app-v2.js
@@ -71,12 +68,15 @@ jobs:
           node --check tests/girls-media-readiness.test.mjs
           node --check tests/girls-home-thumbnail-prime.test.mjs
           node --check tests/girls-home-chat-expand.test.cjs
+          node --check tests/girls-member-view-parity.test.cjs
           node --check tests/girls-media-social-contract.test.cjs
           node --check tests/girls-media-flow-refinement.test.mjs
           node --check tests/girls-poll-nudge.test.mjs
+          node --check tests/girls-home-poll-state.test.cjs
           node --check tests/girls-pwa-security-contract.test.cjs
           node --check tests/girls-contact-backend.test.cjs
           node --check tests/girls-media-deletion-integrity.test.cjs
+          node --check tests/girls-overview-panel-ownership.test.mjs
       - name: Girls Edge Function type-check
         run: |
           deno check supabase/functions/girls-process-communications/index.ts
@@ -102,6 +102,8 @@ jobs:
         run: node tests/girls-feature-parity.test.cjs
       - name: Girls product parity UI contract
         run: node tests/girls-product-parity-ui.test.cjs
+      - name: Full overview panel ownership regression
+        run: node tests/girls-overview-panel-ownership.test.mjs
       - name: Girls document audience contract
         run: node tests/girls-document-audience.test.cjs
       - name: Girls hero and vault UX contract
@@ -112,6 +114,8 @@ jobs:
         run: node tests/hero-control-contract.test.cjs
       - name: Role-aware dock contract
         run: node tests/role-aware-dock.test.cjs
+      - name: Girls member view parity contract
+        run: node tests/girls-member-view-parity.test.cjs
       - name: Cross-tab session and owner guard
         run: node tests/girls-session-guard.test.cjs
       - name: Premium media UX contract
@@ -136,6 +140,8 @@ jobs:
         run: node tests/girls-media-flow-refinement.test.mjs
       - name: Poll nudge contract
         run: node tests/girls-poll-nudge.test.mjs
+      - name: Home poll state ownership contract
+        run: node tests/girls-home-poll-state.test.cjs
       - name: Girls action latency regression
         run: node tests/girls-action-latency.test.cjs
       - name: 100 static product-contract regression

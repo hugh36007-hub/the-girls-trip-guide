@@ -38,6 +38,9 @@ function placeSummary(panel){
   const comms=tools?.querySelector('[data-parity-comms],[data-parity-reminders]');
   const actions=head.querySelector('.actions');
   if(comms&&actions&&!actions.querySelector('[data-parity-comms],[data-parity-reminders]'))actions.appendChild(comms);
+  const all=[...panel.querySelectorAll('[data-parity-comms],[data-parity-reminders]')];
+  const keep=actions?.querySelector('[data-parity-comms],[data-parity-reminders]')||all[0];
+  all.forEach(button=>{if(button!==keep)button.remove()});
   if(tools&&!tools.querySelector('button'))tools.remove();
  }
 }

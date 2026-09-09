@@ -1,0 +1,22 @@
+name: Girls Home poll state
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  verify-home-poll:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Poll runtime syntax
+        run: |
+          node --check girls-home-social-hub-v3.js
+          node --check girls-parity-refresh-20260904.js
+          node --check girls-home-scoreboard-fit.js
+      - name: Home poll state ownership contract
+        run: node tests/girls-home-poll-state.test.cjs

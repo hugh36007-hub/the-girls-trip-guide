@@ -1,6 +1,29 @@
 /* Girls session guard: keep rendered trip permissions aligned with the live Supabase account. */
 (() => {
 'use strict';
+
+/* Home social is a core trip surface, not a late performance enhancement.
+   Start v3 immediately from the direct session path and suppress the older deferred v2. */
+window.__GTG_HOME_SOCIAL_HUB_V2__=true;
+(()=>{
+  if(window.__GTG_HOME_SOCIAL_V3_BOOTSTRAP__)return;
+  window.__GTG_HOME_SOCIAL_V3_BOOTSTRAP__=true;
+  if(!document.querySelector('script[data-gtg-home-social-v3]')){
+    const script=document.createElement('script');
+    script.src='/girls-home-social-hub-v3.js?v=20260908-2';
+    script.async=false;
+    script.dataset.gtgHomeSocialV3='1';
+    document.head.appendChild(script);
+  }
+  if(!document.querySelector('script[data-gtg-home-score-fit]')){
+    const fit=document.createElement('script');
+    fit.src='/girls-home-scoreboard-fit.js?v=20260908-2';
+    fit.async=false;
+    fit.dataset.gtgHomeScoreFit='1';
+    document.head.appendChild(fit);
+  }
+})();
+
 const SUPA='https://vtcmvwixfqyxqghibsla.supabase.co';
 const KEY='sb_publishable_qBQzJjFxSToEGxPJEcmskg_GNd4M4cP';
 let client=null,renderedUserId,checking=false,reloading=false;
@@ -54,6 +77,27 @@ async function mediaDeletePreflight(mediaId){
   if(!row||!trip||(row.created_by!==user.id&&trip.owner_id!==user.id)){reloadForIdentityChange();return false;}
   return true;
 }
+
+/* Entry screen escape: Plan your trip is a full page, so provide an explicit close control back to the public site. */
+function ensureAuthClose(){
+  const card=document.querySelector('.auth-screen .auth-card');
+  if(!card||!card.querySelector('[data-a="signin"]')||card.querySelector('.auth-close-home'))return;
+  if(!document.getElementById('gtg-auth-close-style')){
+    const style=document.createElement('style');
+    style.id='gtg-auth-close-style';
+    style.textContent='.auth-card{position:relative}.auth-close-home{position:absolute;top:16px;right:16px;width:42px;height:42px;display:grid;place-items:center;border:1px solid rgba(255,79,163,.34);border-radius:50%;background:rgba(7,5,7,.72);color:#fff;text-decoration:none;font:300 30px/1 Arial,sans-serif;z-index:3;transition:border-color .15s,background .15s}.auth-close-home:hover,.auth-close-home:focus-visible{border-color:#ff4fa3;background:rgba(255,79,163,.12);outline:none}@media(max-width:600px){.auth-close-home{top:13px;right:13px;width:38px;height:38px;font-size:27px}}';
+    document.head.appendChild(style);
+  }
+  const close=document.createElement('a');
+  close.className='auth-close-home';
+  close.href='/';
+  close.setAttribute('aria-label','Close and return to The Girls Trip Guide');
+  close.textContent='×';
+  card.appendChild(close);
+}
+const authCloseObserver=new MutationObserver(ensureAuthClose);
+authCloseObserver.observe(document.documentElement,{childList:true,subtree:true});
+ensureAuthClose();
 
 const protectedSelector='[data-a="setMediaHero"],[data-a="removeHero"],[data-delete-media],[data-a="deleteVaultMedia"]';
 document.addEventListener('click',async event=>{

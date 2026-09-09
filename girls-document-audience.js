@@ -115,7 +115,7 @@ async function decorate(){
  for(const button of buttons){
   const row=button.closest('.money-row'),doc=(docs.data||[]).find(x=>x.id===button.dataset.id);if(!row||!doc)continue;
   let label=row.querySelector('.doc-audience-label');if(!label){label=document.createElement('span');label.className='doc-audience-label';const info=row.querySelector('div');info?.appendChild(label)}
-  label.textContent=audienceText(doc,recipients.data||[],ctx.members,ctx.owner);
+  const nextLabel=audienceText(doc,recipients.data||[],ctx.members,ctx.owner);if(label.textContent!==nextLabel)label.textContent=nextLabel;
   if(ctx.owner&&!row.querySelector('[data-doc-audience-edit]')){const actions=button.closest('.actions');if(actions){const edit=document.createElement('button');edit.type='button';edit.className='btn';edit.dataset.docAudienceEdit=doc.id;edit.textContent='Access';actions.insertBefore(edit,button)}}
  }
 }
@@ -150,7 +150,19 @@ document.addEventListener('submit',event=>{
  }
 },true);
 
-const app=document.getElementById('app');if(app)new MutationObserver(()=>scheduleDecorate()).observe(app,{childList:true,subtree:true});
+/* Only react when the Plan/document structure itself is inserted. Decorations added by
+   this module no longer trigger another Supabase read/decorate cycle. */
+const app=document.getElementById('app');
+if(app){
+ const observer=new MutationObserver(records=>{
+  const relevant=records.some(record=>[...record.addedNodes].some(node=>{
+   if(node.nodeType!==1)return false;
+   return node.matches?.('[data-panel="plan"],[data-a="openDocument"][data-id]')||Boolean(node.querySelector?.('[data-a="openDocument"][data-id]'));
+  }));
+  if(relevant)scheduleDecorate();
+ });
+ observer.observe(app,{childList:true,subtree:true});
+}
 window.addEventListener('popstate',()=>scheduleDecorate(true));
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',()=>scheduleDecorate(true),{once:true});else scheduleDecorate(true);
 })();

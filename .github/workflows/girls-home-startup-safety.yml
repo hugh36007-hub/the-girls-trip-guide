@@ -1,0 +1,31 @@
+name: Girls Home startup safety
+
+on:
+  pull_request:
+    paths:
+      - 'girls-critical-style-loader.js'
+      - 'girls-home-shell-parity.js'
+      - 'tests/girls-home-startup-safety.test.cjs'
+      - '.github/workflows/girls-home-startup-safety.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'girls-critical-style-loader.js'
+      - 'girls-home-shell-parity.js'
+      - 'tests/girls-home-startup-safety.test.cjs'
+      - '.github/workflows/girls-home-startup-safety.yml'
+
+jobs:
+  verify-home-startup:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Home startup mutation-loop regression
+        run: node tests/girls-home-startup-safety.test.cjs
+      - name: Runtime syntax
+        run: |
+          node --check girls-critical-style-loader.js
+          node --check girls-home-shell-parity.js

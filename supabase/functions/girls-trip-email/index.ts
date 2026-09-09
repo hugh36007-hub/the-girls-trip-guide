@@ -25,7 +25,7 @@ Deno.serve(async req=>{
     const {data:{user},error:ue}=await userDb.auth.getUser()
     if(ue||!user)return json({error:'Sign-in required'},401)
 
-    const body=await req.json().catch(()=>({})),tripId=String(body.tripId||'')
+    const body=await req.json().catch(()=>({})),tripId=String(body.tripId||''),requestedMemberId=String(body.memberId||''),resend=body.resend===true
     if(!UUID.test(tripId))return json({error:'Trip required'},400)
     const {data:trip,error:te}=await userDb.from('trips').select('id,owner_id,name,destination,start_date,end_date,plan,product_key').eq('id',tripId).maybeSingle()
     if(te)throw te
@@ -35,29 +35,41 @@ Deno.serve(async req=>{
     if(!name||!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email))return json({error:'Name and valid email are required.'},400)
 
     const db=createClient(env('SUPABASE_URL'),env('SUPABASE_SERVICE_ROLE_KEY'),{auth:{persistSession:false,autoRefreshToken:false}})
-    let {data:member,error:me}=await db.from('trip_members').select('*').eq('trip_id',tripId).ilike('email',email).maybeSingle()
-    if(me)throw me
-    if(member?.status==='confirmed')return json({error:'That person is already confirmed.'},409)
+    let member:any=null,me:any=null
+    if(requestedMemberId){
+      if(!UUID.test(requestedMemberId))return json({error:'Invalid member.'},400)
+      const result=await db.from('trip_members').select('*').eq('id',requestedMemberId).eq('trip_id',tripId).maybeSingle()
+      member=result.data;me=result.error
+      if(me)throw me
+      if(!member)return json({error:'That trip member could not be found.'},404)
+    }else{
+      const result=await db.from('trip_members').select('*').eq('trip_id',tripId).ilike('email',email).maybeSingle()
+      member=result.data;me=result.error
+      if(me)throw me
+    }
 
+    const wasConfirmed=member?.status==='confirmed'
+    const now=new Date().toISOString()
     if(member){
-      const r=await db.from('trip_members').update({name,email,status:'invited',invited_at:new Date().toISOString(),opened_at:null,confirmed_at:null}).eq('id',member.id).select('*').single()
+      const update=wasConfirmed?{name,email}:{name,email,status:'invited',invited_at:now,opened_at:null,confirmed_at:null}
+      const r=await db.from('trip_members').update(update).eq('id',member.id).eq('trip_id',tripId).select('*').single()
       if(r.error)throw r.error
       member=r.data
     }else{
-      const r=await db.from('trip_members').insert({trip_id:tripId,name,email,role:'member',status:'invited',invited_at:new Date().toISOString()}).select('*').single()
+      const r=await db.from('trip_members').insert({trip_id:tripId,name,email,role:'member',status:'invited',invited_at:now}).select('*').single()
       if(r.error)throw r.error
       member=r.data
     }
 
     const raw=token(),hash=await sha(raw),expires=new Date(Date.now()+7*86400000).toISOString()
-    const ur=await db.from('trip_members').update({invite_token_hash:hash,invite_token_expires_at:expires}).eq('id',member.id)
+    const ur=await db.from('trip_members').update({invite_token_hash:hash,invite_token_expires_at:expires}).eq('id',member.id).eq('trip_id',tripId)
     if(ur.error)throw ur.error
 
     const existing=await db.from('communications').select('id').eq('trip_id',tripId).eq('recipient_member_id',member.id).eq('trigger_code','T03').in('status',['girls_ready','girls_scheduled','girls_failed','held']).order('created_at',{ascending:false}).limit(1).maybeSingle()
     if(existing.error)throw existing.error
     let commId=existing.data?.id
     if(!commId){
-      const q=await db.rpc('queue_communication',{p_trip_id:tripId,p_trigger_code:'T03',p_recipient_member_id:member.id,p_reason:'Invitation issued',p_scheduled_for:new Date().toISOString(),p_essential:true,p_idempotency_key:`gtg-invite:${tripId}:${member.id}:${Date.now()}`})
+      const q=await db.rpc('queue_communication',{p_trip_id:tripId,p_trigger_code:'T03',p_recipient_member_id:member.id,p_reason:resend?'Invitation resent':'Invitation issued',p_scheduled_for:new Date().toISOString(),p_essential:true,p_idempotency_key:`gtg-invite:${tripId}:${member.id}:${Date.now()}`})
       if(q.error)throw q.error
       commId=q.data
     }
@@ -70,7 +82,10 @@ Deno.serve(async req=>{
     join.searchParams.set('token',raw)
     join.searchParams.set('confirm','1')
     const first=titleName(name).split(' ')[0]||''
-    const payload={to:email,character:'grace',title:'You’re invited.',message:`Hey ${first}, you’ve been added to ${trip.name}. Open the invitation and have a look at the plan before another version appears in the group chat.`,tripName:trip.destination||trip.name,cta:'JOIN THE TRIP',url:join.toString(),subject:`You’re invited · ${trip.name}`,preheader:`Grace invited you to ${trip.name}`,idempotencyKey:`gtg-invite-${commId}`}
+    const accessCopy=wasConfirmed||resend
+    const payload=accessCopy
+      ?{to:email,character:'grace',title:'Your trip link is ready.',message:`Hey ${first}, here’s a fresh secure link for ${trip.name}. It opens the correct trip directly.`,tripName:trip.destination||trip.name,cta:'OPEN THE TRIP',url:join.toString(),subject:`Your trip link · ${trip.name}`,preheader:`Fresh secure access to ${trip.name}`,idempotencyKey:`gtg-invite-${commId}`}
+      :{to:email,character:'grace',title:'You’re invited.',message:`Hey ${first}, you’ve been added to ${trip.name}. Open the invitation and have a look at the plan before another version appears in the group chat.`,tripName:trip.destination||trip.name,cta:'JOIN THE TRIP',url:join.toString(),subject:`You’re invited · ${trip.name}`,preheader:`Grace invited you to ${trip.name}`,idempotencyKey:`gtg-invite-${commId}`}
 
     const delivery=(async()=>{
       try{
@@ -85,7 +100,7 @@ Deno.serve(async req=>{
     })()
     EdgeRuntime.waitUntil(delivery)
 
-    return json({ok:true,member,communicationId:commId,sent:false,queued:true,accepted:true})
+    return json({ok:true,member,communicationId:commId,sent:false,queued:true,resend:accessCopy})
   }catch(e){
     console.error(e)
     return json({error:e instanceof Error?e.message:'Invitation failed'},500)

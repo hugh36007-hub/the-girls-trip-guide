@@ -14,6 +14,6 @@ const checks=[
   ['durable Evidence upload refreshes app state',perf.includes('function syncEvidenceState(event)')&&perf.includes("event?.detail?.album!=='evidence'")&&perf.includes("window.dispatchEvent(new Event('popstate'))")],
   ['resume notice',perf.includes('gtg-upload-intent:')&&perf.includes('select the same file again')],
   ['media layers excluded from Home startup',!html.includes('/girls-media-performance-max.js?v=2')&&!html.includes('/girls-media-ux-plus.js?v=2')],
-  ['performance layer loads before UX+ on Evidence route',perfPos>=0&&uxPos>perfPos&&loader.includes("if(route==='evidence')await loadBundle('evidence')")]
+  ['performance layer loads before UX+ in the Full Evidence bundle',perfPos>=0&&uxPos>perfPos&&loader.includes("if(mode==='full')await loadBundle('evidenceFull')")]
 ];
 let failed=0;for(const [name,ok] of checks){console.log(`${ok?'PASS':'FAIL'} ${name}`);if(!ok)failed++;}if(failed)process.exit(1);

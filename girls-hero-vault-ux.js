@@ -31,6 +31,7 @@ function domState(){
 function enhanceHeroControls(s){
  if(!s?.owner||!s.paid)return;
  const hero=document.querySelector('.hero-card');
+ if(hero?.matches('.live-snapshot-hero[data-full-hero-owner="girls-app-v2"]'))return;
  if(hero&&!hero.dataset.heroUx){
   hero.dataset.heroUx='1';
   hero.classList.add('gtg-editable-hero');
@@ -50,18 +51,6 @@ function hardenVaultButton(s){
   btn.textContent='Open Hidden Gallery';
   btn.setAttribute('aria-label','Open PIN-protected Hidden Gallery');
  });
- if(!s?.paid)return;
- const panel=document.querySelector('[data-panel="evidence"]');
- if(panel&&!panel.querySelector('[data-vault-privacy-note]')){
-  const gallery=panel.querySelector('.gallery');
-  if(gallery){
-   const note=document.createElement('div');
-   note.dataset.vaultPrivacyNote='1';
-   note.className='gtg-vault-privacy-note';
-   note.innerHTML='<b>Hidden Gallery is separate from Evidence.</b><span>You can add photos or video without the PIN. The PIN is required to view, open or manage hidden media.</span>';
-   gallery.insertAdjacentElement('beforebegin',note);
-  }
- }
 }
 
 function enhanceFromDom(){
