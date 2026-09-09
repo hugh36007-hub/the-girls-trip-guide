@@ -45,14 +45,16 @@ Deno.serve(async req=>{
     const mode=String(settings?.character_mode||'grace-auto')
     let character='system'
     let message='A trip payment has been requested. Open the trip to review the amount and due date.'
+    let emailSubject='Payment request'
     if(full){
       const resolved=resolveGirlsCommunication('T11',mode,{payment:new Intl.NumberFormat('en-GB',{style:'currency',currency:'GBP'}).format(position.amount),dueDay:'now'})
       character=resolved.character
       message=resolved.message||message
+      emailSubject=resolved.subject||emailSubject
     }
     const {data:comm,error:commError}=await db.from('communications').insert({trip_id:tripId,trigger_code:'T11',recipient_member_id:recipientMemberId,status:'held',essential:true,reason:'Manual payment nudge',scheduled_for:new Date().toISOString(),idempotency_key:`gtg-payment-nudge:${tripId}:${recipientMemberId}:${crypto.randomUUID()}`}).select('id').single();if(commError)throw commError;commId=comm.id
     const target=new URL('https://thegirlstripguide.com/create-trip');target.searchParams.set('trip_id',tripId);target.searchParams.set('action','money')
-    const delivery=await deliver({to:position.member.email,character,title:'Payment request',message,tripName:trip.name,cta:'View payment',url:target.toString(),subject:`Payment request · ${trip.name}`,preheader:`${character==='system'?'The Girls Trip Guide':character.charAt(0).toUpperCase()+character.slice(1)} · Payment request`,idempotencyKey:`gtg-${commId}-${recipientMemberId}`})
+    const delivery=await deliver({to:position.member.email,character,title:'Payment request',message,tripName:trip.name,cta:'View payment',url:target.toString(),subject:`${emailSubject} · ${trip.name}`,preheader:`${character==='system'?'The Girls Trip Guide':character.charAt(0).toUpperCase()+character.slice(1)} · Payment request`,idempotencyKey:`gtg-${commId}-${recipientMemberId}`})
     if(delivery.suppressed){await db.from('communications').update({status:'cancelled',reason:`Recipient suppressed: ${delivery.reason||'delivery blocked'}`,attempt_count:1,last_attempt_at:new Date().toISOString(),last_error:null,character}).eq('id',commId);return json({ok:true,sent:false,suppressed:true,communicationId:commId})}
     await db.from('communications').update({status:'sent',sent_at:new Date().toISOString(),provider:'resend',provider_message_id:delivery.id,attempt_count:1,last_attempt_at:new Date().toISOString(),last_error:null,character}).eq('id',commId)
     return json({ok:true,sent:true,amount:position.amount,character,communicationId:commId})
