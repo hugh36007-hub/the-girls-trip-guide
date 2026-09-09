@@ -7,14 +7,14 @@ const DOC_SRC='/girls-document-audience.js?v=20260908-2';
 const REMINDER_SRC='/girls-free-reminders-parity.js?v=20260908-7';
 const BUNDLES={
   appTheme:[
-    '/logged-in-light-theme.js?v=20260908-4',
+    '/logged-in-light-theme.js?v=20260909-1',
     '/logged-in-light-polish.js?v=20260908-4',
     '/girls-compact-inner-header.js?v=20260908-1',
     '/logged-in-light-theme-final-fix.js?v=20260907-1',
     '/logged-in-stat-icons.js?v=20260907-2',
     '/girls-direct-login-route.js?v=20260907-2',
     '/girls-resend-invite-fix.js?v=20260907-1',
-    '/girls-home-shell-parity.js?v=20260908-1'
+    '/girls-home-shell-parity.js?v=20260909-1'
   ],
   onboarding:['/girls-batch1-parity-safe-v2.js?v=20260907-2','/girls-convince-copy-v2.js?v=20260907-1'],
   parity:['/girls-product-parity.js?v=3'],
@@ -83,15 +83,12 @@ async function loadBundle(name){
 async function loadRoute(route){
  if(!['plan','money','group','evidence'].includes(route))return;
  await loadBundle('shell');
- /* Document audience/access is intentionally interaction-loaded. Its previous deep
-    observer was doing work on every Plan DOM mutation even when documents were not used. */
  if(route==='money')await loadBundle('money');
  if(route==='group')await loadBundle('groupCore');
  if(route==='evidence')await loadBundle('evidence');
 }
 
 void loadBundle('appTheme');
-/* Existing signed-in trips do not need the create/onboarding enhancement bundle. */
 if(!tripId())void loadBundle('onboarding');
 
 function afterDashboard(callback,delay=0){
@@ -111,7 +108,6 @@ function scheduleInitial(){
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',scheduleInitial,{once:true});else scheduleInitial();
 window.addEventListener('popstate',()=>{const route=action();void loadRoute(route);if(route!=='overview')idle(()=>void loadBundle('parity'))});
 
-/* Start route code on pointer intent, before the click navigation is processed. */
 document.addEventListener('pointerdown',event=>{
  const target=event.target.closest?.('[data-tab],[data-a],[data-action],[data-trip-social-tab],[data-gtg-social-tab],[data-parity-comms],[data-parity-reminders],[data-role-money],[data-role-upload]');if(!target)return;
  const tab=target.dataset.tab||'';const a=target.dataset.a||target.dataset.action||'';
@@ -125,7 +121,6 @@ document.addEventListener('pointerdown',event=>{
  if(target.matches('[data-parity-reminders]'))void loadBundle('reminders');
 },{capture:true,passive:true});
 
-/* Preserve first-tap behaviour for interaction-loaded modules. */
 document.addEventListener('click',event=>{
  const addDocument=event.target.closest?.('[data-a="addDocument"]');
  if(addDocument&&!loaded.has(DOC_SRC)){
