@@ -1,14 +1,9 @@
 import "jsr:@supabase/functions-js/edge-runtime.d.ts";
 import { createClient } from 'npm:@supabase/supabase-js@2.112.4'
+import { resolveGirlsCommunication } from '../_shared/girls-communications-voices.mjs'
 
 const cors={'Access-Control-Allow-Origin':'https://thegirlstripguide.com','Access-Control-Allow-Headers':'authorization, x-client-info, apikey, content-type','Access-Control-Allow-Methods':'POST, OPTIONS'}
 const UUID=/^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i
-const FULL_MESSAGES:any={
-  grace:(amount:number)=>`Ladies. ${new Intl.NumberFormat('en-GB',{style:'currency',currency:'GBP'}).format(amount)} is due now. Pay it now so I don’t have to turn a girls’ trip into a disciplinary hearing.`,
-  ava:()=>`Payment requested. Amount, deadline and instructions are all exactly where I put them. A small miracle.`,
-  lola:()=>`Money is due. Tragic news: enthusiasm still cannot be transferred by bank.`,
-  seb:()=>`Girls, money is due. Pay it, stay fabulous, move on.`
-}
 function json(body:unknown,status=200){return new Response(JSON.stringify(body),{status,headers:{...cors,'Content-Type':'application/json','Cache-Control':'no-store'}})}
 function env(name:string){const v=Deno.env.get(name)||'';if(!v)throw new Error(`${name} missing`);return v}
 function validEmail(value:unknown){return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(String(value||'').trim())}
@@ -46,7 +41,7 @@ Deno.serve(async req=>{
     const cutoff=new Date(Date.now()-4*60*60*1000).toISOString(),{data:recent,error:recentError}=await db.from('communications').select('id,created_at').eq('trip_id',tripId).eq('recipient_member_id',recipientMemberId).eq('trigger_code','T11').eq('reason','Manual payment nudge').gte('created_at',cutoff).order('created_at',{ascending:false}).limit(1);if(recentError)throw recentError;if(recent?.length)return json({error:'A payment nudge was already sent to this person recently. Try again later.'},429)
     const [{data:settings,error:settingsError},{data:entitlements,error:entitlementsError}]=await Promise.all([db.from('communication_settings').select('character_mode,enabled,payments').eq('trip_id',tripId).maybeSingle(),db.from('trip_entitlements').select('entitlement').eq('trip_id',tripId).eq('active',true).in('entitlement',['full_trip','full_comms'])]);if(settingsError)throw settingsError;if(entitlementsError)throw entitlementsError
     if(settings?.enabled===false||settings?.payments===false)return json({error:'Payment reminders are disabled for this trip.'},409)
-    const full=Boolean(entitlements?.length),mode=String(settings?.character_mode||'grace-auto'),character=full&&['grace','ava','lola','seb'].includes(mode)?mode:full?'grace':'system',message=full?FULL_MESSAGES[character](position.amount):'A trip payment has been requested. Open the trip to review the amount and due date.'
+    const full=Boolean(entitlements?.length),mode=String(settings?.character_mode||'grace-auto'),resolved=full?resolveGirlsCommunication('T11',mode,{payment:new Intl.NumberFormat('en-GB',{style:'currency',currency:'GBP'}).format(position.amount),dueDay:'now'}):null,character=full?resolved.character:'system',message=full?(resolved.message||'A trip payment has been requested. Open the trip to review the amount and due date.'):'A trip payment has been requested. Open the trip to review the amount and due date.'
     const {data:comm,error:commError}=await db.from('communications').insert({trip_id:tripId,trigger_code:'T11',recipient_member_id:recipientMemberId,status:'held',essential:true,reason:'Manual payment nudge',scheduled_for:new Date().toISOString(),idempotency_key:`gtg-payment-nudge:${tripId}:${recipientMemberId}:${crypto.randomUUID()}`}).select('id').single();if(commError)throw commError;commId=comm.id
     const target=new URL('https://thegirlstripguide.com/create-trip');target.searchParams.set('trip_id',tripId);target.searchParams.set('action','money')
     const delivery=await deliver({to:position.member.email,character,title:'Payment request',message,tripName:trip.name,cta:'View payment',url:target.toString(),subject:`Payment request · ${trip.name}`,preheader:`${character==='system'?'The Girls Trip Guide':character.charAt(0).toUpperCase()+character.slice(1)} · Payment request`,idempotencyKey:`gtg-${commId}-${recipientMemberId}`})
