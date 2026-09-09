@@ -25,6 +25,6 @@ assert(!vaultUx.includes('data-vault-privacy-note'),'Permanent duplicate privacy
 
 assert(loader.includes('/evidence-intro-dismiss.js?v=2'),'Guide cache version not bumped');
 assert(html.includes('/girls-app-v2.js?v=4')&&html.includes('/girls-hero-vault-ux.js?v=3')&&html.includes('/girls-performance-loader.js?v=4'),'Updated scripts must be cache-busted');
-assert(sw.includes("gtg-pwa-v12"),'PWA cache generation not bumped');
+assert(sw.includes("gtg-pwa-v13"),'PWA cache generation not bumped');
 
 console.log('Girls Hidden Gallery discretion contract PASS');
