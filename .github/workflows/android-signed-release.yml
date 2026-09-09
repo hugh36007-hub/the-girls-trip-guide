@@ -1,5 +1,5 @@
 name: Android signed release
-# Rebuild 1.0.2 after the final 9 September 2026 reviewed main sync.
+# Rebuild after the 9 September 2026 hardened invitation callback remediation.
 
 on:
   push:
@@ -48,6 +48,19 @@ jobs:
       - name: Build native web payload
         run: npm run mobile:prepare
 
+      - name: Verify hardened invitation payload
+        run: |
+          test -f mobile-web/invite-auth.html
+          test -f mobile-web/invite-auth.js
+          test -f mobile-web/invite-return.html
+          test -f mobile-web/invite-return.js
+          grep -Fq '/invite-auth.html' mobile-web/native-url.js
+          grep -Fq '/invite-return.html' mobile-web/native-url.js
+          grep -Fq 'https://thegirlstripguide.com/invite-return.html' mobile-web/invite-auth.js
+          grep -Fq 'girls-finalize-invite' mobile-web/invite-return.js
+          ! grep -Fq 'theboystripguide.com' mobile-web/invite-auth.js
+          ! grep -Fq 'theboystripguide.com' mobile-web/invite-return.js
+
       - name: Sync Android project
         run: |
           test -d android || npx cap add android
@@ -85,46 +98,22 @@ jobs:
           ANDROID_UPLOAD_KEYSTORE_PASSWORD: ${{ secrets.GTG_ANDROID_UPLOAD_KEYSTORE_PASSWORD }}
           ANDROID_UPLOAD_KEY_ALIAS: ${{ secrets.GTG_ANDROID_UPLOAD_KEY_ALIAS }}
           ANDROID_UPLOAD_KEY_PASSWORD: ${{ secrets.GTG_ANDROID_UPLOAD_KEY_PASSWORD }}
-    
         shell: bash
         run: |
           python3 - <<'PY'
           import base64
           import os
           from pathlib import Path
-
-          required = [
-              'ANDROID_UPLOAD_KEYSTORE_BASE64',
-              'ANDROID_UPLOAD_KEYSTORE_PASSWORD',
-              'ANDROID_UPLOAD_KEY_ALIAS',
-              'ANDROID_UPLOAD_KEY_PASSWORD',
-          ]
-          missing = [name for name in required if not os.environ.get(name)]
-          if missing:
-              raise SystemExit('Missing required GitHub signing secrets: ' + ', '.join(missing))
-
-          try:
-              key_bytes = base64.b64decode(
-                  os.environ['ANDROID_UPLOAD_KEYSTORE_BASE64'],
-                  validate=True,
-              )
-          except Exception as exc:
-              raise SystemExit(f'Upload keystore secret is not valid base64: {exc}')
-
-          if not key_bytes:
-              raise SystemExit('Decoded upload keystore is empty.')
-
-          key_path = Path(os.environ['ANDROID_UPLOAD_KEYSTORE_PATH'])
-          key_path.write_bytes(key_bytes)
-          key_path.chmod(0o600)
+          required=['ANDROID_UPLOAD_KEYSTORE_BASE64','ANDROID_UPLOAD_KEYSTORE_PASSWORD','ANDROID_UPLOAD_KEY_ALIAS','ANDROID_UPLOAD_KEY_PASSWORD']
+          missing=[name for name in required if not os.environ.get(name)]
+          if missing: raise SystemExit('Missing required GitHub signing secrets: '+', '.join(missing))
+          try: key_bytes=base64.b64decode(os.environ['ANDROID_UPLOAD_KEYSTORE_BASE64'],validate=True)
+          except Exception as exc: raise SystemExit(f'Upload keystore secret is not valid base64: {exc}')
+          if not key_bytes: raise SystemExit('Decoded upload keystore is empty.')
+          key_path=Path(os.environ['ANDROID_UPLOAD_KEYSTORE_PATH']);key_path.write_bytes(key_bytes);key_path.chmod(0o600)
           print('Upload keystore materialized securely on the runner.')
           PY
-
-          keytool -list \
-            -keystore "$ANDROID_UPLOAD_KEYSTORE_PATH" \
-            -storepass "$ANDROID_UPLOAD_KEYSTORE_PASSWORD" \
-            -alias "$ANDROID_UPLOAD_KEY_ALIAS" \
-            >/dev/null
+          keytool -list -keystore "$ANDROID_UPLOAD_KEYSTORE_PATH" -storepass "$ANDROID_UPLOAD_KEYSTORE_PASSWORD" -alias "$ANDROID_UPLOAD_KEY_ALIAS" >/dev/null
 
       - name: Build signed release AAB
         env:
@@ -132,7 +121,6 @@ jobs:
           ANDROID_UPLOAD_KEYSTORE_PASSWORD: ${{ secrets.GTG_ANDROID_UPLOAD_KEYSTORE_PASSWORD }}
           ANDROID_UPLOAD_KEY_ALIAS: ${{ secrets.GTG_ANDROID_UPLOAD_KEY_ALIAS }}
           ANDROID_UPLOAD_KEY_PASSWORD: ${{ secrets.GTG_ANDROID_UPLOAD_KEY_PASSWORD }}
-    
         working-directory: android
         run: ./gradlew bundleRelease
 
@@ -142,31 +130,14 @@ jobs:
           ANDROID_UPLOAD_KEYSTORE_PASSWORD: ${{ secrets.GTG_ANDROID_UPLOAD_KEYSTORE_PASSWORD }}
           ANDROID_UPLOAD_KEY_ALIAS: ${{ secrets.GTG_ANDROID_UPLOAD_KEY_ALIAS }}
           ANDROID_UPLOAD_KEY_PASSWORD: ${{ secrets.GTG_ANDROID_UPLOAD_KEY_PASSWORD }}
-    
         shell: bash
         run: |
           AAB='android/app/build/outputs/bundle/release/app-release.aab'
           test -s "$AAB"
-
-          # Android upload keys are intentionally self-signed. Verify the JAR
-          # signature without treating the self-signed certificate chain as a
-          # trust-store failure, then prove the AAB uses the configured key.
           jarsigner -verify "$AAB"
-
-          EXPECTED_SHA256="$(keytool -list -v \
-            -keystore "$ANDROID_UPLOAD_KEYSTORE_PATH" \
-            -storepass "$ANDROID_UPLOAD_KEYSTORE_PASSWORD" \
-            -alias "$ANDROID_UPLOAD_KEY_ALIAS" \
-            | sed -n 's/^[[:space:]]*SHA256: //p' \
-            | head -n 1)"
-
-          ACTUAL_SHA256="$(keytool -printcert -jarfile "$AAB" \
-            | sed -n 's/^[[:space:]]*SHA256: //p' \
-            | head -n 1)"
-
-          test -n "$EXPECTED_SHA256"
-          test -n "$ACTUAL_SHA256"
-          test "$EXPECTED_SHA256" = "$ACTUAL_SHA256"
+          EXPECTED_SHA256="$(keytool -list -v -keystore "$ANDROID_UPLOAD_KEYSTORE_PATH" -storepass "$ANDROID_UPLOAD_KEYSTORE_PASSWORD" -alias "$ANDROID_UPLOAD_KEY_ALIAS" | sed -n 's/^[[:space:]]*SHA256: //p' | head -n 1)"
+          ACTUAL_SHA256="$(keytool -printcert -jarfile "$AAB" | sed -n 's/^[[:space:]]*SHA256: //p' | head -n 1)"
+          test -n "$EXPECTED_SHA256";test -n "$ACTUAL_SHA256";test "$EXPECTED_SHA256" = "$ACTUAL_SHA256"
           echo 'Signed Android App Bundle verified against the configured upload key.'
 
       - name: Record exact release provenance
@@ -201,6 +172,5 @@ jobs:
       - name: Remove upload key
         env:
           ANDROID_UPLOAD_KEYSTORE_PATH: /tmp/gtg-upload-key.jks
-    
         if: always()
         run: rm -f "$ANDROID_UPLOAD_KEYSTORE_PATH"
