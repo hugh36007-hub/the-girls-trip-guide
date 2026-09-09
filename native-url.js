@@ -3,7 +3,7 @@
   'use strict';
 
   const productionHosts = new Set(['thegirlstripguide.com', 'www.thegirlstripguide.com']);
-  const appPaths = new Set(['/', '/index.html', '/create-trip', '/create-trip.html', '/invite.html']);
+  const appPaths = new Set(['/', '/index.html', '/create-trip', '/create-trip.html', '/invite.html', '/invite-auth.html', '/invite-return.html']);
 
   function normalise(rawUrl, currentPath = '/') {
     try {
@@ -27,4 +27,4 @@
 
   globalThis.GTGNativeUrl = Object.freeze({ normalise });
 })();
-// Rebuild trigger: 2026-09-05 address privacy sync.
+// Rebuild trigger: 2026-09-09 hardened invitation callbacks.
