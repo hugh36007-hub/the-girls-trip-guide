@@ -18,7 +18,7 @@
     const banner=document.createElement('aside');
     banner.className='evidence-intro-dismiss';
     banner.setAttribute('role','status');
-    banner.innerHTML='<div><b>Two separate galleries</b><p>Evidence is visible to everyone confirmed on the trip. Hidden Gallery is separate: members can add photos without the PIN, but the 4-digit trip PIN is required to open, view or manage them. Hidden photos never appear in Evidence or on Home.</p></div>';
+    banner.innerHTML='<div><b>Two separate galleries</b><p>Evidence is visible to everyone confirmed on the trip. Hidden Gallery is separate: the first time the organiser opens it, they will be asked to create the 4-digit trip PIN. Members can add hidden photos without the PIN, but the PIN is required to open, view or manage them. Hidden photos never appear in Evidence or on Home.</p></div>';
 
     const close=document.createElement('button');
     close.type='button';
