@@ -31,6 +31,7 @@ function domState(){
 function enhanceHeroControls(s){
  if(!s?.owner||!s.paid)return;
  const hero=document.querySelector('.hero-card');
+ if(hero?.matches('.live-snapshot-hero[data-full-hero-owner="girls-app-v2"]'))return;
  if(hero&&!hero.dataset.heroUx){
   hero.dataset.heroUx='1';
   hero.classList.add('gtg-editable-hero');
