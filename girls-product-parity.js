@@ -75,7 +75,7 @@ function triggerExisting(action){const el=document.querySelector(`[data-a="${act
 function overview(){
  if(tab()!=='overview')return;
  const dashboard=document.querySelector('.dashboard');if(!dashboard)return;
- const anchor=document.querySelector('.stat-row');
+ const anchor=dashboard.querySelector('.stat-row');
  const next=nextBooking(),pending=Math.max(0,state.members.length-confirmedCount());
  const block=document.createElement('section');block.dataset.parityBlock='overview';block.className='gtg-parity-overview';
  block.innerHTML=`<div class="gtg-overview-grid">
@@ -85,6 +85,12 @@ function overview(){
  <div class="gtg-overview-strip"><span><b>${confirmedCount()}/${state.members.length}</b><small>Group confirmed</small></span><span><b>${pending}</b><small>Invites pending</small></span><span><b>${passportCount()}/${state.members.length}</b><small>Passports checked</small></span><span><b>${state.mediaCount}</b><small>Evidence</small></span></div>
  ${state.owner&&!state.bookings.length&&!state.documents.length?`<aside class="gtg-get-started"><div><span class="eyebrow">Getting started</span><b>Start with the group, then add what is booked.</b><small>Keep travel, stays, documents and costs together.</small></div><button class="btn primary" data-parity-go="group">Open the group</button></aside>`:''}
  ${state.paid&&state.owner?messagePanel():state.paid&&!state.owner?memberOverview():''}`;
+ if(dashboard.dataset.homeComposition==='full'){
+  const panel=dashboard.querySelector('[data-panel="overview"]');if(!panel)return;
+  const head=panel.querySelector(':scope > .section-head');
+  if(head)head.insertAdjacentElement('afterend',block);else panel.prepend(block);
+  return;
+ }
  if(anchor)anchor.insertAdjacentElement('afterend',block);else dashboard.prepend(block)
 }
 function messagePanel(){return `<article class="card gtg-message-panel"><div class="section-head"><div><div class="eyebrow">Organiser</div><h2>Message the group</h2><p>Post a useful note to the trip. It stays with the recipient, date and time.</p></div></div><form data-parity-message><textarea name="message" maxlength="500" required placeholder="Meet in reception at 7.30. Do not be late."></textarea><button class="btn primary">Post to everyone</button></form><div class="gtg-message-history"><h3>Message history</h3>${state.messages.slice(0,8).map(x=>`<div class="gtg-message-row"><div><b>${x.recipient_member_id?esc(state.members.find(m=>m.id===x.recipient_member_id)?.name||'Group member'):'Everyone'}</b><small>${new Date(x.created_at).toLocaleString('en-GB',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'})}</small></div><p>${esc(x.message)}</p></div>`).join('')||'<div class="empty">No trip messages have been posted yet.</div>'}</div></article>`}
