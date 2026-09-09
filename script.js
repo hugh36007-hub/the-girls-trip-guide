@@ -14,6 +14,19 @@ const mobilePublic='/mobile-front-of-house-fixes.js?v=20260907-2';
 const briefingMobile='/briefing-mobile-hero-fix.js?v=20260907-1';
 const homeFade='/homepage-hero-fade-fix.js?v=20260907-6';
 const batchPublic='/girls-batch1-public-safe.js?v=20260907-1';
+const addInsightsFooterLink=()=>{
+  const footer=document.querySelector('.footer');
+  if(!footer||footer.querySelector('a[href="/insights"],a[href="/insights.html"],a[href="insights.html"]')) return;
+  const links=[...footer.querySelectorAll('a')];
+  const marker=links.find(a=>/sitemap/i.test(a.textContent||''))||links.find(a=>/^home$/i.test((a.textContent||'').trim()));
+  if(!marker||!marker.parentNode) return;
+  const link=document.createElement('a');
+  link.href='/insights';
+  link.textContent='Research & Insights';
+  marker.parentNode.insertBefore(link,marker);
+};
+addInsightsFooterLink();
+if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',addInsightsFooterLink,{once:true});
 if(document.readyState==='loading'){
   document.write(`<script src="${core}"><\/script><script src="${theme}"><\/script><script src="${heroSurface}"><\/script><script src="${situation}"><\/script><script src="${heroContrast}"><\/script><script src="${freeVsFull}"><\/script><script src="${galsRefine}"><\/script><script src="${briefingRefine}"><\/script><script src="${appLight}"><\/script><script src="${mobilePublic}"><\/script><script src="${briefingMobile}"><\/script><script src="${homeFade}"><\/script><script src="${batchPublic}"><\/script>`);
   return;
