@@ -10,12 +10,13 @@ const parity=fs.readFileSync('girls-product-parity.js','utf8');
 const polish=fs.readFileSync('girls-inner-page-polish.js','utf8');
 
 assert.match(app,/data-home-composition="\$\{paid\(\)\?'full':'free'\}"/,'authoritative app render must declare the entitlement-based Home composition');
-assert.match(fullHero,/dataset\.homeComposition!=='full'/,'Full hero must mount only in Full composition');
+assert.match(app,/if\(paid\(\)\)return `<section class="hero-card live-snapshot-hero"/,'Full hero must be created only by the paid core composition path');
+assert.match(fullHero,/\.dashboard\[data-home-composition="full"\][^']*data-full-hero-owner="girls-app-v2"/,'Full hero hydration must target only the authoritative Full composition');
 assert.match(freeHero,/dataset\.homeComposition==='free'/,'Free hero must mount only in Free composition');
 assert.match(freeHero,/!hero\.isConnected\|\|!isFreeHome\(hero\)/,'Free hero must recheck composition after its async trip lookup');
 assert.match(freeSocial,/!isFreeHome\(\)\)\{clearHome\(\);return\}/,'Free social renderer must remove its UI when Full composition takes ownership');
-assert.match(evidence,/classList\.toggle\('gtg-mobile-media-grid',hasMedia\)/,'mobile Evidence grid must activate only when media exists');
-assert.match(evidence,/gtg-mobile-media-empty/,'empty Evidence must have an explicit transparent state');
+assert.match(evidence,/classList\.toggle\('gtg-mobile-media-grid',hasMedia\)/,'legacy mobile Evidence grid contract remains inert but structurally valid');
+assert.match(evidence,/gtg-mobile-media-empty/,'legacy empty Evidence contract remains structurally valid');
 assert.match(parity,/const hasComms=Boolean/,'Group parity must detect an existing promoted communications action');
 assert.match(polish,/all\.forEach\(button=>\{if\(button!==keep\)button\.remove\(\)\}\)/,'Group polish must remove duplicate communications actions');
 const switchTab=app.match(/function switchTab\(tab\)\{([^}]|\}(?!\nfunction))*\}/)?.[0]||'';
