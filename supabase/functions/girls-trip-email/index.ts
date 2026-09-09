@@ -1,5 +1,6 @@
 import "jsr:@supabase/functions-js/edge-runtime.d.ts";
 import { createClient } from 'npm:@supabase/supabase-js@2.112.4'
+import { resolveGirlsCommunication } from '../_shared/girls-communications-voices.mjs'
 declare const EdgeRuntime:{waitUntil(promise:Promise<unknown>):void}
 const cors={'Access-Control-Allow-Origin':'https://thegirlstripguide.com','Access-Control-Allow-Headers':'authorization, x-client-info, apikey, content-type','Access-Control-Allow-Methods':'POST, OPTIONS'}
 const UUID=/^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i
@@ -8,6 +9,7 @@ function env(n:string){const v=Deno.env.get(n)||'';if(!v)throw new Error(`${n} m
 function token(){const b=crypto.getRandomValues(new Uint8Array(32));return btoa(String.fromCharCode(...b)).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'')}
 async function sha(v:string){return [...new Uint8Array(await crypto.subtle.digest('SHA-256',new TextEncoder().encode(v)))].map(x=>x.toString(16).padStart(2,'0')).join('')}
 function titleName(v:any){return String(v||'').trim().split(/\s+/).filter(Boolean).map(x=>x[0].toUpperCase()+x.slice(1).toLowerCase()).join(' ')}
+function characterName(v:string){return v==='seb'?'Seb':v==='ava'?'Ava':v==='lola'?'Lola':'Grace'}
 async function deliver(payload:any){
   const r=await fetch(`${env('SUPABASE_URL')}/functions/v1/girls-email-send`,{method:'POST',headers:{'Content-Type':'application/json','x-btg-cron-secret':env('BTG_CRON_SECRET')},body:JSON.stringify(payload)})
   const out=await r.json().catch(()=>({}))
@@ -35,6 +37,19 @@ Deno.serve(async req=>{
     if(!name||!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email))return json({error:'Name and valid email are required.'},400)
 
     const db=createClient(env('SUPABASE_URL'),env('SUPABASE_SERVICE_ROLE_KEY'),{auth:{persistSession:false,autoRefreshToken:false}})
+    const [{data:settings,error:settingsError},{data:entitlements,error:entitlementsError}]=await Promise.all([
+      db.from('communication_settings').select('character_mode').eq('trip_id',tripId).maybeSingle(),
+      db.from('trip_entitlements').select('entitlement').eq('trip_id',tripId).eq('active',true).in('entitlement',['full_trip','full_comms'])
+    ])
+    if(settingsError)throw settingsError
+    if(entitlementsError)throw entitlementsError
+    const full=Boolean(entitlements?.length)
+    const mode=full?String(settings?.character_mode||'grace-auto'):'grace-auto'
+    const resolvedInvite=resolveGirlsCommunication('T03',mode)
+    const inviteCharacter=resolvedInvite.character||'grace'
+    const inviteSubject=resolvedInvite.subject||"You've been invited."
+    const inviteMessage=resolvedInvite.message||"You've been invited. Confirm whether you're in, then read the plan before adding another screenshot to the evidence pile."
+
     let member:any=null,me:any=null
     if(requestedMemberId){
       if(!UUID.test(requestedMemberId))return json({error:'Invalid member.'},400)
@@ -83,15 +98,16 @@ Deno.serve(async req=>{
     join.searchParams.set('confirm','1')
     const first=titleName(name).split(' ')[0]||''
     const accessCopy=wasConfirmed||resend
+    const sender=characterName(inviteCharacter)
     const payload=accessCopy
-      ?{to:email,character:'grace',title:'Your trip link is ready.',message:`Hey ${first}, here’s a fresh secure link for ${trip.name}. It opens the correct trip directly.`,tripName:trip.destination||trip.name,cta:'OPEN THE TRIP',url:join.toString(),subject:`Your trip link · ${trip.name}`,preheader:`Fresh secure access to ${trip.name}`,idempotencyKey:`gtg-invite-${commId}`}
-      :{to:email,character:'grace',title:'You’re invited.',message:`Hey ${first}, you’ve been added to ${trip.name}. Open the invitation and have a look at the plan before another version appears in the group chat.`,tripName:trip.destination||trip.name,cta:'JOIN THE TRIP',url:join.toString(),subject:`You’re invited · ${trip.name}`,preheader:`Grace invited you to ${trip.name}`,idempotencyKey:`gtg-invite-${commId}`}
+      ?{to:email,character:inviteCharacter,title:'Your trip link is ready.',message:`Hey ${first}, here’s a fresh secure link for ${trip.name}. It opens the correct trip directly.`,tripName:trip.destination||trip.name,cta:'OPEN THE TRIP',url:join.toString(),subject:`Your trip link · ${trip.name}`,preheader:`${sender} · Fresh secure access to ${trip.name}`,idempotencyKey:`gtg-invite-${commId}`}
+      :{to:email,character:inviteCharacter,title:inviteSubject,message:inviteMessage,tripName:trip.destination||trip.name,cta:'JOIN THE TRIP',url:join.toString(),subject:`${inviteSubject} · ${trip.name}`,preheader:`${sender} · ${inviteSubject}`,idempotencyKey:`gtg-invite-${commId}`}
 
     const delivery=(async()=>{
       try{
         const result=await deliver(payload)
-        if(result.suppressed){await db.from('communications').update({status:'cancelled',reason:`Recipient suppressed: ${result.reason||'delivery blocked'}`,attempt_count:1,last_attempt_at:new Date().toISOString(),last_error:null,character:'grace'}).eq('id',commId);return}
-        await db.from('communications').update({status:'sent',sent_at:new Date().toISOString(),provider:'resend',provider_message_id:result.id,attempt_count:1,last_attempt_at:new Date().toISOString(),last_error:null,character:'grace'}).eq('id',commId)
+        if(result.suppressed){await db.from('communications').update({status:'cancelled',reason:`Recipient suppressed: ${result.reason||'delivery blocked'}`,attempt_count:1,last_attempt_at:new Date().toISOString(),last_error:null,character:inviteCharacter}).eq('id',commId);return}
+        await db.from('communications').update({status:'sent',sent_at:new Date().toISOString(),provider:'resend',provider_message_id:result.id,attempt_count:1,last_attempt_at:new Date().toISOString(),last_error:null,character:inviteCharacter}).eq('id',commId)
         await db.from('communications').update({status:'cancelled',reason:'Superseded by delivered invitation',last_error:null}).eq('trip_id',tripId).eq('recipient_member_id',member.id).eq('trigger_code','T03').in('status',['girls_ready','girls_scheduled','girls_failed']).neq('id',commId)
       }catch(e){
         console.error('Girls invitation background delivery failed',e instanceof Error?e.message:String(e))
