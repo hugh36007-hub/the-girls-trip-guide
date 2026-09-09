@@ -1,5 +1,14 @@
 /* Full Trip Evidence mobile grid. Core app owns the DOM; this file only styles it. */
 @media (max-width:600px){
+  .dashboard[data-home-composition="full"] [data-panel="evidence"] .gtg-evidence-summary,
+  .dashboard[data-home-composition="full"] [data-panel="evidence"] .gtg-evidence-summary > .gtg-overview-strip{
+    background:transparent!important;
+    border:0!important;
+    border-radius:0!important;
+    box-shadow:none!important;
+    padding:0!important;
+    overflow:visible!important;
+  }
   .dashboard[data-home-composition="full"] [data-panel="evidence"] .gallery:has(> .media){
     display:grid!important;
     grid-template-columns:repeat(3,minmax(0,1fr))!important;
