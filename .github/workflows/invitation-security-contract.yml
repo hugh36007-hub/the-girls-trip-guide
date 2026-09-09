@@ -1,0 +1,33 @@
+name: Invitation security contract
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/invitation-security-contract.yml'
+      - 'invite-auth.html'
+      - 'invite-auth.js'
+      - 'invite-return.html'
+      - 'invite-return.js'
+      - 'sw.js'
+      - 'supabase/functions/girls-accept-invite/**'
+      - 'supabase/functions/girls-finalize-invite/**'
+      - 'supabase/migrations/2026090921*.sql'
+      - 'tests/invitation-security-contract.test.cjs'
+      - 'tests/girls-invitation-voice-contract.test.cjs'
+
+permissions:
+  contents: read
+
+jobs:
+  invitation-security:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Run invitation security contract
+        run: node tests/invitation-security-contract.test.cjs
+      - name: Preserve Girls T03/T06 invitation voice contract
+        run: node tests/girls-invitation-voice-contract.test.cjs
