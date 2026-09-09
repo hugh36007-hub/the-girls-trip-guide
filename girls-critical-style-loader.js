@@ -24,7 +24,7 @@ for(const href of styles){if(document.querySelector(`link[rel="stylesheet"][href
 const scripts=home()?[
  '/home-social-platform-guard.js?v=20260908-2',
  '/girls-home-hero-layout-match.js?v=20260909-1',
- '/girls-live-dashboard-hero.js?v=12',
+ '/girls-live-dashboard-hero.js?v=13',
  '/girls-live-chat-sync.js?v=3',
  '/girls-home-refinements.js?v=2',
  '/girls-home-social-hub-v3.js?v=20260908-4',
@@ -50,7 +50,7 @@ function finalReady(){
  const stats=dashboard.querySelectorAll(':scope .stat-row>.stat');if(stats.length!==4)return false;
  if(mode==='full'){
   if(!hero.matches('.live-snapshot-hero[data-live-snapshot="1"]'))return false;
-  if(hero.dataset.fullHeroOwner!=='live-dashboard-hero')return false;
+  if(hero.dataset.fullHeroOwner!=='girls-app-v2')return false;
   if(hero.querySelectorAll(':scope>.live-hero-title').length!==1)return false;
   if(hero.querySelectorAll(':scope>.live-date-card').length!==1)return false;
   const snapshot=hero.querySelector(':scope>.live-snapshot-bottom');if(!snapshot)return false;
