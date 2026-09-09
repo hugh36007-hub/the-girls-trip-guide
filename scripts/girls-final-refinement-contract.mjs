@@ -43,31 +43,29 @@ for(const href of ['/mobile-viewport-lock.css?v=2','/girls-final-refinement.css?
   assert(html.includes(`rel=\"preload\" as=\"style\" href=\"${href}\"`),`missing Home-shell preload ${href}`);
   assert(critical.includes(href),`critical loader must activate ${href}`);
 }
-assert(critical.includes('/live-dashboard-hero.css?v=6'),'final Home stylesheet must be activated by the first private startup script');
-assert(critical.includes('/girls-live-dashboard-hero.js?v=8'),'final Home transformer must be registered before girls-app-v2 can render');
+assert(critical.includes('/live-dashboard-hero.css?v=10'),'final Home stylesheet must be activated by the first private startup script');
+assert(critical.includes('/girls-live-dashboard-hero.js?v=13'),'final Home hydrator must be registered before girls-app-v2 can render');
 assert(!fs.readFileSync('girls-date-flow.js','utf8').includes('girls-live-dashboard-hero.js'),'legacy date flow must not load a second Home transformer');
-assert(critical.includes("cloneNode(true)" )&&critical.includes('gtg-first-paint-cover'),'parsed private loading shell must remain as one stable paint cover during hydration');
-assert(critical.includes("hero.classList.contains('live-snapshot-hero')"),'paid overview cover must remain until the final Home shell exists');
+assert(critical.includes('cover.innerHTML=boot.outerHTML')&&critical.includes('gtg-first-paint-cover'),'parsed private loading shell must remain as one stable paint cover during hydration');
+assert(critical.includes("hero.matches('.live-snapshot-hero[data-live-snapshot=\"1\"]')")&&critical.includes("hero.dataset.fullHeroOwner!=='girls-app-v2'"),'paid overview cover must remain until the core-owned Full Home shell exists');
 assert(critical.includes('requestAnimationFrame(()=>requestAnimationFrame'),'stable cover must release only after final layout settles across two frames');
 assert(!deferred.includes('installHomePaintGuard'),'deferred loader must not perform a second Home paint handoff');
 assert(!deferred.includes('girls-live-dashboard-hero'),'deferred loader must not trigger a late final-Home rewrite');
-for(const href of ['/girls-product-parity.css?v=1','/girls-inner-page-polish.css?v=1','/girls-document-audience.css?v=1']){
+for(const href of ['/girls-product-parity.css?v=1','/girls-inner-page-polish.css?v=1','/girls-document-audience.css?v=20260908-2']){
   assert(!html.includes(`rel=\"preload\" as=\"style\" href=\"${href}\"`),`route CSS must not preload on Home: ${href}`);
   assert(deferred.includes(href),`route loader must retain ${href}`);
 }
-assert(!html.includes('/girls-inner-page-polish.js?v=1'),'inner-page DOM polish must not execute on Home startup');
-assert(deferred.includes('/girls-inner-page-polish.js?v=1'),'route loader must retain inner-page hierarchy polish');
-assert(html.includes('/girls-critical-style-loader.js?v=1'),'critical style loader missing');
-assert(html.includes('/girls-performance-loader.js?v=1'),'performance loader missing');
+assert(!html.includes('/girls-inner-page-polish.js?v=2'),'inner-page DOM polish must not execute on Home startup');
+assert(deferred.includes('/girls-inner-page-polish.js?v=2'),'route loader must retain inner-page hierarchy polish');
+assert(html.includes('/girls-critical-style-loader.js?v=20260909-6'),'critical style loader missing');
+assert(html.includes('/girls-performance-loader.js?v=10'),'performance loader missing');
 
-// Critical-path performance safeguards.
-assert(html.includes('<style id="gtg-core-styles">'),'core private-app CSS must be inline so Home has no blocking first-party stylesheet request');
-assert(!html.includes('rel="stylesheet" href="/girls-app.css?v=1"'),'girls-app.css must not remain render-blocking after the inline critical-shell move');
-assert(html.includes('rel="preload" as="image" href="/assets/images/hero.webp"'),'default Home hero must be discoverable before runtime render');
-assert(html.includes('fetchpriority="high"'),'Home hero preload must be high priority');
-assert(html.includes('<main class="dashboard" aria-busy="true"'),'private app must ship a geometry-stable dashboard primer before Supabase hydration');
-assert(html.includes('src="/assets/images/hero.webp" width="1600" height="900"'),'dashboard primer must reserve the LCP image geometry explicitly');
-assert(html.includes('girls-trip-guide-logo.webp" width="512" height="512"'),'loading logo must reserve square geometry');
+// Current critical-path safeguards: one light, geometry-stable boot shell until authenticated composition is ready.
+assert(html.includes('rel="stylesheet" href="/girls-app.css?v=20260909-1"'),'current private-app stylesheet must be explicitly versioned');
+assert(html.includes('<style id="gtg-boot-styles">'),'the isolated first-paint shell must remain inline');
+assert(html.includes('class="gtg-boot-shell" aria-busy="true"'),'private app must ship one geometry-stable loading shell before Supabase hydration');
+assert(html.includes('class="gtg-boot-hero"')&&html.includes('class="gtg-boot-stats"'),'loading shell must reserve hero and four-stat geometry');
+assert(!/gtg-boot-shell[\s\S]*girls-trip-guide-logo\.webp/.test(html),'loading shell must not reintroduce the retired square logo');
 assert(!html.includes('rel="preconnect" href="https://fonts.googleapis.com"'),'async fonts must not consume a critical preconnect');
 assert(!html.includes('rel="preconnect" href="https://fonts.gstatic.com"'),'font binaries must not consume a critical preconnect');
 assert(!html.includes('rel="preconnect" href="https://cdn.jsdelivr.net"'),'Supabase script preload must replace a redundant jsDelivr preconnect');
@@ -80,28 +78,28 @@ assert(authBridge.includes('functions/v1/girls-auth-otp'),'OTP bridge must prese
 assert(!html.includes('tus-js-client@4.3.1/dist/tus.min.js'),'resumable upload library must not execute on Home startup');
 assert(deferred.includes('tus-js-client@4.3.1/dist/tus.min.js'),'upload intent must retain resumable upload support');
 assert(!html.includes('defer src="/girls-product-parity.js?v=1"'),'supplementary parity data must not compete with initial dashboard load');
-assert(deferred.includes('/girls-product-parity.js?v=1'),'route loader must retain the parity layer');
+assert(deferred.includes('/girls-product-parity.js?v=4'),'route loader must retain the parity layer');
 assert(!deferred.includes("route==='overview'?1200:220"),'Home parity must not auto-refresh the authoritative dashboard after paint');
-assert(deferred.includes('15000'),'Home thumbnail prime must wait beyond the Lighthouse critical window');
+assert(deferred.includes('12000'),'Home thumbnail prime must wait beyond the Lighthouse critical window');
 assert(!dateFlow.includes('data-payment-nudge-loader'),'date helper must not side-load payment scripts');
 assert(!dateFlow.includes('data-trip-social-loader'),'date helper must not side-load social scripts');
 assert(heroUx.includes("observe(app,{childList:true})")&&!heroUx.includes("observe(document.documentElement"),'hero controls must observe only authoritative app rerenders');
-assert(roleDock.includes("observe(app,{childList:true})")&&!roleDock.includes("observe(document.documentElement"),'dock normalisation must observe only authoritative app rerenders');
+assert(roleDock.includes("observe(app,{childList:true,subtree:false})")&&!roleDock.includes("observe(document.documentElement"),'dock normalisation must observe only authoritative app rerenders');
 
 for(const src of [
- '/girls-vault-contract-fix.js?v=1','/girls-section-layout.js?v=1','/girls-free-entitlement-guard.js?v=1','/girls-inner-page-polish.js?v=1','/girls-document-audience.js?v=1','/girls-hidden-upload-choice.js?v=1','/girls-media-performance-max.js?v=2','/girls-media-ux-plus.js?v=2','/girls-evidence-parity.js?v=2','/girls-media-quality-fix.js?v=4','/girls-mobile-evidence-grid.js?v=2','/girls-media-readiness.js?v=2','/girls-direct-photo-viewer.js?v=4','/girls-media-flow-refinement.js?v=1','/girls-trip-social.js?v=2','/girls-chat-sheet.js?v=2','/girls-media-social.js?v=1','/girls-poll-nudge.js?v=1','/girls-home-thumbnail-prime.js?v=1','/evidence-intro-dismiss.js?v=1'
+ '/girls-vault-contract-fix.js?v=2','/girls-section-layout.js?v=1','/girls-free-entitlement-guard.js?v=1','/girls-inner-page-polish.js?v=2','/girls-document-audience.js?v=20260908-2','/girls-hidden-upload-choice.js?v=1','/girls-media-performance-max.js?v=2','/girls-media-ux-plus.js?v=2','/girls-evidence-parity.js?v=2','/girls-media-quality-fix.js?v=5','/girls-media-readiness.js?v=3','/girls-direct-photo-viewer.js?v=5','/girls-media-flow-refinement.js?v=2','/girls-trip-social.js?v=3','/girls-chat-sheet.js?v=4','/girls-media-social.js?v=1','/girls-poll-nudge.js?v=2','/girls-home-thumbnail-prime.js?v=1','/evidence-intro-dismiss.js?v=3'
 ]){
   assert(!html.includes(`defer src=\"${src}\"`),`noncritical script must not execute on Home startup: ${src}`);
   assert(deferred.includes(src),`route loader must retain ${src}`);
 }
-for(const src of ['/girls-role-aware-dock.js?v=2','/girls-hero-vault-ux.js?v=2'])assert(html.includes(src),`Home-critical interaction must remain immediate: ${src}`);
+for(const src of ['/girls-role-aware-dock.js?v=3','/girls-hero-vault-ux.js?v=4'])assert(html.includes(src),`Home-critical interaction must remain immediate: ${src}`);
 for(const token of ['requestIdleCallback','document.visibilityState','MutationObserver','afterDashboard','loadRoute'])assert(deferred.includes(token),`performance loader missing ${token}`);
 
 const parsed=JSON.parse(manifest);
 assert.equal(parsed.start_url,'/create-trip?source=pwa');
 assert.equal(parsed.display,'standalone');
 assert(html.includes('rel="manifest" href="/manifest.webmanifest"'),'private app must advertise manifest');
-assert(html.includes('/girls-pwa-register.js?v=1'),'service worker registration missing');
+assert(html.includes('/girls-pwa-register.js?v=4'),'service worker registration missing');
 assert(sw.includes("request.mode==='navigate'"),'PWA navigation must be network-first');
 assert(sw.includes("request.destination==='script'||request.destination==='style'"),'PWA scripts/styles must be network-first');
 assert(headers.includes('/sw.js'),'service worker cache header missing');

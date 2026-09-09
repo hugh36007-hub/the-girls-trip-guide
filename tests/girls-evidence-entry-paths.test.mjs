@@ -43,27 +43,27 @@ try{
  await page(c,'full',true);await evalJs(c,"document.documentElement.classList.add('gtg-evidence-route-pending')");await evalJs(c,instrument('evidence'));await wait(900);
  let out=await evalJs(c,"({pending:document.documentElement.classList.contains('gtg-evidence-route-pending'),styles:window.__styles.slice()})");
  assert.equal(out.pending,false,'direct Full Evidence gate must release after readiness');
- assert(out.styles.includes('/girls-evidence-core-grid.css?v=1'),'direct Full Evidence must load final grid CSS before release');
+ assert(out.styles.includes('/girls-evidence-core-grid.css?v=2'),'direct Full Evidence must load final grid CSS before release');
 
  // Bottom tab: pointerdown may preload, but activation must still occur only after the final Full style is ready.
  await c.call('Page.navigate',{url:'about:blank'});await wait(120);await page(c,'full',false);await evalJs(c,instrument('overview'));await evalJs(c,"const b=document.querySelector('[data-tab=evidence]');b.dispatchEvent(new PointerEvent('pointerdown',{bubbles:true}));b.click()");await wait(900);
  out=await evalJs(c,"({events:window.__events.slice(),active:document.querySelector('[data-panel=evidence]').classList.contains('active')})");
  assert(out.active,'bottom Evidence tab must activate');
- assert(out.events.indexOf('style:/girls-evidence-core-grid.css?v=1')>=0,'bottom tab must request final grid style');
- assert(out.events.indexOf('style:/girls-evidence-core-grid.css?v=1')<out.events.indexOf('activate'),'bottom tab must not activate before final grid style');
+ assert(out.events.indexOf('style:/girls-evidence-core-grid.css?v=2')>=0,'bottom tab must request final grid style');
+ assert(out.events.indexOf('style:/girls-evidence-core-grid.css?v=2')<out.events.indexOf('activate'),'bottom tab must not activate before final grid style');
 
  // Home path: programmatic click has no pointerdown; the click gate must still load the same Full bundle first.
  await c.call('Page.navigate',{url:'about:blank'});await wait(120);await page(c,'full',false);await evalJs(c,instrument('overview'));await evalJs(c,"document.querySelector('[data-tab=evidence]').click()");await wait(900);
  out=await evalJs(c,"({events:window.__events.slice(),active:document.querySelector('[data-panel=evidence]').classList.contains('active')})");
  assert(out.active,'Home programmatic Evidence click must activate');
- assert(out.events.indexOf('style:/girls-evidence-core-grid.css?v=1')>=0,'Home path must request final grid style without pointerdown');
- assert(out.events.indexOf('style:/girls-evidence-core-grid.css?v=1')<out.events.indexOf('activate'),'Home path must not activate before final grid style');
+ assert(out.events.indexOf('style:/girls-evidence-core-grid.css?v=2')>=0,'Home path must request final grid style without pointerdown');
+ assert(out.events.indexOf('style:/girls-evidence-core-grid.css?v=2')<out.events.indexOf('activate'),'Home path must not activate before final grid style');
 
  // Free remains on the existing synchronous path and never requests Full grid styling.
  await c.call('Page.navigate',{url:'about:blank'});await wait(120);await page(c,'free',false);await evalJs(c,instrument('overview'));await evalJs(c,"document.querySelector('[data-tab=evidence]').click()");await wait(120);
  out=await evalJs(c,"({events:window.__events.slice(),styles:window.__styles.slice(),active:document.querySelector('[data-panel=evidence]').classList.contains('active')})");
  assert(out.active,'Free Evidence must retain its existing click path');
- assert(!out.styles.includes('/girls-evidence-core-grid.css?v=1'),'Free must never request Full grid styling');
+ assert(!out.styles.includes('/girls-evidence-core-grid.css?v=2'),'Free must never request Full grid styling');
 
  console.log('PASS Girls Evidence entry paths: direct, bottom tab, Home programmatic click, Free isolation');c.close();
 }finally{proc.kill('SIGKILL');try{fs.rmSync(profile,{recursive:true,force:true})}catch{}}

@@ -17,11 +17,11 @@ assert.match(loader,/if\(mode==='full'\)await loadBundle\('evidenceFull'\)/,'Ful
 assert.match(loader,/else if\(mode==='free'\)await loadBundle\('evidenceFree'\)/,'Free bundle must require Free composition');
 assert.match(loader,/if\(picker&&isFull\(\)\)[\s\S]*location\.assign\('\/create-trip'\)/,'leaving a Full dashboard must use a hard navigation boundary');
 assert.doesNotMatch(loader,/girls-mobile-evidence-grid\.js/,'legacy Evidence DOM rewriter must not load');
-assert.match(loader,/evidenceFull:\['\/girls-evidence-core-grid\.css\?v=1'\]/,'Full Evidence grid styling must be a Full-only style bundle');
+assert.match(loader,/evidenceFull:\['\/girls-evidence-core-grid\.css\?v=2'\]/,'Full Evidence grid styling must be a Full-only style bundle');
 
 const fullOnly=['/girls-vault-contract-fix.js?v=2','/girls-hidden-upload-choice.js?v=1','/girls-media-performance-max.js?v=2','/girls-media-ux-plus.js?v=2','/girls-evidence-parity.js?v=2','/girls-media-quality-fix.js?v=5','/girls-media-readiness.js?v=3','/girls-direct-photo-viewer.js?v=5','/girls-gallery-no-zoom.js?v=1','/girls-media-flow-refinement.js?v=2','/girls-media-social.js?v=1','/video-thumbnail-fix.js?v=1'];
 const freeOnly=['/girls-evidence-light-corner-fix.js?v=20260907-1','/girls-free-evidence-upsell-restore.js?v=20260908-1','/girls-convince-copy-v2.js?v=20260907-1'];
-const fullStyle='/girls-evidence-core-grid.css?v=1';
+const fullStyle='/girls-evidence-core-grid.css?v=2';
 const instrumented=loader.replace("location.assign('/create-trip');","window.__hardResetCalls=(window.__hardResetCalls||0)+1;").replace("const action=()=>new URL(location.href).searchParams.get('action')||'overview';","const action=()=> 'evidence';").replace("const tripId=()=>new URL(location.href).searchParams.get('trip_id')||'';","const tripId=()=> 'test-trip';");
 
 const profile=fs.mkdtempSync(path.join(os.tmpdir(),'gtg-evidence-isolation-')),debugPort=10700+Math.floor(Math.random()*200);let stderr='';
