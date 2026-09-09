@@ -13,6 +13,7 @@ function installStartupPolish(){
 #gtg-first-paint-cover{position:fixed;inset:0;z-index:2147482500;overflow:auto;background:radial-gradient(circle at 14% 0,rgba(255,79,163,.055),transparent 30%),#fff;opacity:1;pointer-events:none;transition:opacity 140ms ease}
 #gtg-first-paint-cover.gtg-cover-leaving{opacity:0}
 .gtg-evidence-route-pending .dashboard[data-home-composition="full"] [data-panel="evidence"].active{visibility:hidden!important}
+.gtg-home-route-pending .dashboard[data-home-composition="full"] [data-panel="overview"].active{visibility:hidden!important}
 @media(max-width:600px){#gtg-first-paint-cover .gtg-boot-hero,.gtg-boot-shell .gtg-boot-hero{min-height:340px!important}}
 @media(max-width:700px) and (max-height:700px){#gtg-first-paint-cover .gtg-boot-hero,.gtg-boot-shell .gtg-boot-hero{min-height:300px!important}}
 @media(prefers-reduced-motion:reduce){#gtg-first-paint-cover{transition:none!important}}
@@ -20,11 +21,9 @@ function installStartupPolish(){
  document.head.appendChild(style);
 }
 
-const styles=['/mobile-viewport-lock.css?v=2','/girls-action-feedback.css?v=1','/girls-drawer-fix.css?v=1','/girls-hero-vault-ux.css?v=1','/girls-final-refinement.css?v=1','/girls-date-focus-fix.css?v=1'];
-if(home())styles.push('/live-dashboard-hero.css?v=10');
-for(const href of styles){if(document.querySelector(`link[rel="stylesheet"][href="${href}"]`))continue;const link=document.createElement('link');link.rel='stylesheet';link.href=href;link.dataset.gtgCritical='1';document.head.appendChild(link)}
-
-const scripts=home()?[
+const BASE_STYLES=['/mobile-viewport-lock.css?v=2','/girls-action-feedback.css?v=1','/girls-drawer-fix.css?v=1','/girls-hero-vault-ux.css?v=1','/girls-final-refinement.css?v=1','/girls-date-focus-fix.css?v=1'];
+const HOME_STYLE='/live-dashboard-hero.css?v=10';
+const HOME_SCRIPTS=[
  '/home-social-platform-guard.js?v=20260908-2',
  '/girls-home-hero-layout-match.js?v=20260909-1',
  '/girls-live-dashboard-hero.js?v=13',
@@ -33,8 +32,25 @@ const scripts=home()?[
  '/girls-home-social-hub-v3.js?v=20260908-4',
  '/girls-home-scoreboard-fit.js?v=20260908-3',
  '/girls-parity-refresh-20260904.js?v=4'
-]:[];
-for(const src of scripts){if(document.querySelector(`script[src="${src}"]`))continue;const s=document.createElement('script');s.src=src;s.async=false;s.dataset.gtgCritical='1';document.body.appendChild(s)}
+];
+const stylePending=new Map(),scriptPending=new Map();
+function loadCriticalStyle(href){
+ const existing=document.querySelector(`link[rel="stylesheet"][href="${href}"]`);if(existing)return Promise.resolve();
+ if(stylePending.has(href))return stylePending.get(href);
+ const job=new Promise(resolve=>{const link=document.createElement('link');link.rel='stylesheet';link.href=href;link.dataset.gtgCritical='1';link.onload=()=>{stylePending.delete(href);resolve()};link.onerror=()=>{stylePending.delete(href);resolve()};document.head.appendChild(link)});stylePending.set(href,job);return job;
+}
+function loadCriticalScript(src){
+ const existing=document.querySelector(`script[src="${src}"]`);if(existing)return Promise.resolve();
+ if(scriptPending.has(src))return scriptPending.get(src);
+ const job=new Promise(resolve=>{const s=document.createElement('script');s.src=src;s.async=false;s.dataset.gtgCritical='1';s.onload=()=>{scriptPending.delete(src);resolve()};s.onerror=()=>{scriptPending.delete(src);resolve()};document.body.appendChild(s)});scriptPending.set(src,job);return job;
+}
+async function ensureHomeAssets(){
+ await loadCriticalStyle(HOME_STYLE);
+ for(const src of HOME_SCRIPTS)await loadCriticalScript(src);
+}
+for(const href of BASE_STYLES)void loadCriticalStyle(href);
+if(home())void ensureHomeAssets();
+window.GTGCritical={ensureHomeAssets};
 
 let cover=null,observer=null,released=false,releaseTimer=0;
 function installStablePaintCover(){
