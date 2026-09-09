@@ -38,12 +38,11 @@ const BUNDLES={
     '/girls-media-performance-max.js?v=2',
     '/girls-media-ux-plus.js?v=2',
     '/girls-evidence-parity.js?v=2',
-    '/girls-media-quality-fix.js?v=4',
-    '/girls-mobile-evidence-grid.js?v=3',
-    '/girls-media-readiness.js?v=2',
-    '/girls-direct-photo-viewer.js?v=4',
+    '/girls-media-quality-fix.js?v=5',
+    '/girls-media-readiness.js?v=3',
+    '/girls-direct-photo-viewer.js?v=5',
     '/girls-gallery-no-zoom.js?v=1',
-    '/girls-media-flow-refinement.js?v=1',
+    '/girls-media-flow-refinement.js?v=2',
     '/girls-media-social.js?v=1',
     '/video-thumbnail-fix.js?v=1'
   ],
@@ -60,6 +59,7 @@ const BUNDLES={
 const STYLES={
   shell:['/girls-section-layout.css?v=1','/girls-product-parity.css?v=1','/girls-inner-page-polish.css?v=1'],
   planDocuments:['/girls-document-audience.css?v=20260908-2'],
+  evidenceFull:['/girls-evidence-core-grid.css?v=1'],
   reminders:['/girls-free-reminders-parity.css?v=20260908-7']
 };
 const loaded=new Set(),pending=new Map(),loadedStyles=new Set(),pendingStyles=new Map();
