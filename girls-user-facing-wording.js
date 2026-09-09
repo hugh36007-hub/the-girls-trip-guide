@@ -1,0 +1,1 @@
+/* Girls Trip Guide — user-facing wording refinement only. */
