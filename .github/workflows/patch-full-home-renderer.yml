@@ -1,0 +1,48 @@
+name: Patch Full Home renderer
+on:
+  push:
+    branches: [full-home-single-renderer]
+permissions:
+  contents: write
+jobs:
+  patch:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: full-home-single-renderer
+      - name: Patch core renderer exactly once
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          p=Path('girls-app-v2.js')
+          s=p.read_text()
+          marker="function hero(){return S.heroUrl||'assets/images/hero.webp'}\nfunction renderDashboard(){"
+          if s.count(marker)!=1:
+              raise SystemExit(f'Expected one core renderer marker, found {s.count(marker)}')
+          helper=r'''function hero(){return S.heroUrl||'assets/images/hero.webp'}
+function dashboardHero(days){const confirmed=S.members.filter(x=>x.status==='confirmed').length;if(paid())return `<section class="hero-card live-snapshot-hero" data-live-snapshot="1" data-full-hero-owner="girls-app-v2"><div class="live-hero-title"><div class="eyebrow">FOR THE RECORD</div><h1>${esc(S.trip.destination)}<br><span>${Number.isFinite(days)&&days>=0?`${days} days`:'The trip'}</span></h1><p>${fmt(S.trip.start_date)} — ${fmt(S.trip.end_date)}</p></div><div class="live-date-card"><b>Trip dates</b><span>${confirmed} confirmed<br>20 GB · 12 months</span></div><div class="live-snapshot-bottom is-message-focused" data-focus="message"><div class="live-message-card live-message-loading" role="button" tabindex="0" aria-label="Open group chat"><div class="live-hero-label"><span>Latest message</span></div><div class="live-message-meta"><span class="live-message-avatar" aria-hidden="true"></span><b><i class="live-line live-line-short"></i></b><time></time></div><p><i class="live-line"></i><i class="live-line live-line-mid"></i></p></div><div class="live-photo-block"><div class="live-hero-label"><span>Latest photo</span><span aria-hidden="true">↻</span></div><div class="live-photo-frame"><button type="button" class="live-photo-open" data-a="vault" aria-label="Open Hidden Gallery"><span class="live-photo-empty live-data-loading" aria-label="Loading latest photo"><i></i></span></button><button type="button" class="live-photo-add" data-a="upload">+ Add trip photo</button></div></div></div></section>`;return `<section class="hero-card"><img src="${esc(hero())}" alt=""><div class="hero-meta"><div><div class="eyebrow">Free Trip</div><h1>${esc(S.trip.destination)}<br><span>${Number.isFinite(days)&&days>=0?`${days} days`:'The trip'}</span></h1><p>${fmt(S.trip.start_date)} — ${fmt(S.trip.end_date)}</p></div><div class="trip-stamp"><b>Private trip</b><span>${confirmed} confirmed<br>Upgrade for full media</span></div></div></section>`}
+function renderDashboard(){'''
+          s=s.replace(marker,helper,1)
+          start_token='<section class="hero-card"><img src="${esc(hero())}" alt="">'
+          start=s.find(start_token,s.find('function renderDashboard(){'))
+          if start<0: raise SystemExit('Legacy hero start not found')
+          end=s.find('<div class="stat-row">',start)
+          if end<0: raise SystemExit('Stat row boundary not found')
+          legacy=s[start:end]
+          if legacy.count('<section class="hero-card">')!=1 or 'hero-meta' not in legacy or 'trip-stamp' not in legacy:
+              raise SystemExit('Legacy hero boundary validation failed')
+          s=s[:start]+'${dashboardHero(days)}'+s[end:]
+          if s.count('data-full-hero-owner="girls-app-v2"')!=1:
+              raise SystemExit('Core Full hero owner marker missing or duplicated')
+          p.write_text(s)
+          Path('.github/workflows/patch-full-home-renderer.yml').unlink()
+          PY
+      - name: Commit source-level renderer fix
+        run: |
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git add girls-app-v2.js .github/workflows/patch-full-home-renderer.yml
+          git commit -m "Render current Full Home hero directly in core"
+          git push origin HEAD:full-home-single-renderer
