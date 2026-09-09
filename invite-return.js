@@ -31,9 +31,12 @@ async function sessionFor(client){
   if(current.data?.session)return current.data.session;
   return await new Promise((resolve)=>{
     let settled=false;
-    const finish=(value)=>{if(settled)return;settled=true;subscription?.unsubscribe?.();clearTimeout(timer);resolve(value)};
-    const {data:{subscription}}=client.auth.onAuthStateChange((_event,session)=>{if(session)finish(session)});
-    const timer=setTimeout(()=>finish(null),6000);
+    let subscription=null;
+    let timer=null;
+    const finish=(value)=>{if(settled)return;settled=true;subscription?.unsubscribe?.();if(timer)clearTimeout(timer);resolve(value)};
+    const authListener=client.auth.onAuthStateChange((_event,session)=>{if(session)finish(session)});
+    subscription=authListener.data?.subscription||null;
+    timer=setTimeout(()=>finish(null),6000);
   });
 }
 async function run(){
