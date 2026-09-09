@@ -16,12 +16,14 @@ function syncVaultPinUi(){
     input.setAttribute('aria-describedby','girls-vault-pin-help');
   }
   const modal=form.closest('.modal');
+  const title=modal?.querySelector('h2');
   const copy=modal?.querySelector('p');
-  if(copy)copy.textContent='Set a 4-digit PIN. This gallery remains hidden until unlocked.';
+  if(title)title.textContent='Set your Hidden Gallery PIN';
+  if(copy)copy.textContent='This is the first time Hidden Gallery has been opened. Create a 4-digit trip PIN to protect it.';
   if(!form.querySelector('#girls-vault-pin-help')){
     const help=document.createElement('small');
     help.id='girls-vault-pin-help';
-    help.textContent='Use exactly four numbers.';
+    help.textContent='Use exactly four numbers. You will need this PIN to open, view or manage Hidden Gallery.';
     help.style.display='block';
     help.style.marginTop='-6px';
     help.style.color='var(--muted)';
