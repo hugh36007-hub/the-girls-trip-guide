@@ -10,6 +10,8 @@ function installStartupPolish(){
  const style=document.createElement('style');style.id='gtg-safe-home-startup-polish';style.textContent=`
 #gtg-first-paint-cover{position:fixed;inset:0;z-index:2147482500;overflow:auto;background:radial-gradient(circle at 14% 0,rgba(255,79,163,.055),transparent 30%),#fff;opacity:1;pointer-events:none;transition:opacity 140ms ease}
 #gtg-first-paint-cover.gtg-cover-leaving{opacity:0}
+@media(max-width:600px){#gtg-first-paint-cover .gtg-boot-hero,.gtg-boot-shell .gtg-boot-hero{min-height:340px!important}}
+@media(max-width:700px) and (max-height:700px){#gtg-first-paint-cover .gtg-boot-hero,.gtg-boot-shell .gtg-boot-hero{min-height:300px!important}}
 @media(prefers-reduced-motion:reduce){#gtg-first-paint-cover{transition:none!important}}
 `;
  document.head.appendChild(style);
