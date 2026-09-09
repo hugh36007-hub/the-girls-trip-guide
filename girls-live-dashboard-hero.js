@@ -4,7 +4,7 @@
 if(window.__GTG_LIVE_DASHBOARD_HERO__)return;window.__GTG_LIVE_DASHBOARD_HERO__=true;
 if(!document.querySelector('link[data-live-dashboard-hero]')){
   const link=document.createElement('link');
-  link.rel='stylesheet';link.href='/live-dashboard-hero.css?v=5';link.dataset.liveDashboardHero='1';
+  link.rel='stylesheet';link.href='/live-dashboard-hero.css?v=7';link.dataset.liveDashboardHero='1';
   document.head.appendChild(link);
 }
 const SUPABASE_URL='https://vtcmvwixfqyxqghibsla.supabase.co';
@@ -40,7 +40,7 @@ function buildShell(hero,titleSource){
   const eyebrow=title.querySelector('.eyebrow');if(eyebrow)eyebrow.textContent='FOR THE RECORD';
   const oldDates=hero.querySelector('.trip-stamp span')?.innerHTML||'TBC';
 
-  hero.classList.add('live-snapshot-hero');hero.classList.remove('gtg-live-pending');hero.dataset.liveSnapshot='1';hero.innerHTML='';hero.appendChild(title);
+  hero.classList.add('live-snapshot-hero');hero.classList.remove('gtg-live-pending');hero.dataset.liveSnapshot='1';hero.dataset.fullHeroOwner='live-dashboard-hero';hero.innerHTML='';hero.appendChild(title);
 
   const photo=document.createElement('div');photo.className='live-photo-block';
   photo.innerHTML=`<div class="live-hero-label"><span>Latest photo</span><span aria-hidden="true">↻</span></div><div class="live-photo-frame"><button type="button" class="live-photo-open" data-a="vault" aria-label="Open Hidden Gallery"><span class="live-photo-empty live-data-loading" aria-label="Loading latest photo"><i></i></span></button><button type="button" class="live-photo-add" data-a="upload">+ Add trip photo</button></div>`;
