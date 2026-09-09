@@ -32,7 +32,7 @@
 /* Keep the supporting cards sympathetic to the light Girls dashboard. */
 .live-snapshot-bottom{grid-area:snapshot;display:grid;grid-template-columns:minmax(0,1.28fr) minmax(0,.72fr);gap:16px 18px;min-width:0;align-items:stretch;transition:grid-template-columns .24s cubic-bezier(.22,.72,.2,1)}
 .live-snapshot-bottom.is-photo-focused{grid-template-columns:minmax(0,.72fr) minmax(0,1.28fr)}
-.live-snapshot-bottom>.live-message-card,.live-snapshot-bottom>.live-photo-block{grid-area:auto!important;min-width:0;overflow:hidden;height:auto;min-height:170px}
+.live-snapshot-bottom>.live-message-card,.live-snapshot-bottom>.live-photo-block{grid-area:auto!important;min-width:0;overflow:hidden;height:auto;min-height:213px}
 .live-photo-block{align-self:stretch;min-width:0;height:100%;display:flex;flex-direction:column}
 .live-hero-label{display:flex;justify-content:space-between;align-items:center;gap:8px;margin:1px 2px 9px;color:var(--live-accent);font-size:9px;font-weight:900;letter-spacing:.19em;text-transform:uppercase;flex:0 0 auto}
 .live-photo-frame{position:relative;width:100%;flex:1 1 auto;min-height:0;aspect-ratio:auto;border:1px solid rgba(255,79,163,.34);border-radius:18px;background:linear-gradient(145deg,#fffafd,#fce9f3);overflow:hidden;box-shadow:0 10px 24px rgba(63,28,46,.07),inset 0 1px 0 rgba(255,255,255,.94)}
@@ -67,9 +67,9 @@ html body .hero-card.live-snapshot-hero .live-message-card.gtg-empty-message>p{c
 @media(prefers-reduced-motion:reduce){.live-data-loading i,.live-line{animation:none}}
 @media(max-width:700px){
   .hero-card.live-snapshot-hero{min-height:340px!important;padding:16px!important;gap:12px 11px;grid-template-columns:minmax(0,1.12fr) minmax(0,.88fr)}
-  .live-snapshot-bottom{grid-template-columns:minmax(0,1.58fr) minmax(0,.72fr);gap:12px 11px;min-height:150px}
+  .live-snapshot-bottom{grid-template-columns:minmax(0,1.58fr) minmax(0,.72fr);gap:12px 11px;min-height:188px}
   .live-snapshot-bottom.is-photo-focused{grid-template-columns:minmax(0,.60fr) minmax(0,1.70fr)}
-  .live-snapshot-bottom>.live-message-card,.live-snapshot-bottom>.live-photo-block{min-height:150px}
+  .live-snapshot-bottom>.live-message-card,.live-snapshot-bottom>.live-photo-block{min-height:188px}
   .live-hero-title{padding:6px 2px 0 2px}
   .live-hero-title .eyebrow{font-size:8.5px!important}
   .live-hero-title h1{margin:15px 0 12px!important;font-size:clamp(36px,10vw,43px)!important;line-height:.86!important}
@@ -87,8 +87,8 @@ html body .hero-card.live-snapshot-hero .live-message-card.gtg-empty-message>p{c
 }
 @media(max-width:390px){
   .hero-card.live-snapshot-hero{padding:14px!important;gap:10px 9px;grid-template-columns:minmax(0,1.1fr) minmax(0,.9fr)}
-  .live-snapshot-bottom{gap:10px 9px;min-height:142px}
-  .live-snapshot-bottom>.live-message-card,.live-snapshot-bottom>.live-photo-block{min-height:142px}
+  .live-snapshot-bottom{gap:10px 9px;min-height:178px}
+  .live-snapshot-bottom>.live-message-card,.live-snapshot-bottom>.live-photo-block{min-height:178px}
   .live-hero-title h1{font-size:34px!important}
   .live-photo-add{font-size:6.5px;padding:7px 8px}
   .live-message-card,.live-date-card{padding:11px 10px}
