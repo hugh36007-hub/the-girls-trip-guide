@@ -17,7 +17,7 @@ assert.match(source,/__GTG_LIVE_DASHBOARD_HERO__/,'the Full Home photo hydrator 
 assert.match(source,/new globalThis\.URL\(location\.href\)/,'trip ID parsing must use the browser URL constructor explicitly');
 assert.match(source,/if\(hydrateScheduled\)return/,'mutation bursts must coalesce into one pending hydration');
 assert.match(source,/hydrate\(\)\.catch\(/,'scheduled async hydration must handle top-level failures');
-assert.match(source,/data-full-hero-owner=\\"girls-app-v2\\"/,'the live runtime must target only the core-owned Full hero');
+assert.match(source,/data-full-hero-owner="girls-app-v2"/,'the live runtime must target only the core-owned Full hero');
 assert.doesNotMatch(source,/buildShell|hero\.innerHTML|fullHeroOwner='live-dashboard-hero'/,'the live runtime must never rebuild or claim the Full hero DOM');
 assert.match(source,/live-dashboard-hero\.css\?v=10/,'Full Home hydration must retain the authoritative light hero stylesheet');
 assert.match(appSource,/function dashboardHero\(days\)/,'the core app must own a dedicated Home hero renderer');
