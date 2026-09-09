@@ -23,10 +23,10 @@ const forceApprovedHeader=()=>{
     brand.className='brand site-logo';
     brand.href='/';
     brand.setAttribute('aria-label','The Girls Trip Guide home');
-    brand.innerHTML='<img src="/assets/images/girls-trip-guide-logo.webp" alt="The Girls Trip Guide — Good Plans. Better Stories." loading="eager" decoding="async">';
-    brand.style.cssText='display:flex!important;align-items:center!important;justify-content:flex-start!important;width:160px!important;height:72px!important;flex:0 0 160px!important;margin-right:auto!important;overflow:visible!important;background:transparent!important;';
+    brand.innerHTML='<img src="/assets/images/hero-trans.png" alt="The Girls Trip Guide — Good Plans. Better Stories." loading="eager" decoding="async">';
+    brand.removeAttribute('style');
     const img=brand.querySelector('img');
-    if(img)img.style.cssText='display:block!important;width:150px!important;height:66px!important;object-fit:contain!important;object-position:left center!important;max-width:none!important;';
+    if(img)img.removeAttribute('style');
   }
 };
 forceApprovedHeader();
