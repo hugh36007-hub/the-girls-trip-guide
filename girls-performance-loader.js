@@ -30,10 +30,10 @@ const BUNDLES={
   ],
   groupPollExtras:['/girls-poll-nudge.js?v=2'],
   evidenceShared:[
-    '/evidence-intro-dismiss.js?v=2'
+    '/evidence-intro-dismiss.js?v=3'
   ],
   evidenceFull:[
-    '/girls-vault-contract-fix.js?v=1',
+    '/girls-vault-contract-fix.js?v=2',
     '/girls-hidden-upload-choice.js?v=1',
     '/girls-media-performance-max.js?v=2',
     '/girls-media-ux-plus.js?v=2',
