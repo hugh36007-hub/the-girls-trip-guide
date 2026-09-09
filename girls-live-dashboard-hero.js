@@ -4,7 +4,7 @@
 if(window.__GTG_LIVE_DASHBOARD_HERO__)return;window.__GTG_LIVE_DASHBOARD_HERO__=true;
 if(!document.querySelector('link[data-live-dashboard-hero]')){
   const link=document.createElement('link');
-  link.rel='stylesheet';link.href='/live-dashboard-hero.css?v=8';link.dataset.liveDashboardHero='1';
+  link.rel='stylesheet';link.href='/live-dashboard-hero.css?v=9';link.dataset.liveDashboardHero='1';
   document.head.appendChild(link);
 }
 const SUPABASE_URL='https://vtcmvwixfqyxqghibsla.supabase.co';
@@ -44,15 +44,14 @@ function buildShell(hero,titleSource){
 
   const photo=document.createElement('div');photo.className='live-photo-block';
   photo.innerHTML=`<div class="live-hero-label"><span>Latest photo</span><span aria-hidden="true">↻</span></div><div class="live-photo-frame"><button type="button" class="live-photo-open" data-a="vault" aria-label="Open Hidden Gallery"><span class="live-photo-empty live-data-loading" aria-label="Loading latest photo"><i></i></span></button><button type="button" class="live-photo-add" data-a="upload">+ Add trip photo</button></div>`;
-  hero.appendChild(photo);
 
   const msg=document.createElement('div');msg.className='live-message-card live-message-loading';
   msg.setAttribute('role','button');msg.setAttribute('tabindex','0');msg.setAttribute('aria-label','Open group chat');
   msg.innerHTML=`<div class="live-hero-label"><span>Latest message</span></div><div class="live-message-meta"><span class="live-message-avatar" aria-hidden="true"></span><b><i class="live-line live-line-short"></i></b><time></time></div><p><i class="live-line"></i><i class="live-line live-line-mid"></i></p>`;
   msg.addEventListener('click',openGroupChat);msg.addEventListener('keydown',event=>{if(event.key==='Enter'||event.key===' '){event.preventDefault();openGroupChat()}});
-  hero.appendChild(msg);
 
   const dates=document.createElement('div');dates.className='live-date-card';dates.innerHTML=`<b>Trip dates</b><span>${oldDates}</span>`;hero.appendChild(dates);
+  const bottom=document.createElement('div');bottom.className='live-snapshot-bottom is-message-focused';bottom.dataset.focus='message';bottom.append(msg,photo);hero.appendChild(bottom);
   return photo.querySelector('.live-photo-open');
 }
 
