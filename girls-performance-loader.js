@@ -1,4 +1,4 @@
-/* Girls performance: route-specific loading with no duplicate Home runtime. */
+/* Girls performance: route-specific loading with strict Full/Free Evidence isolation. */
 (()=>{
 'use strict';
 if(window.__GTG_PERFORMANCE_LOADER__)return;window.__GTG_PERFORMANCE_LOADER__=true;
@@ -29,7 +29,10 @@ const BUNDLES={
     '/conversation-header-align.js?v=2'
   ],
   groupPollExtras:['/girls-poll-nudge.js?v=2'],
-  evidence:[
+  evidenceShared:[
+    '/evidence-intro-dismiss.js?v=2'
+  ],
+  evidenceFull:[
     '/girls-vault-contract-fix.js?v=1',
     '/girls-hidden-upload-choice.js?v=1',
     '/girls-media-performance-max.js?v=2',
@@ -42,8 +45,9 @@ const BUNDLES={
     '/girls-gallery-no-zoom.js?v=1',
     '/girls-media-flow-refinement.js?v=1',
     '/girls-media-social.js?v=1',
-    '/evidence-intro-dismiss.js?v=2',
-    '/video-thumbnail-fix.js?v=1',
+    '/video-thumbnail-fix.js?v=1'
+  ],
+  evidenceFree:[
     '/girls-evidence-light-corner-fix.js?v=20260907-1',
     '/girls-free-evidence-upsell-restore.js?v=20260908-1',
     '/girls-convince-copy-v2.js?v=20260907-1'
@@ -62,6 +66,8 @@ const loaded=new Set(),pending=new Map(),loadedStyles=new Set(),pendingStyles=ne
 const visible=()=>document.visibilityState!=='hidden';
 const action=()=>new URL(location.href).searchParams.get('action')||'overview';
 const tripId=()=>new URL(location.href).searchParams.get('trip_id')||'';
+const composition=()=>document.querySelector('.dashboard')?.dataset.homeComposition||'';
+const isFull=()=>composition()==='full';
 const idle=cb=>{'requestIdleCallback'in window?requestIdleCallback(cb,{timeout:1200}):setTimeout(cb,220)};
 
 function loadStyle(href){
@@ -80,12 +86,18 @@ async function loadBundle(name){
  for(const href of STYLES[name]||[])await loadStyle(href);
  for(const src of BUNDLES[name]||[])await loadScript(src);
 }
+async function loadEvidence(){
+ await loadBundle('evidenceShared');
+ const mode=composition();
+ if(mode==='full')await loadBundle('evidenceFull');
+ else if(mode==='free')await loadBundle('evidenceFree');
+}
 async function loadRoute(route){
  if(!['plan','money','group','evidence'].includes(route))return;
  await loadBundle('shell');
  if(route==='money')await loadBundle('money');
  if(route==='group')await loadBundle('groupCore');
- if(route==='evidence')await loadBundle('evidence');
+ if(route==='evidence')await loadEvidence();
 }
 
 void loadBundle('appTheme');
@@ -113,7 +125,7 @@ document.addEventListener('pointerdown',event=>{
  const tab=target.dataset.tab||'';const a=target.dataset.a||target.dataset.action||'';
  if(['plan','money','group','evidence'].includes(tab)){void loadRoute(tab);void loadBundle('parity')}
  if(target.matches('[data-role-money]')||a==='addExpense')void loadRoute('money');
- if(target.matches('[data-role-upload]')||['upload','vault','vaultUpload'].includes(a)){void loadRoute('evidence');void loadBundle('upload')}
+ if(isFull()&&(target.matches('[data-role-upload]')||['upload','vault','vaultUpload'].includes(a))){void loadRoute('evidence');void loadBundle('upload')}
  if(a==='addDocument'||a==='openDocument')void loadBundle('planDocuments');
  if(a==='drawer')void loadBundle('drawer');
  if(tab==='group'||target.matches('[data-trip-social-tab],[data-gtg-social-tab],[data-parity-comms]'))void loadBundle('groupCore');
@@ -122,6 +134,12 @@ document.addEventListener('pointerdown',event=>{
 },{capture:true,passive:true});
 
 document.addEventListener('click',event=>{
+ const picker=event.target.closest?.('[data-a="picker"]');
+ if(picker&&isFull()){
+   event.preventDefault();event.stopImmediatePropagation();
+   location.assign('/create-trip');
+   return;
+ }
  const addDocument=event.target.closest?.('[data-a="addDocument"]');
  if(addDocument&&!loaded.has(DOC_SRC)){
    event.preventDefault();event.stopImmediatePropagation();
@@ -142,5 +160,5 @@ function loadHomeIntent(){if(homeIntent||action()!=='overview')return;homeIntent
 window.addEventListener('scroll',()=>{if((window.scrollY||0)>40)loadHomeIntent()},{passive:true});
 document.addEventListener('keydown',event=>{if(event.key==='PageDown'||event.key==='End')loadHomeIntent()},{passive:true});
 
-window.GTGPerformance={loadBundle,loadRoute};
+window.GTGPerformance={loadBundle,loadRoute,composition};
 })();

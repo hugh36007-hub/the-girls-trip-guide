@@ -21,6 +21,7 @@ on:
       - 'tests/girls-full-trip-composition.test.mjs'
       - 'tests/girls-full-trip-ui-regression.test.cjs'
       - 'tests/girls-mobile-evidence-grid.test.mjs'
+      - 'tests/girls-evidence-composition-isolation.test.mjs'
       - '.github/workflows/girls-live-dashboard-hero.yml'
   push:
     branches: [main]
@@ -43,6 +44,7 @@ on:
       - 'tests/girls-full-trip-composition.test.mjs'
       - 'tests/girls-full-trip-ui-regression.test.cjs'
       - 'tests/girls-mobile-evidence-grid.test.mjs'
+      - 'tests/girls-evidence-composition-isolation.test.mjs'
       - '.github/workflows/girls-live-dashboard-hero.yml'
 
 jobs:
@@ -63,3 +65,5 @@ jobs:
         run: node tests/girls-full-trip-composition.test.mjs
       - name: Paid empty Evidence and populated grid
         run: node tests/girls-mobile-evidence-grid.test.mjs
+      - name: Free and Full Evidence runtime isolation
+        run: node tests/girls-evidence-composition-isolation.test.mjs

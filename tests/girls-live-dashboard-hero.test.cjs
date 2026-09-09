@@ -26,11 +26,11 @@ assert.match(critical,/gtg-cover-leaving/,'the cover must use the short controll
 assert.match(critical,/prefers-reduced-motion/,'the cover must respect reduced motion');
 assert.doesNotMatch(dateFlow,/girls-live-dashboard-hero\.js/,'the legacy date flow must not load a duplicate hero runtime');
 assert.match(html,/girls-critical-style-loader\.js\?v=20260909-3/,'the private shell must cache-bust the corrected critical loader');
-assert.match(html,/girls-performance-loader\.js\?v=4/,'the private shell must refresh deferred theme assets');
+assert.match(html,/girls-performance-loader\.js\?v=5/,'the private shell must refresh the isolated Evidence loader');
 assert.match(html,/girls-pwa-register\.js\?v=4/,'the private shell must refresh PWA registration code');
 assert.match(html,/class="gtg-boot-shell"/,'the private shell must use the isolated light startup skeleton');
 assert.doesNotMatch(html,/gtg-boot-shell[\s\S]*girls-trip-guide-logo\.webp/,'the startup skeleton must not render the old square logo');
-assert.match(sw,/gtg-pwa-v13/,'the fixed private shell must replace the previous offline cache generation');
+assert.match(sw,/gtg-pwa-v14/,'the isolated Evidence loader must advance the offline cache generation');
 assert.match(heroCss,/\.live-message-card\{[^}]*background:linear-gradient\(145deg,#fffafd,#fbe7f1\)/,'the message preview must use the light blush surface');
 assert.match(heroCss,/\.live-photo-frame\{[^}]*background:linear-gradient\(145deg,#fffafd,#fce9f3\)/,'the empty photo preview must use the light blush surface');
 assert.doesNotMatch(heroCss,/\.live-message-card\{[^}]*#21141d/,'the legacy near-black message surface must not return');
