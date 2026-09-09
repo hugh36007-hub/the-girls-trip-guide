@@ -99,6 +99,13 @@ async function loadRoute(route){
  if(route==='group')await loadBundle('groupCore');
  if(route==='evidence')await loadEvidence();
 }
+async function openEvidence(target=null){
+ await loadRoute('evidence');
+ document.documentElement.classList.remove('gtg-evidence-route-pending');
+ if(!target?.isConnected)return;
+ target.dataset.gtgEvidenceReady='1';
+ target.click();
+}
 
 void loadBundle('appTheme');
 if(!tripId())void loadBundle('onboarding');
@@ -112,13 +119,14 @@ function afterDashboard(callback,delay=0){
 }
 function scheduleInitial(){
  const route=action();
- if(route!=='overview')afterDashboard(()=>void loadRoute(route),0);
+ if(route==='evidence')afterDashboard(()=>void openEvidence(),0);
+ else if(route!=='overview')afterDashboard(()=>void loadRoute(route),0);
  if(['group','evidence','plan','money'].includes(route))afterDashboard(()=>idle(()=>void loadBundle('parity')),700);
  if(route==='overview')afterDashboard(()=>setTimeout(()=>{if(visible()&&action()==='overview')idle(()=>void loadBundle('home'))},12000),0);
 }
 
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',scheduleInitial,{once:true});else scheduleInitial();
-window.addEventListener('popstate',()=>{const route=action();void loadRoute(route);if(route!=='overview')idle(()=>void loadBundle('parity'))});
+window.addEventListener('popstate',()=>{const route=action();if(route==='evidence')void openEvidence();else void loadRoute(route);if(route!=='overview')idle(()=>void loadBundle('parity'))});
 
 document.addEventListener('pointerdown',event=>{
  const target=event.target.closest?.('[data-tab],[data-a],[data-action],[data-trip-social-tab],[data-gtg-social-tab],[data-parity-comms],[data-parity-reminders],[data-role-money],[data-role-upload]');if(!target)return;
@@ -134,6 +142,16 @@ document.addEventListener('pointerdown',event=>{
 },{capture:true,passive:true});
 
 document.addEventListener('click',event=>{
+ const evidenceTab=event.target.closest?.('[data-tab="evidence"]');
+ if(evidenceTab&&isFull()){
+   if(evidenceTab.dataset.gtgEvidenceReady==='1'){
+     delete evidenceTab.dataset.gtgEvidenceReady;
+   }else{
+     event.preventDefault();event.stopImmediatePropagation();
+     void openEvidence(evidenceTab);
+     return;
+   }
+ }
  const picker=event.target.closest?.('[data-a="picker"]');
  if(picker&&isFull()){
    event.preventDefault();event.stopImmediatePropagation();
@@ -160,5 +178,5 @@ function loadHomeIntent(){if(homeIntent||action()!=='overview')return;homeIntent
 window.addEventListener('scroll',()=>{if((window.scrollY||0)>40)loadHomeIntent()},{passive:true});
 document.addEventListener('keydown',event=>{if(event.key==='PageDown'||event.key==='End')loadHomeIntent()},{passive:true});
 
-window.GTGPerformance={loadBundle,loadRoute,composition};
+window.GTGPerformance={loadBundle,loadRoute,openEvidence,composition};
 })();
