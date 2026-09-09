@@ -24,6 +24,7 @@ on:
       - 'tests/girls-full-trip-ui-regression.test.cjs'
       - 'tests/girls-mobile-evidence-grid.test.mjs'
       - 'tests/girls-evidence-composition-isolation.test.mjs'
+      - 'tests/girls-evidence-entry-paths.test.mjs'
       - '.github/workflows/girls-live-dashboard-hero.yml'
   push:
     branches: [main]
@@ -49,6 +50,7 @@ on:
       - 'tests/girls-full-trip-ui-regression.test.cjs'
       - 'tests/girls-mobile-evidence-grid.test.mjs'
       - 'tests/girls-evidence-composition-isolation.test.mjs'
+      - 'tests/girls-evidence-entry-paths.test.mjs'
       - '.github/workflows/girls-live-dashboard-hero.yml'
 
 jobs:
@@ -73,3 +75,5 @@ jobs:
         run: node tests/girls-mobile-evidence-grid.test.mjs
       - name: Free and Full Evidence runtime isolation
         run: node tests/girls-evidence-composition-isolation.test.mjs
+      - name: Full Evidence entry paths
+        run: node tests/girls-evidence-entry-paths.test.mjs
