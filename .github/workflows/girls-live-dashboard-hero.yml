@@ -25,6 +25,7 @@ on:
       - 'tests/girls-mobile-evidence-grid.test.mjs'
       - 'tests/girls-evidence-composition-isolation.test.mjs'
       - 'tests/girls-evidence-entry-paths.test.mjs'
+      - 'tests/girls-home-return-readiness.test.mjs'
       - '.github/workflows/girls-live-dashboard-hero.yml'
   push:
     branches: [main]
@@ -51,6 +52,7 @@ on:
       - 'tests/girls-mobile-evidence-grid.test.mjs'
       - 'tests/girls-evidence-composition-isolation.test.mjs'
       - 'tests/girls-evidence-entry-paths.test.mjs'
+      - 'tests/girls-home-return-readiness.test.mjs'
       - '.github/workflows/girls-live-dashboard-hero.yml'
 
 jobs:
@@ -77,3 +79,5 @@ jobs:
         run: node tests/girls-evidence-composition-isolation.test.mjs
       - name: Full Evidence entry paths
         run: node tests/girls-evidence-entry-paths.test.mjs
+      - name: Full Home return from Evidence
+        run: node tests/girls-home-return-readiness.test.mjs
