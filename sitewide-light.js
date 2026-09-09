@@ -5,6 +5,7 @@ const NEW_LOGO_ABS=`https://thegirlstripguide.com${NEW_LOGO}`;
 const PUBLIC_PATHS=new Set(['/','/situation','/the-gals','/free-vs-full','/gals','/briefing','/contact','/terms','/privacy','/cookie-policy','/refund-policy','/safety','/create-trip','/full-trip','/insights','/group-trip-photo-problem']);
 const clean=p=>{let x=(p||'/').replace(/\/+$/,'')||'/';if(x==='/index.html')return '/';return x.replace(/\.html$/,'')};
 const currentPath=clean(location.pathname);
+const isResearch=currentPath==='/insights'||currentPath==='/group-trip-photo-problem';
 
 function wireLogo(){
   document.querySelectorAll('img').forEach(img=>{
@@ -30,6 +31,7 @@ const theme=document.querySelector('meta[name="theme-color"]');if(theme)theme.se
 const scheme=document.querySelector('meta[name="color-scheme"]');if(scheme)scheme.setAttribute('content','light');
 document.documentElement.classList.add('gtg-white-site');
 if(PUBLIC_PATHS.has(currentPath))document.documentElement.classList.add('gtg-public-page');
+if(isResearch)document.documentElement.classList.add('gtg-research-page');
 
 if(PUBLIC_PATHS.has(currentPath)){
   document.querySelectorAll('main > section').forEach(section=>{
@@ -116,6 +118,23 @@ html.gtg-white-site body .footer .footer-bottom{border-top-color:rgba(25,19,22,.
  html.gtg-white-site body .footer .brand img,html.gtg-white-site body .footer img.brand-logo,html.gtg-white-site body .footer .brand.site-logo img{height:96px!important;max-width:138px!important}
 }
 `;
+if(isResearch){
+  css.textContent+=`
+html.gtg-research-page body .site-header .mobile-plan-link{color:#a71558!important;border-color:#a71558!important}
+html.gtg-research-page body main>section.gtg-light-surface .article-kicker,
+html.gtg-research-page body main>section.gtg-light-surface .eyebrow,
+html.gtg-research-page body main>section.gtg-light-surface .section-kicker{color:#a71558!important}
+html.gtg-research-page body .footer h3{color:#a71558!important}
+html.gtg-research-page body .footer .footer-bottom{color:#6c5962!important}
+html.gtg-research-page body .article-body p a,
+html.gtg-research-page body .article-body li a,
+html.gtg-research-page body .sources a,
+html.gtg-research-page body .method a{color:#a71558!important;text-decoration-line:underline!important;text-decoration-thickness:1.5px!important;text-decoration-color:currentColor!important;text-underline-offset:3px!important}
+@media(max-width:700px){
+ html.gtg-research-page body .footer a:not(.brand){display:flex!important;align-items:center!important;min-height:44px!important;margin:0!important;padding:8px 0!important}
+}
+`;
+}
 document.head.appendChild(css);
 wireLogo();
 })();
