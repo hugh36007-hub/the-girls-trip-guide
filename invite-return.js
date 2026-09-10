@@ -5,9 +5,9 @@ const PUBLISHABLE='sb_publishable_qBQzJjFxSToEGxPJEcmskg_GNd4M4cP';
 const PRODUCT='girls';
 const FINALIZER=`${SUPABASE_URL}/functions/v1/girls-finalize-invite`;
 const STATE=/^[A-Za-z0-9_-]{43}$/;
-const TOKEN_HASH=/^[0-9a-f]{64}$/i;
 const UUID=/^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 const status=document.getElementById('status');
+function validAuthToken(token){return typeof token==='string'&&token.length>=16&&token.length<=2048&&!/[\u0000-\u001f\u007f\s]/.test(token);}
 function fail(message){if(status){status.textContent=message;status.className='error';}}
 function invitationCredentials(){
   const hash=new URLSearchParams(location.hash.replace(/^#/,''));
@@ -15,7 +15,7 @@ function invitationCredentials(){
   const tokenHash=hash.get('token_hash')||'';
   const type=hash.get('type')||'email';
   if(!STATE.test(state))throw new Error('This secure invitation state is missing or invalid. Ask the organiser for a fresh invitation.');
-  if(!TOKEN_HASH.test(tokenHash)||type!=='email')throw new Error('This secure invitation authentication token is missing or invalid. Ask the organiser for a fresh invitation.');
+  if(!validAuthToken(tokenHash)||type!=='email')throw new Error('This secure invitation authentication token is missing or invalid. Ask the organiser for a fresh invitation.');
   history.replaceState({},'',location.pathname);
   return {state,tokenHash};
 }
