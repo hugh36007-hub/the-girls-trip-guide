@@ -1,0 +1,57 @@
+name: Verify Supabase auth URL configuration
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/supabase-auth-url-config-verify.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    env:
+      SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+      PROJECT_REF: vtcmvwixfqyxqghibsla
+    steps:
+      - name: Verify required exact redirect URLs
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -n "$SUPABASE_ACCESS_TOKEN" || { echo 'SUPABASE_ACCESS_TOKEN is not configured'; exit 1; }
+          curl -fsS --retry 2 \
+            -H "Authorization: Bearer $SUPABASE_ACCESS_TOKEN" \
+            -H 'Accept: application/json' \
+            "https://api.supabase.com/v1/projects/$PROJECT_REF/config/auth" \
+            -o /tmp/auth-config.json
+          node <<'NODE'
+          const fs=require('fs');
+          const c=JSON.parse(fs.readFileSync('/tmp/auth-config.json','utf8'));
+          const raw=c.uri_allow_list;
+          if(typeof raw!=='string'){
+            console.error('Auth config did not expose uri_allow_list as expected. Available non-secret routing keys:', Object.keys(c).filter(k=>/uri|url|site/i.test(k)).sort().join(', '));
+            process.exit(2);
+          }
+          const allowed=raw.split(',').map(s=>s.trim()).filter(Boolean);
+          const required=[
+            'https://thegirlstripguide.com/invite-return.html',
+            'https://theboystripguide.com/invite-return.html'
+          ];
+          const missing=required.filter(u=>!allowed.includes(u));
+          const productionWildcard=allowed.filter(u=>{
+            try{
+              const lower=u.toLowerCase();
+              return (lower.includes('thegirlstripguide.com')||lower.includes('theboystripguide.com')) && /[*]/.test(u);
+            }catch{return false;}
+          });
+          console.log('Site URL:', typeof c.site_url==='string'?c.site_url:'(not returned)');
+          console.log('Required exact callback entries:', required.map(u=>`${u} = ${allowed.includes(u)?'PRESENT':'MISSING'}`).join(' | '));
+          console.log('Production wildcard callbacks:', productionWildcard.length?productionWildcard.join(', '):'NONE');
+          if(missing.length){console.error('Missing exact callback URL(s):',missing.join(', '));process.exit(3);}
+          if(productionWildcard.length){console.error('Broad production wildcard(s) must be removed:',productionWildcard.join(', '));process.exit(4);}
+          console.log('SUPABASE AUTH URL CONFIGURATION: PASS');
+          NODE
