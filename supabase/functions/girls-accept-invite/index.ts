@@ -1,7 +1,8 @@
 import { createClient } from 'npm:@supabase/supabase-js@2.112.4'
 
 const UUID=/^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i
-function esc(value:unknown){return String(value??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]||c))}
+const TOKEN_HASH=/^[0-9a-f]{64}$/i
+function esc(value:unknown){return String(value??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot',"'":'&#39;'}[c]||c))}
 function hex(bytes:ArrayBuffer){return [...new Uint8Array(bytes)].map(b=>b.toString(16).padStart(2,'0')).join('')}
 async function sha256(value:string){return hex(await crypto.subtle.digest('SHA-256',new TextEncoder().encode(value)))}
 function randomToken(){const b=crypto.getRandomValues(new Uint8Array(32));return btoa(String.fromCharCode(...b)).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'')}
@@ -15,6 +16,14 @@ function validateActionLink(actionLink:string,supabaseUrl:string,expectedCallbac
     const effective=action.searchParams.get('redirect_to')||action.searchParams.get('redirectTo')||''
     return exactCallback(effective,expectedCallback)
   }catch{return false}
+}
+function extractTokenHash(linkData:any,actionLink:string){
+  const generated=String(linkData?.properties?.hashed_token||'')
+  if(TOKEN_HASH.test(generated))return generated
+  try{
+    const fromAction=new URL(actionLink).searchParams.get('token')||''
+    return TOKEN_HASH.test(fromAction)?fromAction:''
+  }catch{return ''}
 }
 
 Deno.serve(async(req)=>{
@@ -51,6 +60,8 @@ Deno.serve(async(req)=>{
     const userId=linkData?.user?.id||''
     if(!actionLink||!UUID.test(userId))throw new Error('Could not create secure access link')
     if(!validateActionLink(actionLink,supabaseUrl,callback))throw new Error('Auth redirect configuration rejected the Girls callback')
+    const authTokenHash=extractTokenHash(linkData,actionLink)
+    if(!authTokenHash)throw new Error('Could not obtain one-time auth token')
 
     const state=randomToken(),stateHash=await sha256(state),expiresAt=new Date(Date.now()+10*60*1000).toISOString()
     const {error:stateError}=await db.rpc('create_invitation_auth_state',{
@@ -65,7 +76,7 @@ Deno.serve(async(req)=>{
     if(stateError)throw stateError
 
     const handoff=new URL('/invite-auth.html',site)
-    handoff.hash=new URLSearchParams({state,magic:actionLink}).toString()
+    handoff.hash=new URLSearchParams({state,token_hash:authTokenHash}).toString()
     return redirect(handoff.toString())
   }catch(error){
     console.error('girls-accept-invite failed',error instanceof Error?error.message:String(error))
