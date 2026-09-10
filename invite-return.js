@@ -42,16 +42,16 @@ async function sessionFor(client){
 async function run(){
   try{
     const state=storedState();
-    if(!state)throw new Error('This secure invitation state is missing or expired. Ask the organiser for a fresh invitation.');
     if(!window.supabase?.createClient)throw new Error('Secure sign-in could not start. Please reopen the invitation.');
     const client=window.supabase.createClient(SUPABASE_URL,PUBLISHABLE,{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true}});
     const session=await sessionFor(client);
     if(!session?.access_token)throw new Error('Secure sign-in did not complete. Ask the organiser for a fresh invitation.');
-    const response=await fetch(FINALIZER,{method:'POST',headers:{'Content-Type':'application/json','apikey':PUBLISHABLE,'Authorization':`Bearer ${session.access_token}`},body:JSON.stringify({state})});
+    if(!state&&status)status.textContent='Recovering this secure invitation…';
+    const response=await fetch(FINALIZER,{method:'POST',headers:{'Content-Type':'application/json','apikey':PUBLISHABLE,'Authorization':`Bearer ${session.access_token}`},body:JSON.stringify({state:state||null})});
     const result=await response.json().catch(()=>({}));
     if(!response.ok||result?.ok!==true)throw new Error(result?.error||'This invitation could not be verified.');
     if(result.productKey!==PRODUCT||!UUID.test(String(result.tripId||'')))throw new Error('The invitation returned an invalid trip.');
-    localStorage.removeItem(STORAGE);
+    try{localStorage.removeItem(STORAGE)}catch{}
     history.replaceState({},'',location.pathname);
     if(window.GTG_NATIVE&&window.Capacitor?.Plugins?.Browser?.close){try{await window.Capacitor.Plugins.Browser.close()}catch{}}
     const target=new URL('/create-trip',location.origin);
