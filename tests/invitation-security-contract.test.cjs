@@ -16,11 +16,15 @@ assert.match(accept,/trip\.product_key!==product/,'acceptance must reject non-Gi
 assert.match(accept,/redirect_to/,'generated action link return must be inspected');
 assert.match(accept,/validateActionLink\(actionLink,supabaseUrl,callback\)/);
 assert.match(accept,/extractTokenHash\(linkData,actionLink\)/,'one-time Supabase token hash must be extracted server-side');
+assert.match(accept,/new URL\(actionLink\)\.searchParams\.get\('token'\)/,'validated action link token must be authoritative when present');
+assert.match(accept,/validAuthToken/,'Supabase auth token must be bounded and validated as opaque data');
+assert.doesNotMatch(accept,/TOKEN_HASH=\/\^\[0-9a-f\]\{64\}/,'Supabase token format must not be assumed to be 64 hex chars');
 assert.match(accept,/handoff\.hash=new URLSearchParams\(\{state,token_hash:authTokenHash\}\)/,'state and auth token must travel together');
 assert.doesNotMatch(accept,/magic:actionLink/,'browser must not be sent the Supabase action link');
 assert.match(accept,/create_invitation_auth_state/);
 assert.doesNotMatch(accept,/from\('trip_members'\)\.update/,'acceptance must not confirm or mutate membership');
 assert.doesNotMatch(accept,/confirmed_at/,'acceptance must not set confirmation timestamps');
+assert.match(accept,/return redirect\(new URL\('\/create-trip\?invite=server',site\)\.toString\(\)\)/,'server errors must return to the product origin');
 
 assert.match(finalizer,/auth\.getUser\(\)/,'finalizer must verify bearer identity');
 assert.match(finalizer,/if\(!STATE\.test\(state\)\)/,'missing or modified state must be rejected');
@@ -31,6 +35,8 @@ assert.match(finalizer,/finalize_trip_invitation/);
 assert.match(finalizer,/result\.product_key!==PRODUCT/);
 
 assert.match(auth,/token_hash/,'handoff must carry the one-time auth token hash');
+assert.match(auth,/validAuthToken/,'handoff must accept bounded opaque Supabase token hashes');
+assert.doesNotMatch(auth,/\^\[0-9a-f\]\{64\}\$/,'handoff must not assume a 64-hex Supabase token');
 assert.match(auth,/new URL\('\/invite-return\.html',location\.origin\)/,'handoff must stay on the current product origin');
 assert.doesNotMatch(auth,/localStorage|sessionStorage/,'browser storage must not carry invitation authority');
 assert.doesNotMatch(auth,/SUPABASE_ORIGIN|auth\/v1\/verify/,'browser must not navigate the generated Supabase action link');
@@ -38,6 +44,8 @@ assert.doesNotMatch(auth,/trip_id/,'handoff must not carry client-authoritative 
 
 assert.match(ret,/FINALIZER=`\$\{SUPABASE_URL\}\/functions\/v1\/girls-finalize-invite`/);
 assert.match(ret,/location\.hash/,'return page must receive state and auth token directly');
+assert.match(ret,/validAuthToken/,'return page must accept bounded opaque Supabase token hashes');
+assert.doesNotMatch(ret,/\^\[0-9a-f\]\{64\}\$/,'return page must not assume a 64-hex Supabase token');
 assert.match(ret,/verifyOtp\(\{token_hash:tokenHash,type:'email'\}\)/,'callback must verify the one-time Supabase token hash');
 assert.match(ret,/detectSessionInUrl:false/,'callback must not depend on Supabase redirect fragments');
 assert.match(ret,/JSON\.stringify\(\{state\}\)/,'exact state must be submitted to the finalizer');
@@ -61,5 +69,5 @@ assert.match(strict,/intended_user_id is distinct from p_user_id/,'state must re
 assert.match(strict,/product_key is distinct from p_expected_product/,'state must remain bound to product');
 assert.match(strict,/callback_url is distinct from p_callback_url/,'state must remain bound to callback');
 
-for(const required of ['/invite-auth.html','/invite-return.html','/invite-auth.js?v=3','/invite-return.js?v=4'])assert.ok(sw.includes(required),`PWA shell missing ${required}`);
+for(const required of ['/invite-auth.html','/invite-return.html','/invite-auth.js?v=4','/invite-return.js?v=5'])assert.ok(sw.includes(required),`PWA shell missing ${required}`);
 console.log('Girls invitation security contract passed');
