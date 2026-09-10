@@ -28,6 +28,16 @@ function removeHeroControls(root){
   root.querySelectorAll('[data-a="tripAppearance"],[data-a="setMediaHero"],.gtg-change-hero,.gtg-set-hero').forEach(el=>el.remove());
 }
 
+/* Auth/trip-picker card only: mirror the approved public-header logo assets. */
+function syncApprovedAuthLogo(){
+  const link=document.querySelector('.auth-screen .auth-card>a:first-child');
+  const img=link?.querySelector('img');
+  if(!link||!img)return;
+  const src=img.getAttribute('src')||'';
+  if(!/girls-trip-guide-logo\.(?:webp|png)(?:[?#].*)?$/i.test(src))return;
+  link.innerHTML='<picture class="gtg-approved-auth-logo"><source media="(max-width:700px)" srcset="/assets/images/hero-trans-mobile.webp" type="image/webp"><img src="/assets/images/hero-trans.png" alt="The Girls Trip Guide — Good Plans. Better Stories." loading="eager" decoding="async"></picture>';
+}
+
 function evidenceTripId(){return new URL(location.href).searchParams.get('trip_id')||''}
 function evidenceSeenKey(){const id=evidenceTripId();return id?`gtg-evidence-seen-count:${id}`:''}
 function evidenceOpen(){return Boolean(document.querySelector('[data-panel="evidence"].active')||document.querySelector('nav.dock button[data-tab="evidence"]')?.classList.contains('active'))}
@@ -98,6 +108,7 @@ function refine(){
   installEvidenceBadgeStyle();
   replaceExactText(document);
   removeHeroControls(document);
+  syncApprovedAuthLogo();
   syncEvidenceBadge();
   document.querySelectorAll('.gtg-immersive-media-host').forEach(refineViewer);
 }
