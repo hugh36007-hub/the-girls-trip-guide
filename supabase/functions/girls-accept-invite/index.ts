@@ -4,7 +4,7 @@ const UUID=/^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]
 function hex(bytes:ArrayBuffer){return [...new Uint8Array(bytes)].map(b=>b.toString(16).padStart(2,'0')).join('')}
 async function sha256(value:string){return hex(await crypto.subtle.digest('SHA-256',new TextEncoder().encode(value)))}
 function randomToken(){const b=crypto.getRandomValues(new Uint8Array(32));return btoa(String.fromCharCode(...b)).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'')}
-function redirect(url:string,status=303){return new Response(null,{status,headers:{Location:url,'Cache-Control':'no-store','Referrer-Policy':'no-referrer'}})}
+function redirect(url:string,status=303){return new Response(null,{status,headers:{Location:url,'Cache-Control':'no-store, no-cache, must-revalidate','Pragma':'no-cache','Expires':'0','Referrer-Policy':'no-referrer','X-Content-Type-Options':'nosniff','Content-Length':'0'}})}
 function exactCallback(raw:string,expected:string){try{const a=new URL(raw),e=new URL(expected);return a.protocol==='https:'&&a.origin===e.origin&&a.pathname===e.pathname&&a.search===''&&a.hash===''&&a.toString()===e.toString()}catch{return false}}
 function validateActionLink(actionLink:string,supabaseUrl:string,expectedCallback:string){
   try{
@@ -28,7 +28,7 @@ Deno.serve(async(req)=>{
   const site='https://thegirlstripguide.com/'
   const product='girls'
   try{
-    if(!['GET','POST'].includes(req.method))return new Response('Method not allowed',{status:405})
+    if(!['GET','POST'].includes(req.method))return redirect(new URL('/create-trip?invite=invalid',site).toString())
     const u=new URL(req.url),memberId=u.searchParams.get('member')||'',token=u.searchParams.get('token')||''
     if(!UUID.test(memberId)||!token)return redirect(new URL('/create-trip?invite=invalid',site).toString())
     if(req.method==='GET'&&u.searchParams.get('confirm')!=='1'){
