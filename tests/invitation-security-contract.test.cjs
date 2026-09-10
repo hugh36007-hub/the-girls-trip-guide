@@ -9,6 +9,7 @@ const auth=read('invite-auth.js');
 const ret=read('invite-return.js');
 const sw=read('sw.js');
 const migration=read('supabase/migrations/20260909211000_invitation_confirmed_access_compatibility.sql');
+const recovery=read('supabase/migrations/20260910084500_invitation_state_recovery.sql');
 
 assert.match(accept,/const product='girls'/);
 assert.match(accept,/trip\.product_key!==product/,'acceptance must reject non-Girls trips');
@@ -19,6 +20,8 @@ assert.doesNotMatch(accept,/from\('trip_members'\)\.update/,'acceptance must not
 assert.doesNotMatch(accept,/confirmed_at/,'acceptance must not set confirmation timestamps');
 
 assert.match(finalizer,/auth\.getUser\(\)/,'finalizer must verify bearer identity');
+assert.match(finalizer,/if\(state&&!STATE\.test\(state\)\)/,'modified non-empty state must be rejected');
+assert.match(finalizer,/p_state_hash:state\?await sha256\(state\):null/,'missing browser state may use server recovery');
 assert.match(finalizer,/p_expected_product:PRODUCT/);
 assert.match(finalizer,/finalize_trip_invitation/);
 assert.match(finalizer,/result\.product_key!==PRODUCT/);
@@ -27,6 +30,8 @@ assert.match(auth,/STORAGE='gtg-invite-auth-state-v2'/);
 assert.match(auth,/redirect_to/);
 assert.doesNotMatch(auth,/trip_id/,'handoff must not carry client-authoritative trip state');
 assert.match(ret,/FINALIZER=`\$\{SUPABASE_URL\}\/functions\/v1\/girls-finalize-invite`/);
+assert.match(ret,/state:state\|\|null/,'return page must allow authenticated server recovery when browser storage is lost');
+assert.doesNotMatch(ret,/if\(!state\)throw/,'missing browser state must not abort before authenticated recovery');
 assert.match(ret,/result\.productKey!==PRODUCT/);
 assert.match(ret,/target\.searchParams\.set\('trip_id',String\(result\.tripId\)\)/,'only server-returned trip id may be opened');
 assert.doesNotMatch(ret,/sessionStorage/,'old client trip authority must be removed');
@@ -40,5 +45,12 @@ assert.match(migration,/v_member\.invite_token_hash is distinct from v_state\.in
 assert.match(migration,/grant execute on function public\.finalize_trip_invitation[^;]+ to service_role/);
 assert.doesNotMatch(migration,/grant execute on function public\.finalize_trip_invitation[^;]+ to authenticated/);
 
-for(const required of ['/invite-auth.html','/invite-return.html','/invite-auth.js?v=2','/invite-return.js?v=2'])assert.ok(sw.includes(required),`PWA shell missing ${required}`);
+assert.match(recovery,/if p_state_hash is null or btrim\(p_state_hash\)=''/);
+assert.match(recovery,/v_candidate_count <> 1/,'recovery must fail unless exactly one candidate exists');
+assert.match(recovery,/intended_user_id = p_user_id/,'recovery must bind authenticated user');
+assert.match(recovery,/product_key = p_expected_product/,'recovery must bind product');
+assert.match(recovery,/callback_url = p_callback_url/,'recovery must bind exact callback');
+assert.match(recovery,/expires_at > v_now/,'recovery must require unexpired state');
+
+for(const required of ['/invite-auth.html','/invite-return.html','/invite-auth.js?v=2','/invite-return.js?v=3'])assert.ok(sw.includes(required),`PWA shell missing ${required}`);
 console.log('Girls invitation security contract passed');
