@@ -29,18 +29,19 @@ jobs:
           trap 'rm -rf "$TMP"' EXIT
 
           for attempt in {1..20}; do
-            if curl -fsSL --connect-timeout 10 --max-time 20 -H 'Cache-Control: no-cache' "$BASE/invite-auth.html?release_probe=20260910-v4" -o "$TMP/auth.html" \
-              && curl -fsSL --connect-timeout 10 --max-time 20 -H 'Cache-Control: no-cache' "$BASE/invite-auth.js?v=3&release_probe=20260910-v4" -o "$TMP/auth.js" \
-              && curl -fsSL --connect-timeout 10 --max-time 20 -H 'Cache-Control: no-cache' "$BASE/invite-return.html?release_probe=20260910-v4" -o "$TMP/return.html" \
-              && curl -fsSL --connect-timeout 10 --max-time 20 -H 'Cache-Control: no-cache' "$BASE/invite-return.js?v=4&release_probe=20260910-v4" -o "$TMP/return.js" \
-              && grep -Fq '/invite-auth.js?v=3' "$TMP/auth.html" \
-              && grep -Fq '/invite-return.js?v=4' "$TMP/return.html" \
-              && grep -Fq 'token_hash' "$TMP/auth.js" \
+            if curl -fsSL --connect-timeout 10 --max-time 20 -H 'Cache-Control: no-cache' "$BASE/invite-auth.html?release_probe=20260910-v5" -o "$TMP/auth.html" \
+              && curl -fsSL --connect-timeout 10 --max-time 20 -H 'Cache-Control: no-cache' "$BASE/invite-auth.js?v=4&release_probe=20260910-v5" -o "$TMP/auth.js" \
+              && curl -fsSL --connect-timeout 10 --max-time 20 -H 'Cache-Control: no-cache' "$BASE/invite-return.html?release_probe=20260910-v5" -o "$TMP/return.html" \
+              && curl -fsSL --connect-timeout 10 --max-time 20 -H 'Cache-Control: no-cache' "$BASE/invite-return.js?v=5&release_probe=20260910-v5" -o "$TMP/return.js" \
+              && grep -Fq '/invite-auth.js?v=4' "$TMP/auth.html" \
+              && grep -Fq '/invite-return.js?v=5' "$TMP/return.html" \
+              && grep -Fq 'validAuthToken' "$TMP/auth.js" \
               && grep -Fq "new URL('/invite-return.html',location.origin)" "$TMP/auth.js" \
+              && grep -Fq 'validAuthToken' "$TMP/return.js" \
               && grep -Fq "verifyOtp({token_hash:tokenHash,type:'email'})" "$TMP/return.js" \
               && grep -Fq 'girls-finalize-invite' "$TMP/return.js" \
               && grep -Fq 'JSON.stringify({state})' "$TMP/return.js" \
-              && ! grep -Eq 'localStorage|sessionStorage|magic=|magic:actionLink|theboystripguide\.com' "$TMP/auth.js" "$TMP/return.js"; then
+              && ! grep -Eq 'localStorage|sessionStorage|magic=|magic:actionLink|theboystripguide\.com|\^\[0-9a-f\]\{64\}\$' "$TMP/auth.js" "$TMP/return.js"; then
                 echo 'LIVE GIRLS CALLBACK VERIFICATION: PASS'
                 exit 0
             fi
