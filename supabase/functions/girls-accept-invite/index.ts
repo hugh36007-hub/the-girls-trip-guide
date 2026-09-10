@@ -1,13 +1,10 @@
 import { createClient } from 'npm:@supabase/supabase-js@2.112.4'
 
 const UUID=/^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i
-const TOKEN_HASH=/^[0-9a-f]{64}$/i
-function esc(value:unknown){return String(value??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]||c))}
 function hex(bytes:ArrayBuffer){return [...new Uint8Array(bytes)].map(b=>b.toString(16).padStart(2,'0')).join('')}
 async function sha256(value:string){return hex(await crypto.subtle.digest('SHA-256',new TextEncoder().encode(value)))}
 function randomToken(){const b=crypto.getRandomValues(new Uint8Array(32));return btoa(String.fromCharCode(...b)).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'')}
 function redirect(url:string,status=303){return new Response(null,{status,headers:{Location:url,'Cache-Control':'no-store','Referrer-Policy':'no-referrer'}})}
-function page(title:string,body:string,status=200){return new Response(`<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex,nofollow"><title>${esc(title)}</title><style>html,body{margin:0;min-height:100%;background:#070507;color:#ffffff;font-family:Arial,sans-serif}.wrap{min-height:100vh;display:grid;place-items:center;padding:24px}.card{width:min(560px,100%);box-sizing:border-box;background:#100a0f;border:1px solid #6b2448;border-radius:20px;padding:36px}.eyebrow{color:#ff4fa3;font-size:12px;font-weight:800;letter-spacing:3px;text-transform:uppercase}h1{font-size:44px;line-height:1;margin:16px 0}p{color:#f3e7ee;font-size:18px;line-height:1.55}</style></head><body><main class="wrap"><section class="card">${body}</section></main></body></html>`,{status,headers:{'Content-Type':'text/html; charset=utf-8','Cache-Control':'no-store','X-Robots-Tag':'noindex, nofollow','Referrer-Policy':'no-referrer'}})}
 function exactCallback(raw:string,expected:string){try{const a=new URL(raw),e=new URL(expected);return a.protocol==='https:'&&a.origin===e.origin&&a.pathname===e.pathname&&a.search===''&&a.hash===''&&a.toString()===e.toString()}catch{return false}}
 function validateActionLink(actionLink:string,supabaseUrl:string,expectedCallback:string){
   try{
@@ -17,13 +14,14 @@ function validateActionLink(actionLink:string,supabaseUrl:string,expectedCallbac
     return exactCallback(effective,expectedCallback)
   }catch{return false}
 }
+function validAuthToken(value:unknown){const token=String(value||'');return token.length>=16&&token.length<=2048&&!/[\u0000-\u001f\u007f\s]/.test(token)}
 function extractTokenHash(linkData:any,actionLink:string){
-  const generated=String(linkData?.properties?.hashed_token||'')
-  if(TOKEN_HASH.test(generated))return generated
   try{
     const fromAction=new URL(actionLink).searchParams.get('token')||''
-    return TOKEN_HASH.test(fromAction)?fromAction:''
-  }catch{return ''}
+    if(validAuthToken(fromAction))return fromAction
+  }catch{}
+  const generated=String(linkData?.properties?.hashed_token||'')
+  return validAuthToken(generated)?generated:''
 }
 
 Deno.serve(async(req)=>{
@@ -80,6 +78,6 @@ Deno.serve(async(req)=>{
     return redirect(handoff.toString())
   }catch(error){
     console.error('girls-accept-invite failed',error instanceof Error?error.message:String(error))
-    return page('Invitation unavailable','<div class="eyebrow">Invitation unavailable</div><h1>That link did not work.</h1><p>Ask the organiser to send a fresh invitation.</p>',500)
+    return redirect(new URL('/create-trip?invite=server',site).toString())
   }
 })
