@@ -12,7 +12,7 @@ for(const icon of manifest.icons){
   const clean=String(icon.src).split('?')[0].replace(/^\//,'');
   assert(fs.existsSync(clean),`Manifest icon does not exist: ${clean}`);
 }
-const cacheVersion=sw.match(/CACHE_VERSION='gtg-pwa-v(\d+)'/)?.[1];
+const cacheVersion=sw.match(/CACHE_VERSION='gtg-pwa-v(\d+)(?:-[^']*)?'/)?.[1];
 assert(Number(cacheVersion)>=2,'PWA cache version must be v2 or newer');
 assert(sw.includes('/manifest.webmanifest'),'Manifest must be in app shell');
 assert(headers.includes('Content-Security-Policy:'),'Girls CSP missing');
