@@ -15,6 +15,7 @@ on:
       - 'supabase/migrations/2026090921*.sql'
       - 'tests/invitation-security-contract.test.cjs'
       - 'tests/girls-invitation-voice-contract.test.cjs'
+  workflow_dispatch:
 
 permissions:
   contents: read
