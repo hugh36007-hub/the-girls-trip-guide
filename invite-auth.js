@@ -1,8 +1,8 @@
 (()=>{
 'use strict';
 const STATE=/^[A-Za-z0-9_-]{43}$/;
-const TOKEN_HASH=/^[0-9a-f]{64}$/i;
 const status=document.getElementById('status');
+function validAuthToken(token){return typeof token==='string'&&token.length>=16&&token.length<=2048&&!/[\u0000-\u001f\u007f\s]/.test(token);}
 function fail(message){if(status){status.textContent=message;status.className='error';}}
 function run(){
   try{
@@ -10,7 +10,7 @@ function run(){
     const state=hash.get('state')||'';
     const tokenHash=hash.get('token_hash')||'';
     if(!STATE.test(state))throw new Error('This invitation state is invalid. Ask the organiser for a fresh invitation.');
-    if(!TOKEN_HASH.test(tokenHash))throw new Error('This invitation authentication token is invalid. Ask the organiser for a fresh invitation.');
+    if(!validAuthToken(tokenHash))throw new Error('This invitation authentication token is invalid. Ask the organiser for a fresh invitation.');
 
     // Keep the credentials in memory only. Fragments are not sent in HTTP requests.
     history.replaceState({},'',location.pathname);
