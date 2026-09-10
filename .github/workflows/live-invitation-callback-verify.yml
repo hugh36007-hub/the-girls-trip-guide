@@ -20,6 +20,38 @@ jobs:
     runs-on: ubuntu-24.04
     timeout-minutes: 8
     steps:
+      - name: Verify Girls accept function returns browser redirects
+        shell: bash
+        run: |
+          set -euo pipefail
+          FUNCTION='https://vtcmvwixfqyxqghibsla.supabase.co/functions/v1/girls-accept-invite'
+          TMP="$(mktemp -d)"
+          trap 'rm -rf "$TMP"' EXIT
+
+          probe_redirect() {
+            local url="$1" expected="$2" label="$3"
+            local status
+            status="$(curl -sS --connect-timeout 10 --max-time 20 \
+              -D "$TMP/$label.headers" -o "$TMP/$label.body" \
+              -w '%{http_code}' "$url")"
+            test "$status" = '303'
+            grep -Eiq "^location: ${expected//\?/\\?}\r?$" "$TMP/$label.headers"
+            ! grep -Eiq '^content-type: *text/html' "$TMP/$label.headers"
+            test ! -s "$TMP/$label.body"
+          }
+
+          MEMBER='00000000-0000-4000-8000-000000000001'
+          TOKEN='release-probe-token'
+          probe_redirect \
+            "$FUNCTION?member=$MEMBER&token=$TOKEN" \
+            'https://thegirlstripguide.com/invite.html?member=00000000-0000-4000-8000-000000000001&token=release-probe-token' \
+            'landing'
+          probe_redirect \
+            "$FUNCTION?member=$MEMBER&token=$TOKEN&confirm=1" \
+            'https://thegirlstripguide.com/create-trip?invite=invalid' \
+            'invalid'
+          echo 'LIVE GIRLS ACCEPT REDIRECT VERIFICATION: PASS'
+
       - name: Verify current Girls callback assets are live
         shell: bash
         run: |
