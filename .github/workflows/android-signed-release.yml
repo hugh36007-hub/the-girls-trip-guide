@@ -1,5 +1,5 @@
 name: Android signed release
-# Rebuild after the 10 September 2026 iOS-safe invitation state recovery remediation.
+# Rebuild after the 10 September 2026 self-contained invitation handoff remediation.
 
 on:
   push:
@@ -56,10 +56,14 @@ jobs:
           test -f mobile-web/invite-return.js
           grep -Fq '/invite-auth.html' mobile-web/native-url.js
           grep -Fq '/invite-return.html' mobile-web/native-url.js
-          grep -Fq 'https://thegirlstripguide.com/invite-return.html' mobile-web/invite-auth.js
-          grep -Fq '/invite-return.js?v=3' mobile-web/invite-return.html
+          grep -Fq '/invite-auth.js?v=3' mobile-web/invite-auth.html
+          grep -Fq '/invite-return.js?v=4' mobile-web/invite-return.html
+          grep -Fq "new URL('/invite-return.html',location.origin)" mobile-web/invite-auth.js
+          grep -Fq 'token_hash' mobile-web/invite-auth.js
+          grep -Fq "verifyOtp({token_hash:tokenHash,type:'email'})" mobile-web/invite-return.js
           grep -Fq 'girls-finalize-invite' mobile-web/invite-return.js
-          grep -Fq 'state:state||null' mobile-web/invite-return.js
+          grep -Fq 'JSON.stringify({state})' mobile-web/invite-return.js
+          ! grep -Eq 'localStorage|sessionStorage|magic=|magic:actionLink' mobile-web/invite-auth.js mobile-web/invite-return.js
           ! grep -Fq 'theboystripguide.com' mobile-web/invite-auth.js
           ! grep -Fq 'theboystripguide.com' mobile-web/invite-return.js
 
