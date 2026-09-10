@@ -10,6 +10,7 @@ on:
       - 'invite-return.html'
       - 'invite-return.js'
       - 'sw.js'
+      - 'supabase/functions/girls-accept-invite/**'
   workflow_dispatch:
 
 permissions:
