@@ -1,0 +1,51 @@
+name: Live invitation callback verification
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/live-invitation-callback-verify.yml'
+      - 'invite-auth.html'
+      - 'invite-auth.js'
+      - 'invite-return.html'
+      - 'invite-return.js'
+      - 'sw.js'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  verify-live:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 8
+    steps:
+      - name: Verify current Girls callback assets are live
+        shell: bash
+        run: |
+          set -euo pipefail
+          BASE='https://thegirlstripguide.com'
+          TMP="$(mktemp -d)"
+          trap 'rm -rf "$TMP"' EXIT
+
+          for attempt in {1..20}; do
+            if curl -fsSL --connect-timeout 10 --max-time 20 -H 'Cache-Control: no-cache' "$BASE/invite-auth.html?release_probe=20260910-v4" -o "$TMP/auth.html" \
+              && curl -fsSL --connect-timeout 10 --max-time 20 -H 'Cache-Control: no-cache' "$BASE/invite-auth.js?v=3&release_probe=20260910-v4" -o "$TMP/auth.js" \
+              && curl -fsSL --connect-timeout 10 --max-time 20 -H 'Cache-Control: no-cache' "$BASE/invite-return.html?release_probe=20260910-v4" -o "$TMP/return.html" \
+              && curl -fsSL --connect-timeout 10 --max-time 20 -H 'Cache-Control: no-cache' "$BASE/invite-return.js?v=4&release_probe=20260910-v4" -o "$TMP/return.js" \
+              && grep -Fq '/invite-auth.js?v=3' "$TMP/auth.html" \
+              && grep -Fq '/invite-return.js?v=4' "$TMP/return.html" \
+              && grep -Fq 'token_hash' "$TMP/auth.js" \
+              && grep -Fq "new URL('/invite-return.html',location.origin)" "$TMP/auth.js" \
+              && grep -Fq "verifyOtp({token_hash:tokenHash,type:'email'})" "$TMP/return.js" \
+              && grep -Fq 'girls-finalize-invite' "$TMP/return.js" \
+              && grep -Fq 'JSON.stringify({state})' "$TMP/return.js" \
+              && ! grep -Eq 'localStorage|sessionStorage|magic=|magic:actionLink|theboystripguide\.com' "$TMP/auth.js" "$TMP/return.js"; then
+                echo 'LIVE GIRLS CALLBACK VERIFICATION: PASS'
+                exit 0
+            fi
+            echo "Live assets not current yet (attempt $attempt/20); retrying in 15s..."
+            sleep 15
+          done
+          echo 'LIVE GIRLS CALLBACK VERIFICATION: FAIL'
+          exit 1
