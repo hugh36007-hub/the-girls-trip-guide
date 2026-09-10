@@ -1,5 +1,5 @@
 name: Android signed release
-# Rebuild after the 9 September 2026 hardened invitation callback remediation.
+# Rebuild after the 10 September 2026 iOS-safe invitation state recovery remediation.
 
 on:
   push:
@@ -57,7 +57,9 @@ jobs:
           grep -Fq '/invite-auth.html' mobile-web/native-url.js
           grep -Fq '/invite-return.html' mobile-web/native-url.js
           grep -Fq 'https://thegirlstripguide.com/invite-return.html' mobile-web/invite-auth.js
+          grep -Fq '/invite-return.js?v=3' mobile-web/invite-return.html
           grep -Fq 'girls-finalize-invite' mobile-web/invite-return.js
+          grep -Fq 'state:state||null' mobile-web/invite-return.js
           ! grep -Fq 'theboystripguide.com' mobile-web/invite-auth.js
           ! grep -Fq 'theboystripguide.com' mobile-web/invite-return.js
 
