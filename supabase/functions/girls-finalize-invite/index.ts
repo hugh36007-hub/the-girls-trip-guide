@@ -20,9 +20,8 @@ Deno.serve(async req=>{
   try{
     const auth=req.headers.get('Authorization')||''
     if(!auth.startsWith('Bearer '))return json({error:'Sign-in required'},401,origin)
-    const body=await req.json().catch(()=>({}))
-    const state=body?.state==null?'':String(body.state)
-    if(state&&!STATE.test(state))return json({error:'Invitation state is invalid.'},400,origin)
+    const state=String((await req.json().catch(()=>({})))?.state||'')
+    if(!STATE.test(state))return json({error:'Invitation state is invalid.'},400,origin)
 
     const supabaseUrl=env('SUPABASE_URL')
     const pub=Deno.env.get('SUPABASE_PUBLISHABLE_KEY')||env('SUPABASE_ANON_KEY')
@@ -32,7 +31,7 @@ Deno.serve(async req=>{
 
     const db=createClient(supabaseUrl,env('SUPABASE_SERVICE_ROLE_KEY'),{auth:{persistSession:false,autoRefreshToken:false}})
     const {data,error}=await db.rpc('finalize_trip_invitation',{
-      p_state_hash:state?await sha256(state):null,
+      p_state_hash:await sha256(state),
       p_user_id:user.id,
       p_expected_product:PRODUCT,
       p_callback_url:CALLBACK
@@ -40,7 +39,7 @@ Deno.serve(async req=>{
     if(error){console.warn('girls-finalize-invite rejected',error.message);return json({error:'This invitation could not be verified. Ask the organiser for a fresh link.'},403,origin)}
     const result:any=data||{}
     if(result.product_key!==PRODUCT||!UUID.test(String(result.trip_id||'')))return json({error:'Invitation result was invalid.'},403,origin)
-    return json({ok:true,tripId:result.trip_id,productKey:result.product_key,purpose:result.purpose||'invite',stateRecovered:result.state_recovered===true},200,origin)
+    return json({ok:true,tripId:result.trip_id,productKey:result.product_key,purpose:result.purpose||'invite'},200,origin)
   }catch(error){
     console.error('girls-finalize-invite failed',error instanceof Error?error.message:String(error))
     return json({error:'This invitation could not be completed.'},500,origin)
