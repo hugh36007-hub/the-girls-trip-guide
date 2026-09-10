@@ -34,8 +34,12 @@ jobs:
             status="$(curl -sS --connect-timeout 10 --max-time 20 \
               -D "$TMP/$label.headers" -o "$TMP/$label.body" \
               -w '%{http_code}' "$url")"
+            echo "PROBE $label STATUS=$status"
+            sed 's/\r$//' "$TMP/$label.headers"
+            echo "PROBE $label BODY_BYTES=$(wc -c < "$TMP/$label.body")"
+            if test -s "$TMP/$label.body"; then head -c 240 "$TMP/$label.body"; echo; fi
             test "$status" = '303'
-            grep -Eiq "^location: ${expected//\?/\\?}\r?$" "$TMP/$label.headers"
+            grep -Fqi "location: $expected" "$TMP/$label.headers"
             ! grep -Eiq '^content-type: *text/html' "$TMP/$label.headers"
             test ! -s "$TMP/$label.body"
           }
