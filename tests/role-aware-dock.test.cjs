@@ -8,7 +8,7 @@ const checks=[
  ['Money is decorated as the centre navigation item',js.includes("decorate(money,'money','Money','Money')")],
  ['Money is present for both organiser and member roles',js.includes("money=dockButton(dock,'money')||moneyButton()")&&!js.includes("who==='owner'?'money':'upload'")],
  ['member dock no longer substitutes Upload for Money',!js.includes('data-role-upload')&&!js.includes('memberUploadButton')],
- ['core dashboard exposes the Money panel',app.includes('data-panel="money"')&&app.includes("['overview','plan','money','evidence','group']")),
+ ['core dashboard exposes the Money panel',app.includes('data-panel="money"')&&app.includes("['overview','plan','money','evidence','group']")],
  ['core role is identity-based and confirmed-member-only',app.includes("function tripRole(){if(isOwner())return 'owner';return currentMember()?.status==='confirmed'?'member':'denied'}")],
  ['core publishes role separately from entitlement',app.includes('data-trip-role="${role}"')&&app.includes('data-home-composition="${paid()?\'full\':\'free\'}"')],
  ['vector icon set is installed',js.includes('const ICONS=')&&js.includes('<svg viewBox="0 0 24 24"')],
