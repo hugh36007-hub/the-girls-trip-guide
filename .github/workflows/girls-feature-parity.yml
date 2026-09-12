@@ -77,6 +77,8 @@ jobs:
           node --check tests/girls-contact-backend.test.cjs
           node --check tests/girls-media-deletion-integrity.test.cjs
           node --check tests/girls-overview-panel-ownership.test.mjs
+          node --check tests/girls-payment-lifecycle-integrity.test.mjs
+          node --check tests/girls-upload-context-isolation.test.mjs
       - name: Girls Edge Function type-check
         run: |
           deno check supabase/functions/girls-process-communications/index.ts
@@ -90,6 +92,10 @@ jobs:
           deno check supabase/functions/media-action/index.ts
       - name: Girls backend source parity contract
         run: node tests/girls-backend-source-parity.test.cjs
+      - name: Girls payment lifecycle regression
+        run: node tests/girls-payment-lifecycle-integrity.test.mjs
+      - name: Girls upload context isolation regression
+        run: node tests/girls-upload-context-isolation.test.mjs
       - name: Girls PWA and browser-security contract
         run: node tests/girls-pwa-security-contract.test.cjs
       - name: Girls backend support contract
