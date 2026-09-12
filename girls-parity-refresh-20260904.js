@@ -3,7 +3,6 @@
 'use strict';
 if(window.__GTG_PARITY_REFRESH_20260904__)return;window.__GTG_PARITY_REFRESH_20260904__=true;
 
-const LEGAL_VERSION='2026-09-04-2';
 const SUPA='https://vtcmvwixfqyxqghibsla.supabase.co';
 const KEY='sb_publishable_qBQzJjFxSToEGxPJEcmskg_GNd4M4cP';
 const esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]||c));
@@ -58,25 +57,6 @@ html body .dock.gtg-option7 .dock-role-primary::after{display:none!important}
 @media(max-width:560px){.gtg-poll-hero-alert{right:150px;bottom:14px;width:calc(100% - 170px);min-height:96px;padding:10px}.gtg-poll-hero-alert strong{font-size:12.5px}.gtg-poll-hero-alert small,.gtg-poll-hero-alert em{font-size:8px}.gtg-poll-alert{grid-template-columns:1fr}.gtg-poll-alert em{grid-column:1;grid-row:auto;margin-top:3px}}
 `;
 document.head.appendChild(style);
-
-/* Make the revised checkout legal version authoritative without rewriting the core app. */
-if(!window.__GTG_LEGAL_FETCH_PATCH__){
- window.__GTG_LEGAL_FETCH_PATCH__=true;
- const originalFetch=window.fetch.bind(window);
- window.fetch=(input,init)=>{
-   try{
-     const url=typeof input==='string'?input:input?.url||'';
-     if(url.includes('/functions/v1/girls-stripe-checkout')&&typeof init?.body==='string'){
-       const body=JSON.parse(init.body);
-       if(body?.action==='create'){
-         body.legalVersion=LEGAL_VERSION;body.refundPolicyVersion=LEGAL_VERSION;
-         return originalFetch(input,{...init,body:JSON.stringify(body)});
-       }
-     }
-   }catch{}
-   return originalFetch(input,init);
- };
-}
 
 /* Poll state must exist before the first normalise() call. The previous ordering
    entered the temporal dead zone for `pending` and then left two observers
