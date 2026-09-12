@@ -65,6 +65,7 @@ jobs:
           node --check tests/girls-media-performance-max.test.cjs
           node --check tests/girls-evidence-parity.test.cjs
           node --check tests/girls-mobile-evidence-grid.test.mjs
+          node --check tests/girls-dock-navigation-completeness.test.mjs
           node --check tests/girls-media-readiness.test.mjs
           node --check tests/girls-home-thumbnail-prime.test.mjs
           node --check tests/girls-home-chat-expand.test.cjs
@@ -120,6 +121,8 @@ jobs:
         run: node tests/hero-control-contract.test.cjs
       - name: Role-aware dock contract
         run: node tests/role-aware-dock.test.cjs
+      - name: Girls dock navigation completeness
+        run: node tests/girls-dock-navigation-completeness.test.mjs
       - name: Girls member view parity contract
         run: node tests/girls-member-view-parity.test.cjs
       - name: Cross-tab session and owner guard
