@@ -1,0 +1,33 @@
+name: Tier role matrix
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - 'girls-app-v2.js'
+      - 'girls-performance-loader.js'
+      - 'tests/tier-role-matrix.test.mjs'
+      - 'tests/girls-evidence-composition-isolation.test.mjs'
+      - '.github/workflows/tier-role-matrix.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'girls-app-v2.js'
+      - 'girls-performance-loader.js'
+      - 'tests/tier-role-matrix.test.mjs'
+      - 'tests/girls-evidence-composition-isolation.test.mjs'
+      - '.github/workflows/tier-role-matrix.yml'
+  workflow_dispatch:
+
+jobs:
+  matrix:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Verify Free Full role matrix
+        run: node tests/tier-role-matrix.test.mjs
+      - name: Verify mobile Free Full Evidence isolation
+        run: node tests/girls-evidence-composition-isolation.test.mjs
