@@ -4,7 +4,7 @@ import assert from 'node:assert/strict';
 const checkout=fs.readFileSync('supabase/functions/girls-stripe-checkout/index.ts','utf8');
 const app=fs.readFileSync('girls-app-v2.js','utf8');
 const parity=fs.readFileSync('girls-parity-refresh-20260904.js','utf8');
-const migration=fs.readFileSync('supabase/migrations/20260912143000_single_pending_stripe_checkout.sql','utf8');
+const migration=fs.readFileSync('supabase/migrations/20260912162244_single_pending_stripe_checkout.sql','utf8');
 
 assert.match(migration,/unique index if not exists purchases_one_pending_stripe_checkout|unique index if not exists purchases_one_pending_stripe_per_trip_idx/i,'pending checkout uniqueness must be source-controlled');
 assert.match(migration,/on public\.purchases \(trip_id\)/);
