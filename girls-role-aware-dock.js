@@ -15,11 +15,8 @@ function tripRole(){
   const role=document.querySelector('.dashboard')?.dataset.tripRole||'';
   return role==='owner'||role==='member'?role:'';
 }
-function ownerMoneyButton(){
-  const b=document.createElement('button');b.type='button';b.dataset.tab='money';b.dataset.roleMoney='1';b.setAttribute('aria-label','Money');return b;
-}
-function memberUploadButton(){
-  const b=document.createElement('button');b.type='button';b.className='dock-role-primary';b.dataset.roleUpload='1';b.setAttribute('aria-label','Upload photos or video');return b;
+function moneyButton(){
+  const b=document.createElement('button');b.type='button';b.dataset.tab='money';b.setAttribute('aria-label','Money');return b;
 }
 function decorate(button,kind,label,aria=label){
   if(!button)return;
@@ -32,28 +29,21 @@ function decorate(button,kind,label,aria=label){
 }
 function normaliseDock(){
   const dock=document.querySelector('nav.dock'),who=tripRole();if(!dock||!who)return;
-  const overview=dockButton(dock,'overview'),plan=dockButton(dock,'plan'),group=dockButton(dock,'group'),evidence=dockButton(dock,'evidence');
-  if(!overview||!plan||!group||!evidence)return;
-  let centre;
-  if(who==='owner'){
-    centre=dockButton(dock,'money')||dock.querySelector('[data-role-money]')||ownerMoneyButton();
-    centre.classList.remove('dock-role-primary');
-  }else{
-    centre=dock.querySelector('[data-role-upload]')||memberUploadButton();centre.classList.add('dock-role-primary');
-  }
+  const overview=dockButton(dock,'overview'),plan=dockButton(dock,'plan'),money=dockButton(dock,'money')||moneyButton(),group=dockButton(dock,'group'),evidence=dockButton(dock,'evidence');
+  if(!overview||!plan||!money||!group||!evidence)return;
 
   decorate(overview,'home','Home','Home');
   decorate(plan,'plan','Plan','The Plan');
-  decorate(centre,who==='owner'?'money':'upload',who==='owner'?'Money':'Upload',who==='owner'?'Money':'Upload photos or video');
+  decorate(money,'money','Money','Money');
   decorate(group,'group','Group','The Group');
   decorate(evidence,'evidence','Evidence','Evidence');
   dock.classList.add('gtg-option7');
 
   const action=new URL(location.href).searchParams.get('action')||'overview';
-  [overview,plan,centre,group,evidence].forEach(b=>b.classList.remove('active'));
-  const active={overview,plan,money:who==='owner'?centre:null,group,evidence}[action]||overview;if(active)active.classList.add('active');
+  [overview,plan,money,group,evidence].forEach(b=>b.classList.remove('active'));
+  const active={overview,plan,money,group,evidence}[action]||overview;if(active)active.classList.add('active');
 
-  const wanted=[overview,plan,centre,group,evidence],current=[...dock.children];
+  const wanted=[overview,plan,money,group,evidence],current=[...dock.children];
   if(current.length!==wanted.length||!wanted.every((node,i)=>current[i]===node))dock.replaceChildren(...wanted);
 }
 
@@ -67,13 +57,6 @@ const style=document.createElement('style');style.id='gtg-option7-dock-style';st
 .dock.gtg-option7.is-compact{width:min(400px,calc(100% - 64px));min-height:52px;padding:3px 6px;border-radius:17px;background:rgba(9,5,9,.97)}.dock.gtg-option7.is-compact button{min-height:46px;padding:5px 3px;gap:0}.dock.gtg-option7.is-compact .dock-icon{width:21px;height:21px}.dock.gtg-option7.is-compact .dock-label{max-height:0;opacity:0}
 @media(max-width:430px){.dock.gtg-option7{width:calc(100% - 28px)}.dock.gtg-option7.is-compact{width:calc(100% - 72px)}}@media(prefers-reduced-motion:reduce){.dock.gtg-option7,.dock.gtg-option7 button,.dock.gtg-option7 .dock-label{transition:none!important}}
 `;if(!document.getElementById(style.id))document.head.appendChild(style);
-
-document.addEventListener('click',event=>{
-  const money=event.target.closest('[data-role-money]');
-  if(money){event.preventDefault();event.stopImmediatePropagation();const existing=document.querySelector('.stat[data-tab="money"],.panel[data-panel="money"]');if(existing?.matches?.('.stat')){existing.click();return;}const u=new URL(location.href);u.searchParams.set('action','money');location.href=u.toString();return;}
-  const upload=event.target.closest('[data-role-upload]');if(!upload)return;
-  event.preventDefault();event.stopImmediatePropagation();const uploader=document.querySelector('[data-a="upload"]');if(uploader){uploader.click();return;}document.querySelector('nav.dock button[data-tab="evidence"]')?.click();
-},true);
 
 let lastY=Math.max(0,window.scrollY||0),scrollTick=false;
 function setCompact(value){document.querySelectorAll('nav.dock.gtg-option7').forEach(dock=>dock.classList.toggle('is-compact',Boolean(value)))}
