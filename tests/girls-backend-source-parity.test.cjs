@@ -22,6 +22,11 @@ assert(scheduled.includes("in('entitlement',['full_trip','full_comms'])"),'Girls
 assert(scheduled.includes('20*60*60*1000'),'Girls optional-message 20-hour rate limit missing');
 assert(scheduled.includes("reason:'Held by optional-message rate limit'"),'Girls optional-message reschedule reason missing');
 assert(scheduled.includes(".eq('essential',false).gte('sent_at',cutoff)"),'Girls optional-message rate-limit query changed');
+assert(scheduled.includes('const FREE_TRANSACTIONALS:any='),'Free transactional message map missing');
+assert(scheduled.includes('const freeTransactional=!full?FREE_TRANSACTIONALS[row.trigger_code]:null'),'Free transactionals must be selected only when Full communications are absent');
+assert(scheduled.includes("if(freeTransactional){character='system'"),'Free transactionals must use the neutral system sender');
+assert(scheduled.includes("else if(full&&character!=='system')"),'Character voice resolver must remain Full-only');
+assert(scheduled.includes('tripName:trip.name,cta,url:'),'Resolved Free/Full CTA must be sent instead of the raw trigger CTA');
 
 assert(invite.includes("trip.product_key!=='girls'"),'Invitation sender must reject non-Girls trips');
 assert(invite.includes("idempotencyKey:`gtg-invite-${commId}`"),'Invitation idempotency key changed');
@@ -38,4 +43,4 @@ assert(stripe.includes("const PRICE_ID='price_1U7JW9EUQ5rJLL4MdDH2x3qP'"),'Girls
 
 console.log('Girls backend source parity contract: PASS');
 console.log('Scheduled and invitation email paths use girls-email-send');
-console.log('Girls queue/product isolation, idempotency, entitlements, optional-message limiting and v3 banners preserved');
+console.log('Girls queue/product isolation, Free transactional routing, Full character routing, idempotency, entitlements, optional-message limiting and v3 banners preserved');
