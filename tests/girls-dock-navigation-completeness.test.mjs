@@ -7,6 +7,7 @@ import {fileURLToPath} from 'node:url';
 
 const root=path.resolve(path.dirname(fileURLToPath(import.meta.url)),'..');
 const dockSource=fs.readFileSync(path.join(root,'girls-role-aware-dock.js'),'utf8');
+const appCss=fs.readFileSync(path.join(root,'girls-app.css'),'utf8');
 const chrome=[process.env.CHROME_BIN,process.env.CHROME_PATH,'/usr/bin/google-chrome','/usr/bin/google-chrome-stable','/opt/google/chrome/chrome','/usr/bin/chromium','/usr/bin/chromium-browser'].filter(Boolean).find(fs.existsSync);
 assert(chrome,'Chrome/Chromium required');
 const port=9950+Math.floor(Math.random()*40),profile=fs.mkdtempSync(path.join(os.tmpdir(),'gtg-dock-'));let stderr='';
@@ -19,7 +20,7 @@ async function evalJs(c,expression){const r=await c.call('Runtime.evaluate',{exp
 const baseDock=`<nav class="dock"><button data-tab="overview"><span>⌂</span><small>Overview</small></button><button data-tab="plan"><span>✦</span><small>Plan</small></button><button data-tab="money"><span>£</span><small>Money</small></button><button data-tab="evidence"><span>▣</span><small>Evidence</small></button><button data-tab="group"><span>●</span><small>Group</small></button></nav>`;
 try{
  const t=await target(),c=await connect(t.webSocketDebuggerUrl);await c.call('Runtime.enable');await c.call('Emulation.setDeviceMetricsOverride',{width:390,height:844,deviceScaleFactor:3,mobile:false});
- await evalJs(c,`document.body.innerHTML='<div id="app"></div>';true`);
+ await evalJs(c,`document.body.innerHTML='<div id="app"></div>';const style=document.createElement('style');style.textContent=${JSON.stringify(appCss)};document.head.appendChild(style);true`);
  await evalJs(c,dockSource);await wait(80);
  for(const role of ['owner','member']){
    await evalJs(c,`document.getElementById('app').innerHTML='<main class="dashboard" data-trip-role="${role}"></main>'+${JSON.stringify(baseDock)};true`);await wait(100);
