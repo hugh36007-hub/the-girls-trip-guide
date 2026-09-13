@@ -12,6 +12,9 @@ on:
       - 'native-app.js'
       - 'native-app.css'
       - 'native-url.js'
+      - 'girls-conversation-inbox.js'
+      - 'girls-media-social.js'
+      - 'girls-trip-social.js'
       - 'package.json'
       - 'package-lock.json'
   workflow_dispatch:
@@ -64,12 +67,12 @@ jobs:
           root=Path('.')
           src=Path('approved-web')
           allowed={'.html','.css','.js','.webmanifest'}
-          keep={'native-app.css','native-app.js','native-url.js','delete-account.html'}
+          keep={'native-app.css','native-app.js','native-url.js','delete-account.html','girls-conversation-inbox.js','girls-media-social.js','girls-trip-social.js'}
           for p in root.iterdir():
               if p.is_file() and p.suffix in allowed and p.name not in keep:
                   p.unlink()
           for p in src.iterdir():
-              if p.is_file() and p.suffix in allowed:
+              if p.is_file() and p.suffix in allowed and p.name not in keep:
                   shutil.copy2(p,root/p.name)
           shutil.rmtree(root/'assets',ignore_errors=True)
           shutil.copytree(src/'assets',root/'assets')
@@ -94,6 +97,9 @@ jobs:
           grep -Fq 'data-native-delete-account' mobile-web/native-app.js
           grep -Fq 'data-native-report' mobile-web/native-app.js
           grep -Fq 'data-native-block' mobile-web/native-app.js
+          grep -Fq 'data-native-media-report' mobile-web/girls-media-social.js
+          grep -Fq 'data-native-media-block' mobile-web/girls-media-social.js
+          grep -Fq 'GTGNativeSafety' mobile-web/girls-conversation-inbox.js
           grep -Fq 'girls-finalize-invite' mobile-web/invite-return.js
           ! grep -Fq 'theboystripguide.com' mobile-web/invite-return.js
 
