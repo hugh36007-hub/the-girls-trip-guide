@@ -1,5 +1,5 @@
 name: Android signed release
-# Rebuild after the 10 September 2026 opaque Supabase invitation-token remediation.
+# Final Google Play build: isolated native shell + exact approved Girls web release.
 
 on:
   push:
@@ -15,16 +15,33 @@ on:
 permissions:
   contents: read
 
+env:
+  GTG_WEB_SOURCE_SHA: fe7154dd6ea4e28731f0a8bf1752c29a6a697d3b
+
 jobs:
   signed-release:
     runs-on: ubuntu-24.04
     timeout-minutes: 30
 
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout isolated native shell
+        uses: actions/checkout@v4
         with:
           ref: ${{ github.sha }}
           fetch-depth: 0
+
+      - name: Checkout approved Girls web release
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ env.GTG_WEB_SOURCE_SHA }}
+          path: web-source
+          fetch-depth: 1
+
+      - name: Verify exact approved web source
+        shell: bash
+        run: |
+          test "$(git -C web-source rev-parse HEAD)" = "$GTG_WEB_SOURCE_SHA"
+          printf 'webSourceCommit=%s\nnativeShellCommit=%s\n' "$GTG_WEB_SOURCE_SHA" "$GITHUB_SHA" > web-source-provenance.txt
 
       - uses: actions/setup-node@v4
         with:
@@ -45,7 +62,9 @@ jobs:
           node -e 'const a=require("./dependency-audit.json");if(a.error)throw Error(JSON.stringify(a.error));console.log(JSON.stringify(a,null,2));if(a.metadata.vulnerabilities.critical)throw Error("Critical build dependency vulnerability")'
           npm audit --omit=dev --audit-level=high
 
-      - name: Build native web payload
+      - name: Build native web payload from approved release
+        env:
+          GTG_WEB_SOURCE_DIR: web-source
         run: npm run mobile:prepare
 
       - name: Verify hardened invitation payload
@@ -69,6 +88,16 @@ jobs:
           ! grep -Fq 'theboystripguide.com' mobile-web/invite-auth.js
           ! grep -Fq 'theboystripguide.com' mobile-web/invite-return.js
 
+      - name: Run approved web release guards
+        shell: bash
+        run: |
+          cd web-source
+          node tests/release-contract.test.cjs
+          node tests/girls-feature-parity.test.cjs
+          node tests/girls-product-parity-ui.test.cjs
+          node tests/girls-pwa-security-contract.test.cjs
+          node tests/retest-100.cjs
+
       - name: Sync Android project
         run: |
           test -d android || npx cap add android
@@ -78,26 +107,20 @@ jobs:
       - name: Generate approved Android branding
         run: |
           mkdir -p native-assets
-          cp assets/images/gtg-pwa-512.svg native-assets/icon.svg
-          cp assets/images/gtg-pwa-maskable.svg native-assets/icon-foreground.svg
-          cp assets/images/gtg-pwa-512.svg native-assets/splash.svg
+          cp web-source/assets/images/gtg-pwa-512.svg native-assets/icon.svg
+          cp web-source/assets/images/gtg-pwa-maskable.svg native-assets/icon-foreground.svg
+          cp web-source/assets/images/gtg-pwa-512.svg native-assets/splash.svg
           npx capacitor-assets generate --android --assetPath native-assets --iconBackgroundColor '#070507' --splashBackgroundColor '#070507'
 
       - name: Run native contract tests
         run: npm run test:native
 
-      - name: Run release guards
-        run: |
-          node tests/release-contract.test.cjs
-          node tests/girls-feature-parity.test.cjs
-          node tests/girls-product-parity-ui.test.cjs
-          node tests/girls-pwa-security-contract.test.cjs
-          node tests/retest-100.cjs
-
-      - name: Verify Android package identity
+      - name: Verify Android package identity and version
         run: |
           grep -Fq 'applicationId "com.storystone.thegirlstripguide"' android/app/build.gradle
           grep -Fq '"appId": "com.storystone.thegirlstripguide"' capacitor.config.json
+          grep -Fq 'versionCode 4' android/app/build.gradle
+          grep -Fq 'versionName "1.0.3"' android/app/build.gradle
 
       - name: Validate and materialize upload key
         env:
@@ -115,11 +138,11 @@ jobs:
           required=['ANDROID_UPLOAD_KEYSTORE_BASE64','ANDROID_UPLOAD_KEYSTORE_PASSWORD','ANDROID_UPLOAD_KEY_ALIAS','ANDROID_UPLOAD_KEY_PASSWORD']
           missing=[name for name in required if not os.environ.get(name)]
           if missing: raise SystemExit('Missing required GitHub signing secrets: '+', '.join(missing))
-          try: key_bytes=base64.b64decode(os.environ['ANDROID_UPLOAD_KEYSTORE_BASE64'],validate=True)
-          except Exception as exc: raise SystemExit(f'Upload keystore secret is not valid base64: {exc}')
+          key_bytes=base64.b64decode(os.environ['ANDROID_UPLOAD_KEYSTORE_BASE64'], validate=True)
           if not key_bytes: raise SystemExit('Decoded upload keystore is empty.')
-          key_path=Path(os.environ['ANDROID_UPLOAD_KEYSTORE_PATH']);key_path.write_bytes(key_bytes);key_path.chmod(0o600)
-          print('Upload keystore materialized securely on the runner.')
+          key_path=Path(os.environ['ANDROID_UPLOAD_KEYSTORE_PATH'])
+          key_path.write_bytes(key_bytes)
+          key_path.chmod(0o600)
           PY
           keytool -list -keystore "$ANDROID_UPLOAD_KEYSTORE_PATH" -storepass "$ANDROID_UPLOAD_KEYSTORE_PASSWORD" -alias "$ANDROID_UPLOAD_KEY_ALIAS" >/dev/null
 
@@ -145,7 +168,9 @@ jobs:
           jarsigner -verify "$AAB"
           EXPECTED_SHA256="$(keytool -list -v -keystore "$ANDROID_UPLOAD_KEYSTORE_PATH" -storepass "$ANDROID_UPLOAD_KEYSTORE_PASSWORD" -alias "$ANDROID_UPLOAD_KEY_ALIAS" | sed -n 's/^[[:space:]]*SHA256: //p' | head -n 1)"
           ACTUAL_SHA256="$(keytool -printcert -jarfile "$AAB" | sed -n 's/^[[:space:]]*SHA256: //p' | head -n 1)"
-          test -n "$EXPECTED_SHA256";test -n "$ACTUAL_SHA256";test "$EXPECTED_SHA256" = "$ACTUAL_SHA256"
+          test -n "$EXPECTED_SHA256"
+          test -n "$ACTUAL_SHA256"
+          test "$EXPECTED_SHA256" = "$ACTUAL_SHA256"
           echo 'Signed Android App Bundle verified against the configured upload key.'
 
       - name: Record exact release provenance
@@ -165,6 +190,7 @@ jobs:
           path: |
             android/app/build/outputs/bundle/release/app-release.aab
             release-provenance.json
+            web-source-provenance.txt
           if-no-files-found: error
           retention-days: 14
 
