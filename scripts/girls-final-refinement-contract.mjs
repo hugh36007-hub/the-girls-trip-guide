@@ -57,7 +57,7 @@ for(const href of ['/girls-product-parity.css?v=1','/girls-inner-page-polish.css
 }
 assert(!html.includes('/girls-inner-page-polish.js?v=2'),'inner-page DOM polish must not execute on Home startup');
 assert(deferred.includes('/girls-inner-page-polish.js?v=2'),'route loader must retain inner-page hierarchy polish');
-assert(html.includes('/girls-critical-style-loader.js?v=20260909-6'),'critical style loader missing');
+assert(html.includes('/girls-critical-style-loader.js?v=20260913-1'),'critical style loader missing');
 assert(html.includes('/girls-performance-loader.js?v=10'),'performance loader missing');
 
 // Current critical-path safeguards: one light, geometry-stable boot shell until authenticated composition is ready.
