@@ -8,6 +8,14 @@ const webRoot = process.env.GTG_WEB_SOURCE_DIR
 const out = path.join(nativeRoot, 'mobile-web');
 const excludedRootFiles = new Set(['worker.js', 'service-worker.js', 'sw.js', 'girls-pwa-register.js']);
 const allowedRootExtensions = new Set(['.html', '.css', '.js', '.webmanifest']);
+const nativeRuntimeFiles = [
+  'native-app.css',
+  'native-url.js',
+  'native-app.js',
+  'girls-conversation-inbox.js',
+  'girls-media-social.js',
+  'girls-trip-social.js'
+];
 
 await rm(out, { recursive: true, force: true });
 await mkdir(out, { recursive: true });
@@ -24,10 +32,9 @@ for (const entry of entries) {
   await cp(path.join(webRoot, entry.name), path.join(out, entry.name));
 }
 
-// Native shell files deliberately live only on native-app-isolated. Overlay them
-// after copying the approved web release so the AAB contains current production
-// behaviour plus the isolated Capacitor integration.
-for (const name of ['native-app.css', 'native-url.js', 'native-app.js']) {
+// Native shell and App Store safety integration files deliberately live only on
+// native-app-isolated. Overlay them after copying the approved web release.
+for (const name of nativeRuntimeFiles) {
   await cp(path.join(nativeRoot, name), path.join(out, name));
 }
 
