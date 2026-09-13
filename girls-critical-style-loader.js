@@ -52,13 +52,22 @@ for(const href of BASE_STYLES)void loadCriticalStyle(href);
 if(home())void ensureHomeAssets();
 window.GTGCritical={ensureHomeAssets};
 
-let cover=null,observer=null,released=false,releaseTimer=0;
+let cover=null,observer=null,released=false,releaseTimer=0,failsafeTimer=0;
 function installStablePaintCover(){
  if(!home()||window.__GTG_FIRST_PAINT_DONE__||document.getElementById('gtg-first-paint-cover'))return;
  const app=document.getElementById('app'),boot=app?.querySelector(':scope > .gtg-boot-shell');if(!app||!boot)return;
  cover=document.createElement('div');cover.id='gtg-first-paint-cover';cover.setAttribute('aria-hidden','true');cover.innerHTML=boot.outerHTML;document.body.appendChild(cover);
 }
 function lightReady(){return document.documentElement.classList.contains('gtg-app-light')&&document.documentElement.classList.contains('gtg-home-shell')}
+function coreReady(){
+ const app=document.getElementById('app');if(!app)return false;
+ if(app.querySelector('.auth-screen'))return true;
+ const dashboard=app.querySelector('.dashboard[data-home-composition]');if(!dashboard||dashboard.getAttribute('aria-busy')==='true')return false;
+ const mode=dashboard.dataset.homeComposition;if(mode!=='free'&&mode!=='full')return false;
+ if(dashboard.querySelectorAll(':scope .hero-card').length!==1)return false;
+ if(dashboard.querySelectorAll(':scope .stat-row>.stat').length!==4)return false;
+ return true;
+}
 function finalReady(){
  const app=document.getElementById('app');if(!app)return false;
  if(app.querySelector('.auth-screen'))return document.documentElement.classList.contains('gtg-app-light');
@@ -83,20 +92,30 @@ function finalReady(){
  return true;
 }
 function removeCover(){if(cover?.isConnected)cover.remove();cover=null}
-function release(){
- if(released||!finalReady())return;released=true;window.__GTG_FIRST_PAINT_DONE__=true;observer?.disconnect();observer=null;
+function release(force=false){
+ if(released)return;
+ if(force?!coreReady():!finalReady())return;
+ released=true;window.__GTG_FIRST_PAINT_DONE__=true;observer?.disconnect();observer=null;clearTimeout(failsafeTimer);
  if(!cover)return;
  const reduce=globalThis.matchMedia?.('(prefers-reduced-motion: reduce)')?.matches;if(reduce){removeCover();return}
  cover.classList.add('gtg-cover-leaving');
  const finish=()=>{clearTimeout(releaseTimer);removeCover()};cover.addEventListener('transitionend',finish,{once:true});releaseTimer=setTimeout(finish,190);
 }
 function check(){if(finalReady())release()}
+function failsafeCheck(){
+ if(released)return;
+ if(coreReady()){
+  console.warn('[GTG startup] Enhanced Home readiness timed out; releasing the complete core dashboard.');
+  release(true);return;
+ }
+ failsafeTimer=setTimeout(failsafeCheck,1000);
+}
 
 installStartupPolish();
 installStablePaintCover();
 if(home()&&!window.__GTG_FIRST_PAINT_DONE__){
  observer=new MutationObserver(check);observer.observe(document.documentElement,{childList:true,subtree:true,attributes:true,attributeFilter:['class','data-home-composition','data-live-snapshot','aria-busy']});
  requestAnimationFrame(()=>requestAnimationFrame(check));
- setTimeout(()=>{if(!released)console.warn('[GTG startup] Home cover is waiting for a complete Free/Full composition.')},9000);
+ failsafeTimer=setTimeout(failsafeCheck,9000);
 }
 })();

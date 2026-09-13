@@ -10,13 +10,16 @@ on:
       - 'package.json'
       - 'package-lock.json'
       - 'capacitor.config.json'
+      - 'android/app/build.gradle'
+      - 'girls-critical-style-loader.js'
+      - 'create-trip.html'
   workflow_dispatch:
 
 permissions:
   contents: read
 
 env:
-  GTG_WEB_SOURCE_SHA: fe7154dd6ea4e28731f0a8bf1752c29a6a697d3b
+  GTG_WEB_SOURCE_SHA: c65b306996e5c4a92556862a52428a1d2aed2cc4
 
 jobs:
   signed-release:
@@ -88,6 +91,13 @@ jobs:
           ! grep -Fq 'theboystripguide.com' mobile-web/invite-auth.js
           ! grep -Fq 'theboystripguide.com' mobile-web/invite-return.js
 
+      - name: Verify fixed Girls Home startup payload
+        run: |
+          grep -Fq 'girls-critical-style-loader.js?v=20260913-1' mobile-web/create-trip.html
+          grep -Fq 'function coreReady()' mobile-web/girls-critical-style-loader.js
+          grep -Fq 'release(true)' mobile-web/girls-critical-style-loader.js
+          grep -Fq 'failsafeTimer=setTimeout(failsafeCheck,9000)' mobile-web/girls-critical-style-loader.js
+
       - name: Run approved web release guards
         shell: bash
         run: |
@@ -96,6 +106,8 @@ jobs:
           node tests/girls-feature-parity.test.cjs
           node tests/girls-product-parity-ui.test.cjs
           node tests/girls-pwa-security-contract.test.cjs
+          node tests/girls-home-startup-safety.test.cjs
+          node tests/girls-live-dashboard-hero.test.cjs
           node tests/retest-100.cjs
 
       - name: Sync Android project
@@ -119,7 +131,7 @@ jobs:
         run: |
           grep -Fq 'applicationId "com.storystone.thegirlstripguide"' android/app/build.gradle
           grep -Fq '"appId": "com.storystone.thegirlstripguide"' capacitor.config.json
-          grep -Fq 'versionCode 4' android/app/build.gradle
+          grep -Fq 'versionCode 5' android/app/build.gradle
           grep -Fq 'versionName "1.0.3"' android/app/build.gradle
 
       - name: Validate and materialize upload key
@@ -186,7 +198,7 @@ jobs:
       - name: Upload signed Android release bundle
         uses: actions/upload-artifact@v4
         with:
-          name: girls-trip-guide-android-release-signed
+          name: girls-trip-guide-android-1.0.3-build-5-signed
           path: |
             android/app/build/outputs/bundle/release/app-release.aab
             release-provenance.json

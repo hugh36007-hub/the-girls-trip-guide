@@ -1,6 +1,14 @@
 name: Native store release
 
 on:
+  push:
+    branches:
+      - native-app-isolated
+    paths:
+      - '.github/workflows/native-store-release.yml'
+      - 'girls-critical-style-loader.js'
+      - 'create-trip.html'
+      - 'scripts/configure-ios-app-store-version.mjs'
   workflow_dispatch:
     inputs:
       platform:
@@ -47,6 +55,11 @@ jobs:
           test -n "$KEY_PASSWORD" || { echo 'Missing ANDROID_KEY_PASSWORD.'; exit 1; }
       - run: npm ci
       - run: npm run mobile:prepare && npx cap sync android && node scripts/configure-native-platforms.mjs
+      - name: Verify fixed Girls Home startup payload
+        run: |
+          grep -Fq 'girls-critical-style-loader.js?v=20260913-1' mobile-web/create-trip.html
+          grep -Fq 'function coreReady()' mobile-web/girls-critical-style-loader.js
+          grep -Fq 'release(true)' mobile-web/girls-critical-style-loader.js
       - name: Build signed Play bundle
         env:
           KEYSTORE: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
@@ -63,18 +76,18 @@ jobs:
             -Pandroid.injected.signing.key.password="$KEY_PASSWORD"
       - uses: actions/upload-artifact@v4
         with:
-          name: girls-trip-guide-play-release
+          name: girls-trip-guide-play-release-1.0.3-build-5
           path: android/app/build/outputs/bundle/release/app-release.aab
           if-no-files-found: error
-          retention-days: 7
+          retention-days: 14
 
   ios:
-    if: inputs.platform == 'both' || inputs.platform == 'ios'
+    if: github.event_name == 'push' || inputs.platform == 'both' || inputs.platform == 'ios'
     runs-on: macos-26
     timeout-minutes: 60
     env:
       VERSION_NAME: 1.0.3
-      BUILD_NUMBER: '4'
+      BUILD_NUMBER: '5'
       BUNDLE_ID: com.storystone.thegirlstripguide
       GTG_WEB_SOURCE_DIR: approved-web
     steps:
@@ -86,13 +99,13 @@ jobs:
       - name: Checkout approved Girls web release
         uses: actions/checkout@v4
         with:
-          ref: fe7154dd6ea4e28731f0a8bf1752c29a6a697d3b
+          ref: c65b306996e5c4a92556862a52428a1d2aed2cc4
           path: approved-web
           fetch-depth: 1
 
       - name: Require current App Store toolchain and approved source
         run: |
-          test "$(git -C approved-web rev-parse HEAD)" = 'fe7154dd6ea4e28731f0a8bf1752c29a6a697d3b'
+          test "$(git -C approved-web rev-parse HEAD)" = 'c65b306996e5c4a92556862a52428a1d2aed2cc4'
           xcodebuild -version
           XCODE_MAJOR="$(xcodebuild -version | awk '/Xcode/{split($2,a,".");print a[1]}')"
           test "$XCODE_MAJOR" -ge 26 || { echo 'Xcode 26 or later is required.'; exit 1; }
@@ -115,6 +128,12 @@ jobs:
 
       - run: npm ci
 
+      - name: Verify fixed approved Girls web release
+        run: |
+          cd approved-web
+          node tests/girls-home-startup-safety.test.cjs
+          node tests/girls-live-dashboard-hero.test.cjs
+
       - name: Prepare and verify iOS source
         run: |
           npm run mobile:prepare
@@ -129,6 +148,10 @@ jobs:
           grep -Fq 'data-native-media-report' mobile-web/girls-media-social.js
           grep -Fq 'GTGNativeSafety' mobile-web/girls-conversation-inbox.js
           grep -Fq 'girls-finalize-invite' mobile-web/invite-return.js
+          grep -Fq 'girls-critical-style-loader.js?v=20260913-1' mobile-web/create-trip.html
+          grep -Fq 'function coreReady()' mobile-web/girls-critical-style-loader.js
+          grep -Fq 'release(true)' mobile-web/girls-critical-style-loader.js
+          grep -Fq 'CURRENT_PROJECT_VERSION = 5;' ios/App/App.xcodeproj/project.pbxproj
 
       - name: Prepare App Store Connect API key
         env:
@@ -208,7 +231,7 @@ jobs:
           xcrun altool --validate-app -f "$IPA_PATH" -t ios --apiKey "$API_KEY_ID" --apiIssuer "$API_ISSUER_ID"
 
       - name: Upload validated build to TestFlight
-        if: inputs.upload_to_testflight
+        if: github.event_name == 'workflow_dispatch' && inputs.upload_to_testflight
         env:
           API_KEY_ID: ${{ secrets.APP_STORE_CONNECT_API_KEY_ID }}
           API_ISSUER_ID: ${{ secrets.APP_STORE_CONNECT_ISSUER_ID }}
@@ -219,7 +242,7 @@ jobs:
 
       - uses: actions/upload-artifact@v4
         with:
-          name: girls-trip-guide-ios-1.0.3-build-4
+          name: girls-trip-guide-ios-1.0.3-build-5
           path: |
             ios/build/GirlsTripGuide.xcarchive
             ios/build/export/*.ipa
