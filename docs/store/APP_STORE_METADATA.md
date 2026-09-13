@@ -7,7 +7,7 @@
 - Primary category: Travel
 - Secondary category: Lifestyle
 - Price: Free download
-- Age rating recommendation: 17+ because invited users can upload and exchange unmoderated user-generated photos, videos and messages.
+- Age rating: complete the current App Store Connect age-rating questionnaire from the app's actual user-generated-content capabilities; do not use the retired legacy 17+ recommendation as a fixed value.
 - Marketing URL: https://thegirlstripguide.com/
 - Support URL: https://thegirlstripguide.com/contact.html
 - Privacy URL: https://thegirlstripguide.com/privacy.html
@@ -56,6 +56,7 @@ Suggested review path:
 4. Open the prepared Free trip and inspect Plan, Money and Group.
 5. Switch to the prepared Full Trip and inspect shared media and communications.
 6. Account deletion is under My details.
+7. Native message and media safety controls allow members to report content and block another member.
 
 Commerce note: the submitted build contains no Stripe checkout, external purchase button or external purchase call to action. Existing web entitlements are recognised after sign-in. Any native purchase implementation will be submitted only after the applicable App Store commercial route is selected.
 
