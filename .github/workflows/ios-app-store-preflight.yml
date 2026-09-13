@@ -28,12 +28,11 @@ env:
   GTG_WEB_SOURCE_DIR: approved-web
   VERSION_NAME: 1.0.3
   BUILD_NUMBER: '4'
-  BUNDLE_ID: com.storystone.thegirlstripguide
 
 jobs:
   preflight:
     runs-on: macos-26
-    timeout-minutes: 60
+    timeout-minutes: 45
     steps:
       - name: Checkout native shell
         uses: actions/checkout@v4
@@ -58,18 +57,6 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
-
-      - name: Confirm Apple signing access
-        env:
-          TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
-          API_KEY_ID: ${{ secrets.APP_STORE_CONNECT_API_KEY_ID }}
-          API_ISSUER_ID: ${{ secrets.APP_STORE_CONNECT_ISSUER_ID }}
-          API_PRIVATE_KEY: ${{ secrets.APP_STORE_CONNECT_API_PRIVATE_KEY }}
-        run: |
-          test -n "$TEAM_ID" || { echo 'Missing APPLE_TEAM_ID.'; exit 1; }
-          test -n "$API_KEY_ID" || { echo 'Missing APP_STORE_CONNECT_API_KEY_ID.'; exit 1; }
-          test -n "$API_ISSUER_ID" || { echo 'Missing APP_STORE_CONNECT_ISSUER_ID.'; exit 1; }
-          test -n "$API_PRIVATE_KEY" || { echo 'Missing APP_STORE_CONNECT_API_PRIVATE_KEY.'; exit 1; }
 
       - name: Install pinned native toolchain
         run: npm ci
@@ -111,102 +98,3 @@ jobs:
             MARKETING_VERSION="$VERSION_NAME" \
             CURRENT_PROJECT_VERSION="$BUILD_NUMBER" \
             build
-
-      - name: Prepare App Store Connect API key
-        env:
-          API_KEY_ID: ${{ secrets.APP_STORE_CONNECT_API_KEY_ID }}
-          API_PRIVATE_KEY: ${{ secrets.APP_STORE_CONNECT_API_PRIVATE_KEY }}
-        run: |
-          KEY_DIR="$RUNNER_TEMP/private_keys"
-          KEY_PATH="$KEY_DIR/AuthKey_$API_KEY_ID.p8"
-          mkdir -p "$KEY_DIR"
-          umask 077
-          printf '%s\n' "$API_PRIVATE_KEY" > "$KEY_PATH"
-          grep -Fq -- '-----BEGIN PRIVATE KEY-----' "$KEY_PATH"
-          grep -Fq -- '-----END PRIVATE KEY-----' "$KEY_PATH"
-
-      - name: Archive with Apple-managed signing
-        env:
-          TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
-          API_KEY_ID: ${{ secrets.APP_STORE_CONNECT_API_KEY_ID }}
-          API_ISSUER_ID: ${{ secrets.APP_STORE_CONNECT_ISSUER_ID }}
-        run: |
-          KEY_PATH="$RUNNER_TEMP/private_keys/AuthKey_$API_KEY_ID.p8"
-          xcodebuild \
-            -project ios/App/App.xcodeproj \
-            -scheme App \
-            -configuration Release \
-            -destination 'generic/platform=iOS' \
-            -archivePath ios/build/GirlsTripGuide.xcarchive \
-            DEVELOPMENT_TEAM="$TEAM_ID" \
-            CODE_SIGN_STYLE=Automatic \
-            MARKETING_VERSION="$VERSION_NAME" \
-            CURRENT_PROJECT_VERSION="$BUILD_NUMBER" \
-            -allowProvisioningUpdates \
-            -authenticationKeyPath "$KEY_PATH" \
-            -authenticationKeyID "$API_KEY_ID" \
-            -authenticationKeyIssuerID "$API_ISSUER_ID" \
-            archive
-
-      - name: Export signed IPA
-        env:
-          TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
-          API_KEY_ID: ${{ secrets.APP_STORE_CONNECT_API_KEY_ID }}
-          API_ISSUER_ID: ${{ secrets.APP_STORE_CONNECT_ISSUER_ID }}
-        run: |
-          KEY_PATH="$RUNNER_TEMP/private_keys/AuthKey_$API_KEY_ID.p8"
-          cat > "$RUNNER_TEMP/ExportOptions.plist" <<PLIST
-          <?xml version="1.0" encoding="UTF-8"?>
-          <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
-          <plist version="1.0"><dict>
-          <key>method</key><string>app-store-connect</string>
-          <key>destination</key><string>export</string>
-          <key>signingStyle</key><string>automatic</string>
-          <key>teamID</key><string>$TEAM_ID</string>
-          <key>manageAppVersionAndBuildNumber</key><false/>
-          <key>stripSwiftSymbols</key><true/>
-          <key>uploadSymbols</key><true/>
-          </dict></plist>
-          PLIST
-          xcodebuild \
-            -exportArchive \
-            -archivePath ios/build/GirlsTripGuide.xcarchive \
-            -exportPath ios/build/export \
-            -exportOptionsPlist "$RUNNER_TEMP/ExportOptions.plist" \
-            -allowProvisioningUpdates \
-            -authenticationKeyPath "$KEY_PATH" \
-            -authenticationKeyID "$API_KEY_ID" \
-            -authenticationKeyIssuerID "$API_ISSUER_ID"
-          IPA_PATH="$(find ios/build/export -name '*.ipa' -print -quit)"
-          test -s "$IPA_PATH"
-
-      - name: Validate signed IPA with App Store Connect
-        env:
-          API_KEY_ID: ${{ secrets.APP_STORE_CONNECT_API_KEY_ID }}
-          API_ISSUER_ID: ${{ secrets.APP_STORE_CONNECT_ISSUER_ID }}
-        run: |
-          export API_PRIVATE_KEYS_DIR="$RUNNER_TEMP/private_keys"
-          IPA_PATH="$(find ios/build/export -name '*.ipa' -print -quit)"
-          xcrun altool --validate-app -f "$IPA_PATH" -t ios --apiKey "$API_KEY_ID" --apiIssuer "$API_ISSUER_ID"
-
-      - name: Upload validated build to TestFlight
-        env:
-          API_KEY_ID: ${{ secrets.APP_STORE_CONNECT_API_KEY_ID }}
-          API_ISSUER_ID: ${{ secrets.APP_STORE_CONNECT_ISSUER_ID }}
-        run: |
-          export API_PRIVATE_KEYS_DIR="$RUNNER_TEMP/private_keys"
-          IPA_PATH="$(find ios/build/export -name '*.ipa' -print -quit)"
-          xcrun altool --upload-app -f "$IPA_PATH" -t ios --apiKey "$API_KEY_ID" --apiIssuer "$API_ISSUER_ID"
-
-      - uses: actions/upload-artifact@v4
-        with:
-          name: girls-trip-guide-ios-1.0.3-build-4
-          path: |
-            ios/build/GirlsTripGuide.xcarchive
-            ios/build/export/*.ipa
-          if-no-files-found: error
-          retention-days: 14
-
-      - name: Remove App Store Connect key
-        if: always()
-        run: rm -rf "$RUNNER_TEMP/private_keys"
