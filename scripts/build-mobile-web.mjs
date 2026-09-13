@@ -1,34 +1,44 @@
 import { cp, mkdir, readdir, readFile, rm, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 
-const root = process.cwd();
-const out = path.join(root, 'mobile-web');
+const nativeRoot = process.cwd();
+const webRoot = process.env.GTG_WEB_SOURCE_DIR
+  ? path.resolve(nativeRoot, process.env.GTG_WEB_SOURCE_DIR)
+  : nativeRoot;
+const out = path.join(nativeRoot, 'mobile-web');
 const excludedRootFiles = new Set(['worker.js', 'service-worker.js', 'sw.js', 'girls-pwa-register.js']);
 const allowedRootExtensions = new Set(['.html', '.css', '.js', '.webmanifest']);
 
 await rm(out, { recursive: true, force: true });
 await mkdir(out, { recursive: true });
 
-const entries = await readdir(root, { withFileTypes: true });
+const entries = await readdir(webRoot, { withFileTypes: true });
 for (const entry of entries) {
   if (entry.name === 'assets' && entry.isDirectory()) {
-    await cp(path.join(root, entry.name), path.join(out, entry.name), { recursive: true });
+    await cp(path.join(webRoot, entry.name), path.join(out, entry.name), { recursive: true });
     continue;
   }
   if (!entry.isFile()) continue;
   if (excludedRootFiles.has(entry.name)) continue;
   if (!allowedRootExtensions.has(path.extname(entry.name))) continue;
-  await cp(path.join(root, entry.name), path.join(out, entry.name));
+  await cp(path.join(webRoot, entry.name), path.join(out, entry.name));
+}
+
+// Native shell files deliberately live only on native-app-isolated. Overlay them
+// after copying the approved web release so the AAB contains current production
+// behaviour plus the isolated Capacitor integration.
+for (const name of ['native-app.css', 'native-url.js', 'native-app.js']) {
+  await cp(path.join(nativeRoot, name), path.join(out, name));
 }
 
 const vendorDir = path.join(out, 'vendor');
 await mkdir(vendorDir, { recursive: true });
 await cp(
-  path.join(root, 'node_modules/@supabase/supabase-js/dist/umd/supabase.js'),
+  path.join(nativeRoot, 'node_modules/@supabase/supabase-js/dist/umd/supabase.js'),
   path.join(vendorDir, 'supabase.js')
 );
 await cp(
-  path.join(root, 'node_modules/tus-js-client/dist/tus.min.js'),
+  path.join(nativeRoot, 'node_modules/tus-js-client/dist/tus.min.js'),
   path.join(vendorDir, 'tus.min.js')
 );
 
@@ -67,4 +77,4 @@ for (const name of forbidden) {
   }
 }
 
-console.log('Prepared self-contained mobile-web from the current Girls runtime.');
+console.log(`Prepared self-contained mobile-web from ${webRoot}.`);
