@@ -106,12 +106,12 @@ jobs:
           TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
           API_KEY_ID: ${{ secrets.APP_STORE_CONNECT_API_KEY_ID }}
           API_ISSUER_ID: ${{ secrets.APP_STORE_CONNECT_ISSUER_ID }}
-          API_PRIVATE_KEY: ${{ secrets.APP_STORE_CONNECT_API_PRIVATE_KEY_BASE64 }}
+          API_PRIVATE_KEY: ${{ secrets.APP_STORE_CONNECT_API_PRIVATE_KEY }}
         run: |
           test -n "$TEAM_ID" || { echo 'Missing APPLE_TEAM_ID.'; exit 1; }
           test -n "$API_KEY_ID" || { echo 'Missing APP_STORE_CONNECT_API_KEY_ID.'; exit 1; }
           test -n "$API_ISSUER_ID" || { echo 'Missing APP_STORE_CONNECT_ISSUER_ID.'; exit 1; }
-          test -n "$API_PRIVATE_KEY" || { echo 'Missing APP_STORE_CONNECT_API_PRIVATE_KEY_BASE64.'; exit 1; }
+          test -n "$API_PRIVATE_KEY" || { echo 'Missing APP_STORE_CONNECT_API_PRIVATE_KEY.'; exit 1; }
 
       - run: npm ci
 
@@ -133,17 +133,15 @@ jobs:
       - name: Prepare App Store Connect API key
         env:
           API_KEY_ID: ${{ secrets.APP_STORE_CONNECT_API_KEY_ID }}
-          API_PRIVATE_KEY: ${{ secrets.APP_STORE_CONNECT_API_PRIVATE_KEY_BASE64 }}
+          API_PRIVATE_KEY: ${{ secrets.APP_STORE_CONNECT_API_PRIVATE_KEY }}
         run: |
           KEY_DIR="$RUNNER_TEMP/private_keys"
           KEY_PATH="$KEY_DIR/AuthKey_$API_KEY_ID.p8"
           mkdir -p "$KEY_DIR"
-          KEY_PATH="$KEY_PATH" API_PRIVATE_KEY="$API_PRIVATE_KEY" python3 - <<'PY'
-          import base64, os
-          from pathlib import Path
-          Path(os.environ['KEY_PATH']).write_bytes(base64.b64decode(os.environ['API_PRIVATE_KEY'], validate=True))
-          PY
-          chmod 600 "$KEY_PATH"
+          umask 077
+          printf '%s\n' "$API_PRIVATE_KEY" > "$KEY_PATH"
+          grep -Fq -- '-----BEGIN PRIVATE KEY-----' "$KEY_PATH"
+          grep -Fq -- '-----END PRIVATE KEY-----' "$KEY_PATH"
 
       - name: Archive with Apple-managed signing
         env:
