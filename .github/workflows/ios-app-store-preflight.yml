@@ -6,6 +6,7 @@ on:
       - native-app-isolated
     paths:
       - '.github/workflows/ios-app-store-preflight.yml'
+      - 'scripts/build-mobile-web.mjs'
       - 'scripts/configure-ios-app-store-version.mjs'
       - 'scripts/configure-ios-privacy-manifest.mjs'
       - 'scripts/configure-native-platforms.mjs'
@@ -24,6 +25,7 @@ permissions:
 
 env:
   WEB_SOURCE_SHA: fe7154dd6ea4e28731f0a8bf1752c29a6a697d3b
+  GTG_WEB_SOURCE_DIR: approved-web
   VERSION_NAME: 1.0.3
   BUILD_NUMBER: '4'
 
@@ -58,25 +60,6 @@ jobs:
 
       - name: Install pinned native toolchain
         run: npm ci
-
-      - name: Overlay approved web release
-        run: |
-          python3 - <<'PY'
-          from pathlib import Path
-          import shutil
-          root=Path('.')
-          src=Path('approved-web')
-          allowed={'.html','.css','.js','.webmanifest'}
-          keep={'native-app.css','native-app.js','native-url.js','delete-account.html','girls-conversation-inbox.js','girls-media-social.js','girls-trip-social.js'}
-          for p in root.iterdir():
-              if p.is_file() and p.suffix in allowed and p.name not in keep:
-                  p.unlink()
-          for p in src.iterdir():
-              if p.is_file() and p.suffix in allowed and p.name not in keep:
-                  shutil.copy2(p,root/p.name)
-          shutil.rmtree(root/'assets',ignore_errors=True)
-          shutil.copytree(src/'assets',root/'assets')
-          PY
 
       - name: Prepare native payload
         run: |
