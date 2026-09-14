@@ -9,6 +9,8 @@ const cors={
 let cachedResendKey=''
 function json(body:unknown,status=200){return new Response(JSON.stringify(body),{status,headers:{...cors,'Content-Type':'application/json'}})}
 function env(name:string){const v=Deno.env.get(name)||'';if(!v)throw new Error(`${name} missing`);return v}
+function keyFromJson(name:string){const raw=Deno.env.get(name)||'';if(!raw)return'';try{const parsed=JSON.parse(raw);return String(parsed?.default||Object.values(parsed||{})[0]||'')}catch{return''}}
+function serviceKey(){return Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')||keyFromJson('SUPABASE_SECRET_KEYS')}
 function cleanEmail(v:unknown){return String(v||'').trim().toLowerCase()}
 function validEmail(v:string){return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v)&&v.length<=254}
 function esc(v:unknown){return String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]||c))}
@@ -39,7 +41,9 @@ Deno.serve(async req=>{
     const email=cleanEmail(body?.email)
     if(!validEmail(email))return json({error:'Enter a valid email address.'},400)
 
-    const db=createClient(env('SUPABASE_URL'),env('SUPABASE_SERVICE_ROLE_KEY'),{auth:{persistSession:false,autoRefreshToken:false}})
+    const service=serviceKey()
+    if(!service)throw new Error('SUPABASE service key missing')
+    const db=createClient(env('SUPABASE_URL'),service,{auth:{persistSession:false,autoRefreshToken:false}})
     const keyPromise=resendKey(db)
     const rate=await db.rpc('girls_auth_otp_rate_check',{p_email:email})
     if(rate.error)throw new Error(`rate:${rate.error.message}`)
