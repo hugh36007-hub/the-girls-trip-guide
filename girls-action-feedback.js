@@ -24,6 +24,30 @@
   };
 
   const active = new Set();
+  const TEMP_ID_NAME = '__gtg_record_id';
+
+  function formId(form) {
+    return form?.getAttribute?.('id') || '';
+  }
+
+  function temporarilyUnclobberId(form) {
+    const actualId = formId(form);
+    if (!actualId || (typeof form.id === 'string' && form.id === actualId)) return [];
+    const controls = [...form.querySelectorAll('[name="id"]')];
+    for (const control of controls) {
+      control.dataset.gtgOriginalName = 'id';
+      control.name = TEMP_ID_NAME;
+    }
+    return controls;
+  }
+
+  function restoreIdControls(controls) {
+    for (const control of controls) {
+      if (!control.isConnected || control.dataset.gtgOriginalName !== 'id') continue;
+      control.name = 'id';
+      delete control.dataset.gtgOriginalName;
+    }
+  }
 
   function submitButton(form) {
     return form.querySelector('button[type="submit"], .modal-actions .btn.primary, button.btn.primary:not([type="button"])');
@@ -40,7 +64,7 @@
     button.disabled = true;
     button.setAttribute('aria-disabled', 'true');
     button.classList.add('is-busy');
-    const label = LABELS[form.id] || 'Working…';
+    const label = LABELS[formId(form)] || 'Working…';
     button.innerHTML = `<span class="action-spinner" aria-hidden="true"></span><span>${label}</span>`;
     active.add(form);
 
@@ -66,9 +90,23 @@
     active.delete(form);
   }
 
+  // HTML forms expose named controls as properties. A hidden input named "id" can therefore
+  // shadow form.id. Keep the stored record id in FormData while allowing downstream handlers
+  // to read the form's real id attribute during the submit event.
+  document.addEventListener('formdata', event => {
+    const form = event.target;
+    if (!(form instanceof HTMLFormElement)) return;
+    const recordId = form.querySelector(`[name="${TEMP_ID_NAME}"][data-gtg-original-name="id"]`);
+    if (recordId) event.formData.set('id', recordId.value);
+  });
+
   document.addEventListener('submit', event => {
     const form = event.target;
     if (!(form instanceof HTMLFormElement)) return;
+
+    const renamed = temporarilyUnclobberId(form);
+    if (renamed.length) window.setTimeout(() => restoreIdControls(renamed), 0);
+
     if (form.dataset.actionBusy === '1') {
       event.preventDefault();
       event.stopImmediatePropagation();
