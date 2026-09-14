@@ -6,6 +6,7 @@ const scheduled=read('girls-process-communications');
 const invite=read('girls-trip-email');
 const sender=read('girls-email-send');
 const stripe=read('girls-stripe-checkout');
+const authOtp=read('girls-auth-otp');
 
 for(const [name,source] of [['girls-process-communications',scheduled],['girls-trip-email',invite]]){
   assert(source.includes('/functions/v1/girls-email-send'),`${name} must route email through girls-email-send`);
@@ -40,6 +41,10 @@ assert(sender.includes('/assets/email-banners/'),'girls-email-send must remain t
 assert(stripe.includes('&product_key=eq.girls&select=id,name,plan'),'Girls checkout product isolation changed');
 assert(stripe.includes("session?.metadata?.product_key==='girls'"),'Girls Stripe verification product key changed');
 assert(stripe.includes("const PRICE_ID='price_1U7JW9EUQ5rJLL4MdDH2x3qP'"),'Girls £24.99 Stripe mapping changed');
+
+assert(authOtp.includes("keyFromJson('SUPABASE_SECRET_KEYS')"),'Girls OTP must support the current Supabase secret-key bundle');
+assert(authOtp.includes("Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')"),'Girls OTP must retain legacy service-role key compatibility');
+assert(authOtp.includes("if(!service)throw new Error('SUPABASE service key missing')"),'Girls OTP must fail closed when no service key is configured');
 
 console.log('Girls backend source parity contract: PASS');
 console.log('Scheduled and invitation email paths use girls-email-send');
