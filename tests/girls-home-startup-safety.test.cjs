@@ -28,7 +28,7 @@ assert.match(html,/girls-app-v2\.js\?v=7/,'core app cache version missing');
 assert.match(html,/girls-session-guard\.js\?v=2/,'session guard cache version missing');
 assert.match(html,/girls-home-social-hub-v3\.js\?v=20260914-1/,'core Free chat cache version missing');
 assert.match(html,/girls-performance-loader\.js\?v=13/,'runtime loader cache version missing');
-assert.match(sw,/gtg-pwa-v31-plan-money-entry/,'service worker cache must advance for Plan and Money entry');
+assert.match(sw,/gtg-pwa-v32-core-form-submit/,'service worker cache must advance for core form submission');
 assert.doesNotMatch(sw,/home-startup-failsafe/,'obsolete startup-failsafe cache must be retired');
 
 console.log('Girls Home runtime consolidation: PASS');
