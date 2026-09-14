@@ -6,6 +6,13 @@ window.__GTG_HOME_POLL_RETURN_REFRESH__=true;
 
 const POLL_SELECTOR='.gtg-home-poll-v3,.gtg-home-score-v3,.gtg-home-poll-v2,.gtg-home-score-v2,.gtg-poll-hero-alert,.gtg-poll-alert';
 function clearPollUi(){document.querySelectorAll(POLL_SELECTOR).forEach(node=>node.remove())}
+function installCompactPollStyle(){
+ if(document.getElementById('gtg-home-poll-compact-css'))return;
+ const style=document.createElement('style');
+ style.id='gtg-home-poll-compact-css';
+ style.textContent='@media(max-width:700px) and (max-height:700px){.gtg-home-poll-v3{padding:10px 12px 12px!important;min-height:0!important;height:auto!important}}';
+ document.head.appendChild(style);
+}
 
 /*
 The core trip app changes tabs without a popstate event. The Home social hub already
@@ -17,4 +24,6 @@ document.addEventListener('click',event=>{
  if(!tab)return;
  clearPollUi();
 },false);
+
+installCompactPollStyle();
 })();
