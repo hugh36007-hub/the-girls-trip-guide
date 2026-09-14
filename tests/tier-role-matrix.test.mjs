@@ -17,8 +17,8 @@ assert.match(app,/async function loadMedia\(\)\{S\.media=\[\];S\.urls=\{\};if\(!
   'Free trips must not load Evidence media');
 assert.match(app,/async function loadVaultState\(\)\{S\.vaultConfigured=false;S\.vaultUnlocked=false;if\(!S\.trip\|\|!paid\(\)\)return;/,
   'Free trips must not initialise Hidden Gallery state');
-assert.match(app,/if\(paid\(\)\)await Promise\.all\(\[loadContributions\(\)\.catch\(\(\)=>\{\}\),loadMessages\(\)\.catch\(\(\)=>\{\}\)\]\)/,
-  'paid contribution/message loading must remain entitlement-gated');
+assert.match(app,/if\(paid\(\)\)deferred\.push\(loadContributions\(\)\.catch\(\(\)=>\{\}\),loadMessages\(\)\.catch\(\(\)=>\{\}\)\)/,
+  'paid contribution/message loading must remain entitlement-gated and nonblocking');
 assert.match(app,/data-home-composition="\$\{paid\(\)\?'full':'free'\}" data-trip-role="\$\{role\}"/,
   'dashboard must expose authoritative tier and role state');
 assert.match(app,/function panelEvidence\(\)\{if\(!paid\(\)\)return `[\s\S]*Included with Full Trip[\s\S]*isOwner\(\)\?'<div class="actions"[\s\S]*data-a="upgrade"/,

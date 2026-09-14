@@ -55,11 +55,12 @@ jobs:
           test -n "$KEY_PASSWORD" || { echo 'Missing ANDROID_KEY_PASSWORD.'; exit 1; }
       - run: npm ci
       - run: npm run mobile:prepare && npx cap sync android && node scripts/configure-native-platforms.mjs
-      - name: Verify fixed Girls Home startup payload
+      - name: Verify consolidated Girls Home runtime
         run: |
-          grep -Fq 'girls-critical-style-loader.js?v=20260913-1' mobile-web/create-trip.html
-          grep -Fq 'function coreReady()' mobile-web/girls-critical-style-loader.js
-          grep -Fq 'release(true)' mobile-web/girls-critical-style-loader.js
+          grep -Fq 'girls-critical-style-loader.js?v=20260914-1' mobile-web/create-trip.html
+          grep -Fq 'girls-app-v2.js?v=7' mobile-web/create-trip.html
+          grep -Fq 'girls-performance-loader.js?v=11' mobile-web/create-trip.html
+          ! grep -Fq 'gtg-first-paint-cover' mobile-web/girls-critical-style-loader.js
       - name: Build signed Play bundle
         env:
           KEYSTORE: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
@@ -148,9 +149,10 @@ jobs:
           grep -Fq 'data-native-media-report' mobile-web/girls-media-social.js
           grep -Fq 'GTGNativeSafety' mobile-web/girls-conversation-inbox.js
           grep -Fq 'girls-finalize-invite' mobile-web/invite-return.js
-          grep -Fq 'girls-critical-style-loader.js?v=20260913-1' mobile-web/create-trip.html
-          grep -Fq 'function coreReady()' mobile-web/girls-critical-style-loader.js
-          grep -Fq 'release(true)' mobile-web/girls-critical-style-loader.js
+          grep -Fq 'girls-critical-style-loader.js?v=20260914-1' mobile-web/create-trip.html
+          grep -Fq 'girls-app-v2.js?v=7' mobile-web/create-trip.html
+          grep -Fq 'girls-performance-loader.js?v=11' mobile-web/create-trip.html
+          ! grep -Fq 'gtg-first-paint-cover' mobile-web/girls-critical-style-loader.js
           grep -Fq 'CURRENT_PROJECT_VERSION = 5;' ios/App/App.xcodeproj/project.pbxproj
 
       - name: Prepare App Store Connect API key

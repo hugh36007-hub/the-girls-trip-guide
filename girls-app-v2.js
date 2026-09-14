@@ -86,14 +86,24 @@ async function loadTrip(tripId){
  const [tr,m,b,bp,d,e,ep,r,rp,en,set]=results;
  Object.assign(S,{trip:tr.data,members:m.data||[],bookings:b.data||[],bp:bp.data||[],documents:d.data||[],expenses:e.data||[],ep:ep.data||[],requests:r.data||[],rp:rp.data||[],entitlements:en.data||[],settings:set.data||null,messages:[],contributions:{},urls:{},avatarUrls:{},docUrls:{},heroUrl:'',storage:null});
  S.tab=new URL(location.href).searchParams.get('action')||'overview';if(!['overview','plan','money','evidence','group'].includes(S.tab))S.tab='overview';
- await Promise.all([loadMedia(),loadVaultState(),loadHero(),loadStorageUsage(),loadAvatars(),loadProfile().catch(()=>null)]);
- if(paid())await Promise.all([loadContributions().catch(()=>{}),loadMessages().catch(()=>{})]);
  renderDashboard();
+ const activeTripId=S.trip.id;
+ const deferred=[loadMedia(),loadVaultState(),loadHero(),loadStorageUsage(),loadAvatars(),loadProfile().catch(()=>null)];
+ if(paid())deferred.push(loadContributions().catch(()=>{}),loadMessages().catch(()=>{}));
+ Promise.allSettled(deferred).then(()=>{
+  if(S.trip?.id!==activeTripId)return;
+  const evidenceCount=document.querySelector('.stat[data-tab="evidence"] b');
+  if(evidenceCount)evidenceCount.textContent=String(S.media.length);
+  const freeHero=document.querySelector('.dashboard[data-home-composition="free"] .hero-card>img');
+  if(freeHero&&S.heroUrl)freeHero.src=S.heroUrl;
+  if(S.tab==='evidence')observeMedia();
+  window.dispatchEvent(new CustomEvent('gtg:core-data-ready',{detail:{tripId:activeTripId}}));
+ });
 }
 async function loadStorageUsage(tripId=S.trip.id){try{const {data,error}=await db().rpc('trip_storage_usage',{target_trip_id:tripId});if(error)throw error;const row=Array.isArray(data)?data[0]:data;S.storage=row?{used:Number(row.used_bytes||0),quota:Number(row.quota_bytes||CFG.quota),remaining:Number(row.remaining_bytes||0)}:null}catch{S.storage=null}}
 async function signPath(bucket,path,seconds=3600){if(!path)return'';const {data,error}=await db().storage.from(bucket).createSignedUrl(path,seconds);if(error)throw error;return data?.signedUrl||''}
 async function loadHero(){S.heroUrl='';if(!S.trip?.hero_storage_path)return;try{S.heroUrl=await signPath('btg-evidence',S.trip.hero_storage_path)}catch{}}
-async function loadAvatars(){for(const m of S.members){if(!m.avatar_path)continue;try{S.avatarUrls[m.id]=await signPath('btg-documents',m.avatar_path)}catch{}}}
+async function loadAvatars(){await Promise.all(S.members.filter(m=>m.avatar_path).map(async m=>{try{S.avatarUrls[m.id]=await signPath('btg-documents',m.avatar_path)}catch{}}))}
 async function loadContributions(){const {data,error}=await db().rpc('trip_media_contribution_breakdown',{p_trip_id:S.trip.id});if(error)throw error;S.contributions={};for(const row of data||[])S.contributions[row.created_by]={photos:Number(row.photo_count||0),videos:Number(row.video_count||0),total:Number(row.total_count||0),latest:row.latest_created_at||null}}
 async function loadMessages(){const {data,error}=await db().from('trip_messages').select('*').eq('trip_id',S.trip.id).order('created_at',{ascending:false}).limit(100);if(error)throw error;S.messages=data||[]}
 async function signMedia(rows,bucket='btg-evidence'){const pending=rows.filter(row=>row&&!S.urls[row.id]&&!mediaSigning.has(row.id));for(let i=0;i<pending.length;i+=6){const batch=pending.slice(i,i+6);batch.forEach(row=>mediaSigning.add(row.id));try{const signed=await Promise.all(batch.map(row=>signPath(bucket,row.thumbnail_path||row.storage_path).catch(()=>'')));signed.forEach((url,index)=>{const row=batch[index];if(!url)return;S.urls[row.id]=url;const el=document.querySelector(`[data-media-id="${row.id}"]`);if(el&&!el.getAttribute('src'))el.setAttribute('src',url)})}finally{batch.forEach(row=>mediaSigning.delete(row.id))}}}
@@ -143,7 +153,7 @@ async function upgrade(){checkoutConsentModal()}
 async function startCheckout(){const h=await authHeader(),res=await fetch(CFG.stripe,{method:'POST',headers:{'Content-Type':'application/json',...h},body:JSON.stringify({action:'create',tripId:S.trip.id,tripName:S.trip.name,email:S.user.email,termsAccepted:true,immediateAccessRequested:true,legalVersion:LEGAL_VERSION,refundPolicyVersion:LEGAL_VERSION})});const out=await res.json();if(!res.ok)throw Error(out.error||'Checkout failed');if(out.already_active){closeModal();await loadTrip(S.trip.id);return}if(!out.url)throw Error('Secure checkout could not be opened.');location.href=out.url}
 async function verifyStripe(){const u=new URL(location.href),sid=u.searchParams.get('session_id');if(u.searchParams.get('stripe')!=='success'||!sid)return false;const h=await authHeader(),res=await fetch(CFG.stripe,{method:'POST',headers:{'Content-Type':'application/json',...h},body:JSON.stringify({action:'verify',sessionId:sid})});const out=await res.json();if(!res.ok)throw Error(out.error||'Could not verify payment');u.searchParams.delete('stripe');u.searchParams.delete('session_id');history.replaceState({},'',u);say('Full Trip unlocked.');return true}
 async function refresh(){await loadTrip(S.trip.id)}
-async function boot(){try{const {data:{user}}=await db().auth.getUser();S.user=user||null;if(!S.user){authView();if(new URL(location.href).searchParams.get('join')==='1')signInModal('join');return}await loadProfile().catch(()=>null);await listTrips();await verifyStripe();const u=new URL(location.href),tripId=u.searchParams.get('trip_id');if(u.searchParams.get('join')==='1'){joinModal();return}if(tripId&&S.trips.some(x=>x.id===tripId)){await loadTrip(tripId);return}if(S.trips.length===1){u.searchParams.set('trip_id',S.trips[0].id);history.replaceState({},'',u);await loadTrip(S.trips[0].id);return}tripPicker()}catch(e){console.error(e);say(e.message||'Something went wrong');authView()}}
+async function boot(){try{const {data:{user}}=await db().auth.getUser();S.user=user||null;if(!S.user){authView();if(new URL(location.href).searchParams.get('join')==='1')signInModal('join');return}await Promise.all([loadProfile().catch(()=>null),listTrips()]);await verifyStripe();const u=new URL(location.href),tripId=u.searchParams.get('trip_id');if(u.searchParams.get('join')==='1'){joinModal();return}if(tripId&&S.trips.some(x=>x.id===tripId)){await loadTrip(tripId);return}if(S.trips.length===1){u.searchParams.set('trip_id',S.trips[0].id);history.replaceState({},'',u);await loadTrip(S.trips[0].id);return}tripPicker()}catch(e){console.error(e);say(e.message||'Something went wrong');authView()}}
 document.addEventListener('change',e=>{if(e.target?.id==='bookingKind')syncBookingFields()});
 document.addEventListener('click',e=>{
  const t=e.target.closest('[data-delete-media],[data-a="deleteVaultMedia"]');

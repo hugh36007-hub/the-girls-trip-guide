@@ -4,7 +4,7 @@ const assert=require('assert/strict');
 
 const social=fs.readFileSync('girls-home-social-hub-v3.js','utf8');
 const parity=fs.readFileSync('girls-parity-refresh-20260904.js','utf8');
-const loader=fs.readFileSync('girls-critical-style-loader.js','utf8');
+const loader=fs.readFileSync('girls-performance-loader.js','utf8');
 const helper=vm.runInNewContext(`${social.match(/function choosePollState[\s\S]*?\n}/)[0]};choosePollState`);
 const polls=[{id:'new'},{id:'old'}];
 
