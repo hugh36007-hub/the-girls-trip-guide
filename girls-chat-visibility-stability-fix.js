@@ -59,4 +59,43 @@ const observer=new MutationObserver(()=>{
  social.classList.add('gtg-chat-sheet');
 });
 observer.observe(document.documentElement,{childList:true,subtree:true});
+
+/* Mobile UX: when the full-screen chat feed is already at its top, a downward pull
+   dismisses the sheet. Ordinary scrolling inside the message feed is unchanged. */
+let swipe=null;
+function sheetOpen(){return document.documentElement.classList.contains('gtg-chat-sheet-open')||document.body.classList.contains('gtg-chat-sheet-open')}
+function social(){return document.querySelector('[data-gtg-trip-social].gtg-chat-sheet')}
+function resetSwipe(){const el=social();if(el){el.classList.remove('dragging');el.style.setProperty('--gtg-chat-drag','0px')}swipe=null}
+function startSwipe(event){
+ if(!sheetOpen())return;
+ const feed=event.target.closest?.('[data-gtg-chat-feed]');
+ const t=event.touches?.[0];
+ if(!feed||!t||feed.scrollTop>1)return;
+ swipe={feed,startX:t.clientX,startY:t.clientY,lastY:t.clientY,startAt:performance.now(),dragging:false};
+}
+function moveSwipe(event){
+ if(!swipe||!sheetOpen())return;
+ const t=event.touches?.[0];if(!t)return;
+ if(swipe.feed.scrollTop>1){resetSwipe();return}
+ const dy=t.clientY-swipe.startY,dx=Math.abs(t.clientX-swipe.startX);
+ swipe.lastY=t.clientY;
+ if(dy<=0){if(swipe.dragging)resetSwipe();return}
+ if(!swipe.dragging){if(dy<12||dx>dy*1.15)return;swipe.dragging=true;social()?.classList.add('dragging')}
+ if(event.cancelable)event.preventDefault();
+ social()?.style.setProperty('--gtg-chat-drag',`${Math.min(dy,280)}px`);
+}
+function endSwipe(){
+ if(!swipe)return;
+ const state=swipe,dy=Math.max(0,state.lastY-state.startY),elapsed=Math.max(1,performance.now()-state.startAt),velocity=dy/elapsed;
+ swipe=null;
+ if(state.dragging&&(dy>82||(dy>30&&velocity>.65))){
+  const close=document.querySelector('[data-gtg-chat-close]');
+  if(close){close.click();return}
+ }
+ const el=social();if(el){el.classList.remove('dragging');el.style.setProperty('--gtg-chat-drag','0px')}
+}
+document.addEventListener('touchstart',startSwipe,{capture:true,passive:true});
+document.addEventListener('touchmove',moveSwipe,{capture:true,passive:false});
+document.addEventListener('touchend',endSwipe,{capture:true,passive:true});
+document.addEventListener('touchcancel',()=>resetSwipe(),{capture:true,passive:true});
 })();
