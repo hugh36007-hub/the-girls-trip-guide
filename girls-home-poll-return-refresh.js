@@ -13,16 +13,29 @@ function installCompactPollStyle(){
  style.textContent='@media(max-width:700px) and (max-height:700px){.gtg-home-poll-v3{padding:10px 12px 12px!important;min-height:0!important;height:auto!important}}';
  document.head.appendChild(style);
 }
+function refreshHomeAfterNavigation(){
+ setTimeout(()=>{
+  const current=new URL(location.href).searchParams.get('action')||'overview';
+  if(current!=='overview')return;
+  const app=document.getElementById('app');
+  if(!app)return;
+  /* The Home social hub observes direct app child changes. A zero-layout comment
+     gives it one deterministic post-navigation refresh after the Home dataset is ready. */
+  const marker=document.createComment('gtg-home-poll-return-refresh');
+  app.appendChild(marker);
+  marker.remove();
+ },80);
+}
 
 /*
-The core trip app changes tabs without a popstate event. The Home social hub already
-re-queries poll state when Home renders; removing the stale nodes at navigation time
-prevents a closed poll from being painted while that fresh query completes.
+The core trip app changes tabs without a popstate event. Clear stale poll nodes at
+navigation time, then give Home one deterministic refresh after its DOM has settled.
 */
 document.addEventListener('click',event=>{
  const tab=event.target.closest?.('[data-tab]');
  if(!tab)return;
  clearPollUi();
+ if(tab.dataset.tab==='overview')refreshHomeAfterNavigation();
 },false);
 
 installCompactPollStyle();
