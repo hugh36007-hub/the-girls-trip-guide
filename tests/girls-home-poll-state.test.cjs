@@ -21,5 +21,6 @@ assert(loader.includes('/girls-parity-refresh-20260904.js?v=4'));
 assert(loader.includes('/girls-home-poll-return-refresh.js?v=1'),'Home bundle must load the stale-poll return guard');
 assert(returnRefresh.includes("closest?.('[data-tab]')"),'return guard must react to trip-tab navigation');
 assert(returnRefresh.includes('clearPollUi();'),'return guard must clear stale poll UI before the Home query settles');
+assert(returnRefresh.includes('padding:10px 12px 12px!important'),'short mobile Home poll must not retain the old 94px bottom padding');
 assert(!returnRefresh.includes("dispatchEvent(new Event('pageshow'))"),'return guard must not fake page lifecycle events');
-console.log('PASS Girls Home poll ownership covers prompt-only, scoreboard-only, mixed and return-refresh states');
+console.log('PASS Girls Home poll ownership covers prompt-only, scoreboard-only, mixed, return-refresh and compact mobile states');
