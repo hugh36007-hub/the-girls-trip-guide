@@ -53,7 +53,6 @@ window.fetch=function(input,init){
   }).finally(()=>inflight.delete(k));
   inflight.set(k,master);
  }
- /* Every consumer gets its own Response clone; the shared master is never read. */
  return master.then(r=>r.clone());
 };
 
@@ -74,8 +73,6 @@ async function prewarm(){
 
  setStatus('Checking your secure sign-in…');
  const sessionPromise=client.auth.getSession().catch(()=>({data:{session:null}}));
- /* Start server validation immediately too. The main app will reuse the same
-    in-flight /auth/v1/user read when it boots a moment later. */
  const userPromise=client.auth.getUser().catch(()=>({data:{user:null}}));
  const [{data:sessionData},{data:userData}]=await Promise.all([sessionPromise,userPromise]);
  const user=userData?.user||sessionData?.session?.user||null;
@@ -94,7 +91,7 @@ async function prewarm(){
 
  setStatus('Loading the plan…');
  const q=client;
- const core=await Promise.all([
+ const core=[
   q.from('trips').select('*').eq('id',tripId).eq('product_key','girls').single(),
   q.from('trip_members').select('*').eq('trip_id',tripId).order('created_at'),
   q.from('bookings').select('*').eq('trip_id',tripId).order('created_at'),
@@ -106,13 +103,16 @@ async function prewarm(){
   q.from('payment_request_participants').select('*').eq('trip_id',tripId),
   q.from('trip_entitlements').select('*').eq('trip_id',tripId).eq('active',true),
   q.from('communication_settings').select('*').eq('trip_id',tripId).maybeSingle()
- ]);
+ ];
 
- const trip=core[0]?.data||null;
- const members=core[1]?.data||[];
- const entitlements=core[9]?.data||[];
- const full=entitlements.some(x=>x.active!==false&&['full_trip','evidence'].includes(x.entitlement));
+ /* Start optional reads as soon as their dependencies are ready instead of
+    waiting for every booking/money/document query to finish first. */
+ const [tripResult,membersResult,entitlementsResult]=await Promise.all([core[0],core[1],core[9]]);
+ const trip=tripResult?.data||null;
+ const members=membersResult?.data||[];
+ const entitlements=entitlementsResult?.data||[];
  if(!trip)return;
+ const full=entitlements.some(x=>x.active!==false&&['full_trip','evidence'].includes(x.entitlement));
 
  setStatus('Finishing the details…');
  const extras=[client.rpc('trip_storage_usage',{target_trip_id:tripId})];
@@ -133,7 +133,7 @@ async function prewarm(){
    }
   }
  }
- await Promise.allSettled(extras);
+ await Promise.allSettled([...core,...extras]);
  setStatus('Almost there…');
 }
 
