@@ -1,0 +1,56 @@
+/* Free-trip Home only: keep the post-vote poll result compact in the hero upper-right.
+   Full Trip and the pre-vote poll prompt are intentionally untouched. */
+.dashboard[data-home-composition="free"] .hero-card.gtg-has-home-chat{
+  position:relative!important;
+}
+.dashboard[data-home-composition="free"] .hero-card.gtg-has-home-chat .gtg-home-score-v3{
+  position:absolute!important;
+  top:14px!important;
+  right:14px!important;
+  bottom:auto!important;
+  left:auto!important;
+  width:min(220px,48%)!important;
+  max-width:220px!important;
+  margin:0!important;
+  padding:10px 11px!important;
+  z-index:30!important;
+  border-radius:13px!important;
+}
+.dashboard[data-home-composition="free"] .hero-card.gtg-has-home-chat .gtg-home-score-v3 h3{
+  margin:5px 0 7px!important;
+  font-size:16px!important;
+  line-height:1.05!important;
+}
+.dashboard[data-home-composition="free"] .hero-card.gtg-has-home-chat .gtg-score-v3-row{
+  gap:3px 6px!important;
+  margin-top:5px!important;
+}
+.dashboard[data-home-composition="free"] .hero-card.gtg-has-home-chat .gtg-score-v3-row span{
+  font-size:9.5px!important;
+  line-height:1.15!important;
+}
+.dashboard[data-home-composition="free"] .hero-card.gtg-has-home-chat .gtg-score-v3-row b{
+  font-size:9px!important;
+}
+.dashboard[data-home-composition="free"] .hero-card.gtg-has-home-chat .gtg-score-v3-total{
+  margin-top:6px!important;
+  font-size:8px!important;
+}
+@media(max-width:430px){
+  .dashboard[data-home-composition="free"] .hero-card.gtg-has-home-chat .gtg-home-score-v3{
+    top:12px!important;
+    right:12px!important;
+    width:176px!important;
+    max-width:48%!important;
+    padding:9px 10px!important;
+  }
+}
+@media(max-width:370px){
+  .dashboard[data-home-composition="free"] .hero-card.gtg-has-home-chat .gtg-home-score-v3{
+    width:158px!important;
+    max-width:47%!important;
+  }
+  .dashboard[data-home-composition="free"] .hero-card.gtg-has-home-chat .gtg-home-score-v3 h3{
+    font-size:14px!important;
+  }
+}
