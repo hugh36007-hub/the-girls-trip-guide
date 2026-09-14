@@ -71,15 +71,19 @@ const forceApprovedHeader=()=>{
   }
   const navLinks=document.getElementById('navLinks');
   if(navLinks){navLinks.innerHTML='<a href="/situation">So… what’s the plan?</a><a href="/the-gals#how-it-works">How It Works</a><a href="/free-vs-full">Free vs Full</a><a href="/gals">The GALS</a><a href="/briefing">The Briefing</a>';}
+  const desktopCta=header.querySelector('.nav-cta');
+  if(desktopCta){desktopCta.href='/create-trip';desktopCta.textContent='Sign in';desktopCta.setAttribute('aria-label','Sign in');}
   const button=document.getElementById('menuButton');
   const nav=button?.parentElement;
   if(button&&nav){
-    button.setAttribute('aria-expanded','false');button.setAttribute('aria-controls','mobileNavigation');
-    if(!nav.querySelector('.mobile-plan-link')){const a=document.createElement('a');a.className='mobile-plan-link';a.href='/create-trip';a.textContent='Plan your trip';nav.insertBefore(a,button);}
+    button.type='button';button.setAttribute('aria-controls','mobileNavigation');if(!header.classList.contains('open'))button.setAttribute('aria-expanded','false');
+    let mobileCta=nav.querySelector('.mobile-plan-link');
+    if(!mobileCta){mobileCta=document.createElement('a');mobileCta.className='mobile-plan-link';nav.insertBefore(mobileCta,button);}
+    mobileCta.href='/create-trip';mobileCta.textContent='Sign in';mobileCta.setAttribute('aria-label','Sign in');
     if(!header.querySelector('.mobile-drawer')){
       const d=document.createElement('nav');d.className='mobile-drawer';d.id='mobileNavigation';d.setAttribute('aria-label','Mobile navigation');d.innerHTML='<a href="/situation">So… what’s the plan?</a><a href="/the-gals#how-it-works">How It Works</a><a href="/free-vs-full">Free vs Full</a><a href="/gals">The GALS</a><a href="/briefing">The Briefing</a><a href="/create-trip">Create a Free Trip</a>';header.appendChild(d);d.querySelectorAll('a').forEach(a=>a.addEventListener('click',()=>{header.classList.remove('open');button.setAttribute('aria-expanded','false')}));
     }
-    if(!button.dataset.sharedShellBound){button.dataset.sharedShellBound='true';button.addEventListener('click',()=>{const open=header.classList.toggle('open');button.setAttribute('aria-expanded',String(open))});document.addEventListener('keydown',e=>{if(e.key==='Escape'&&header.classList.contains('open')){header.classList.remove('open');button.setAttribute('aria-expanded','false');button.focus()}});}
+    if(isResearch&&!button.dataset.sharedShellBound){button.dataset.sharedShellBound='true';button.addEventListener('click',()=>{const open=header.classList.toggle('open');button.setAttribute('aria-expanded',String(open))});document.addEventListener('keydown',e=>{if(e.key==='Escape'&&header.classList.contains('open')){header.classList.remove('open');button.setAttribute('aria-expanded','false');button.focus()}});}
   }
 };
 forceApprovedHeader();
