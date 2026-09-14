@@ -1,6 +1,16 @@
 (() => {
   'use strict';
 
+  // Resend is a core organiser action, not a route enhancement. Start its handler
+  // with the core form layer so a slow/deferred theme bundle cannot miss submit.
+  if (!document.querySelector('script[data-gtg-resend-core]')) {
+    const resendScript = document.createElement('script');
+    resendScript.src = '/girls-resend-invite-fix.js?v=20260914-3';
+    resendScript.async = false;
+    resendScript.dataset.gtgResendCore = '1';
+    document.head.appendChild(resendScript);
+  }
+
   const LABELS = {
     emailForm: 'Sending code…',
     otpForm: 'Signing in…',
