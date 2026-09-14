@@ -19,8 +19,6 @@ function setStatus(text){
 }
 setStatus('Opening your secure trip…');
 
-/* During startup only, share identical Supabase reads between the prewarmer
-   and the real app. This is deliberately allow-listed: no writes are cached. */
 const nativeFetch=window.fetch.bind(window);
 const inflight=new Map();
 const cached=new Map();
@@ -79,8 +77,8 @@ async function prewarm(){
  if(!user)return;
 
  setStatus('Finding your trip…');
- const profilePromise=client.from('profiles').select('*').eq('id',user.id).maybeSingle();
- const tripsPromise=client.from('trips').select('*').eq('product_key','girls').order('start_date',{ascending:false});
+ const profilePromise=Promise.resolve(client.from('profiles').select('*').eq('id',user.id).maybeSingle());
+ const tripsPromise=Promise.resolve(client.from('trips').select('*').eq('product_key','girls').order('start_date',{ascending:false}));
  const [,tripsResult]=await Promise.allSettled([profilePromise,tripsPromise]);
  const trips=tripsResult.status==='fulfilled'&&!tripsResult.value.error?(tripsResult.value.data||[]):[];
  const url=new URL(location.href);
@@ -103,10 +101,8 @@ async function prewarm(){
   q.from('payment_request_participants').select('*').eq('trip_id',tripId),
   q.from('trip_entitlements').select('*').eq('trip_id',tripId).eq('active',true),
   q.from('communication_settings').select('*').eq('trip_id',tripId).maybeSingle()
- ];
+ ].map(p=>Promise.resolve(p));
 
- /* Start optional reads as soon as their dependencies are ready instead of
-    waiting for every booking/money/document query to finish first. */
  const [tripResult,membersResult,entitlementsResult]=await Promise.all([core[0],core[1],core[9]]);
  const trip=tripResult?.data||null;
  const members=membersResult?.data||[];
@@ -115,21 +111,21 @@ async function prewarm(){
  const full=entitlements.some(x=>x.active!==false&&['full_trip','evidence'].includes(x.entitlement));
 
  setStatus('Finishing the details…');
- const extras=[client.rpc('trip_storage_usage',{target_trip_id:tripId})];
- if(trip.hero_storage_path)extras.push(client.storage.from('btg-evidence').createSignedUrl(trip.hero_storage_path,3600));
- for(const m of members){if(m.avatar_path)extras.push(client.storage.from('btg-documents').createSignedUrl(m.avatar_path,3600));}
+ const extras=[Promise.resolve(client.rpc('trip_storage_usage',{target_trip_id:tripId}))];
+ if(trip.hero_storage_path)extras.push(Promise.resolve(client.storage.from('btg-evidence').createSignedUrl(trip.hero_storage_path,3600)));
+ for(const m of members){if(m.avatar_path)extras.push(Promise.resolve(client.storage.from('btg-documents').createSignedUrl(m.avatar_path,3600)));}
  if(full){
-  extras.push(client.rpc('vault_is_configured',{p_trip_id:tripId}));
-  extras.push(client.rpc('has_active_vault_session',{target_trip_id:tripId}));
-  extras.push(client.rpc('trip_media_contribution_breakdown',{p_trip_id:tripId}));
-  extras.push(client.from('trip_messages').select('*').eq('trip_id',tripId).order('created_at',{ascending:false}).limit(100));
-  const mediaPromise=client.from('media').select('*').eq('trip_id',tripId).eq('album','evidence').order('created_at',{ascending:false}).limit(250);
+  extras.push(Promise.resolve(client.rpc('vault_is_configured',{p_trip_id:tripId})));
+  extras.push(Promise.resolve(client.rpc('has_active_vault_session',{target_trip_id:tripId})));
+  extras.push(Promise.resolve(client.rpc('trip_media_contribution_breakdown',{p_trip_id:tripId})));
+  extras.push(Promise.resolve(client.from('trip_messages').select('*').eq('trip_id',tripId).order('created_at',{ascending:false}).limit(100)));
+  const mediaPromise=Promise.resolve(client.from('media').select('*').eq('trip_id',tripId).eq('album','evidence').order('created_at',{ascending:false}).limit(250));
   extras.push(mediaPromise);
   const media=await mediaPromise.catch(()=>({data:[]}));
   if(url.searchParams.get('action')==='evidence'){
    for(const item of (media?.data||[]).slice(0,6)){
     const path=item.thumbnail_path||item.storage_path;
-    if(path)extras.push(client.storage.from('btg-evidence').createSignedUrl(path,3600));
+    if(path)extras.push(Promise.resolve(client.storage.from('btg-evidence').createSignedUrl(path,3600)));
    }
   }
  }
@@ -139,7 +135,6 @@ async function prewarm(){
 
 prewarm().catch(()=>{});
 
-/* Never leave a convincing-looking fake dashboard silently sitting there. */
 setTimeout(()=>{
  if(!app?.querySelector('.gtg-boot-shell'))return;
  setStatus('Still connecting. If this does not open in a few seconds, refresh once.');
