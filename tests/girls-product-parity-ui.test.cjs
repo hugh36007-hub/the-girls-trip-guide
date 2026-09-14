@@ -2,6 +2,7 @@ const fs=require('fs');
 const assert=require('assert');
 const js=fs.readFileSync('girls-product-parity.js','utf8');
 const css=fs.readFileSync('girls-product-parity.css','utf8');
+const polish=fs.readFileSync('girls-inner-page-polish.js','utf8');
 assert(js.includes('function addBookingForKind(kind)'),'empty plan categories must open the correctly typed booking form');
 assert(js.includes("!state.bookings.some(x=>x.kind===kind)"),'populated plan categories must remain filters');
 const html=fs.readFileSync('create-trip.html','utf8');
@@ -21,6 +22,12 @@ for(const token of ['data-parity-go="plan"','data-parity-go="money"','data-parit
 
 // Plan, money and group parity.
 for(const token of ['Travel','Accommodation','Local transport','Activities','Other','Invite another','Outstanding requests','Passports checked','Invites pending']) must(js,token,token);
+
+// Mobile Plan/Money presentation has one late authoritative owner.
+for(const token of ['gtg-plan-money-mobile-authority','panel[data-panel="money"].active .money-row','padding-bottom:calc(128px + env(safe-area-inset-bottom))','gtg-kind-chooser','gtgMobileKindSource']) must(polish,token,`Plan/Money mobile authority: ${token}`);
+must(polish,"appbar.classList.toggle('gtg-inner-appbar'",'inner header route resync');
+must(polish,"select.dispatchEvent(new Event('change',{bubbles:true}))",'booking type value bridge');
+assert(polish.includes('background:#fff!important'),'Plan/Money mobile light surfaces must override legacy dark refinement');
 
 // Full Trip communications and Evidence parity.
 for(const token of ['GALS communications','Who handles the messages?','Automatic routing','The Boss','The Organised One','The Chaos Agent','The Hammer','Payment reminders','Gallery nudges','Post-trip upload reminders']) must(js,token,token);
