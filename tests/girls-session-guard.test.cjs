@@ -5,7 +5,7 @@ const loader=fs.readFileSync('girls-performance-loader.js','utf8');
 const checks=[
  ['guard loaded after app core',html.includes('/girls-session-guard.js?v=2')&&html.indexOf('girls-app-v2.js')<html.indexOf('girls-session-guard.js')],
  ['guard does not bootstrap Home UI',!src.includes('GTG_HOME_SOCIAL_V3_BOOTSTRAP')&&!src.includes('girls-home-scoreboard-fit.js')],
- ['runtime loader owns Home UI',loader.includes('/girls-home-social-hub-v3.js?v=20260908-4')&&loader.includes('/girls-home-scoreboard-fit.js?v=20260908-3')],
+ ['runtime ownership is split intentionally',!loader.includes('/girls-home-social-hub-v3.js')&&loader.includes('/girls-home-scoreboard-fit.js?v=20260908-3')],
  ['auth change subscription',src.includes('auth.onAuthStateChange')],
  ['focus reconciliation',src.includes("window.addEventListener('focus'")&&src.includes('visibilitychange')&&src.includes("window.addEventListener('pageshow'")],
  ['live user is server confirmed',src.includes('auth.getUser()')],

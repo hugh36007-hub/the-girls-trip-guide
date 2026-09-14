@@ -59,7 +59,8 @@ jobs:
         run: |
           grep -Fq 'girls-critical-style-loader.js?v=20260914-1' mobile-web/create-trip.html
           grep -Fq 'girls-app-v2.js?v=7' mobile-web/create-trip.html
-          grep -Fq 'girls-performance-loader.js?v=11' mobile-web/create-trip.html
+          grep -Fq 'girls-home-social-hub-v3.js?v=20260914-1' mobile-web/create-trip.html
+          grep -Fq 'girls-performance-loader.js?v=12' mobile-web/create-trip.html
           ! grep -Fq 'gtg-first-paint-cover' mobile-web/girls-critical-style-loader.js
       - name: Build signed Play bundle
         env:
@@ -151,7 +152,8 @@ jobs:
           grep -Fq 'girls-finalize-invite' mobile-web/invite-return.js
           grep -Fq 'girls-critical-style-loader.js?v=20260914-1' mobile-web/create-trip.html
           grep -Fq 'girls-app-v2.js?v=7' mobile-web/create-trip.html
-          grep -Fq 'girls-performance-loader.js?v=11' mobile-web/create-trip.html
+          grep -Fq 'girls-home-social-hub-v3.js?v=20260914-1' mobile-web/create-trip.html
+          grep -Fq 'girls-performance-loader.js?v=12' mobile-web/create-trip.html
           ! grep -Fq 'gtg-first-paint-cover' mobile-web/girls-critical-style-loader.js
           grep -Fq 'CURRENT_PROJECT_VERSION = 5;' ios/App/App.xcodeproj/project.pbxproj
 

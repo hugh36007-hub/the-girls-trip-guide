@@ -12,7 +12,9 @@ assert.doesNotMatch(critical,/MutationObserver|gtg-first-paint-cover|finalReady|
 assert.match(critical,/const BASE_STYLES=/,'critical loader must be styling-only');
 assert.match(critical,/live-dashboard-hero\.css\?v=10/,'authoritative Home styling must be available before app paint');
 assert.equal((loader.match(/\/girls-live-dashboard-hero\.js/g)||[]).length,1,'Home hero runtime must have one loader owner');
-assert.equal((loader.match(/\/girls-home-social-hub-v3\.js/g)||[]).length,1,'Home social runtime must have one loader owner');
+assert.equal((html.match(/\/girls-home-social-hub-v3\.js/g)||[]).length,1,'Free Home chat must load directly with the core dashboard');
+assert.equal((loader.match(/\/girls-home-social-hub-v3\.js/g)||[]).length,0,'deferred Home bundle must not duplicate the core chat owner');
+assert.doesNotMatch(loader,/girls-home-hero-layout-match/,'legacy black Free hero override must not load');
 assert.equal((loader.match(/\/girls-home-scoreboard-fit\.js/g)||[]).length,1,'Home scoreboard runtime must have one loader owner');
 assert.doesNotMatch(guard,/girls-home-social-hub-v3|girls-home-scoreboard-fit/,'session security must not own Home UI startup');
 assert.match(loader,/if\(route==='overview'\)afterDashboard\(\(\)=>void loadBundle\('home'\),0\)/,'Home enhancement bundle must start once after the core dashboard exists');
@@ -24,8 +26,9 @@ assert.match(app,/async function loadAvatars\(\)\{await Promise\.all/,'avatar si
 assert.match(html,/girls-critical-style-loader\.js\?v=20260914-1/,'critical style loader cache version missing');
 assert.match(html,/girls-app-v2\.js\?v=7/,'core app cache version missing');
 assert.match(html,/girls-session-guard\.js\?v=2/,'session guard cache version missing');
-assert.match(html,/girls-performance-loader\.js\?v=11/,'runtime loader cache version missing');
-assert.match(sw,/gtg-pwa-v29-runtime-consolidation/,'service worker cache must advance for runtime consolidation');
+assert.match(html,/girls-home-social-hub-v3\.js\?v=20260914-1/,'core Free chat cache version missing');
+assert.match(html,/girls-performance-loader\.js\?v=12/,'runtime loader cache version missing');
+assert.match(sw,/gtg-pwa-v30-free-home-consistency/,'service worker cache must advance for Free Home consistency');
 assert.doesNotMatch(sw,/home-startup-failsafe/,'obsolete startup-failsafe cache must be retired');
 
 console.log('Girls Home runtime consolidation: PASS');

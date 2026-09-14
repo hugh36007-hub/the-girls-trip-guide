@@ -53,11 +53,9 @@ const BUNDLES={
   drawer:['/girls-free-entitlement-guard.js?v=1','/trip-export-menu-guard.js?v=1','/trip-export.js?v=1'],
   home:[
     '/home-social-platform-guard.js?v=20260908-2',
-    '/girls-home-hero-layout-match.js?v=20260909-1',
     '/girls-live-dashboard-hero.js?v=13',
     '/girls-live-chat-sync.js?v=3',
     '/girls-home-refinements.js?v=2',
-    '/girls-home-social-hub-v3.js?v=20260908-4',
     '/girls-home-scoreboard-fit.js?v=20260908-3',
     '/girls-parity-refresh-20260904.js?v=4',
     '/girls-home-thumbnail-prime.js?v=1'
