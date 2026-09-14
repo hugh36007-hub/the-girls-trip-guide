@@ -58,7 +58,7 @@ jobs:
       - name: Verify consolidated Girls Home runtime
         run: |
           grep -Fq 'girls-critical-style-loader.js?v=20260914-1' mobile-web/create-trip.html
-          grep -Fq 'girls-app-v2.js?v=7' mobile-web/create-trip.html
+          grep -Fq 'girls-app-v2.js?v=8' mobile-web/create-trip.html
           grep -Fq 'girls-home-social-hub-v3.js?v=20260914-1' mobile-web/create-trip.html
           grep -Fq 'girls-performance-loader.js?v=12' mobile-web/create-trip.html
           ! grep -Fq 'gtg-first-paint-cover' mobile-web/girls-critical-style-loader.js
@@ -151,7 +151,7 @@ jobs:
           grep -Fq 'GTGNativeSafety' mobile-web/girls-conversation-inbox.js
           grep -Fq 'girls-finalize-invite' mobile-web/invite-return.js
           grep -Fq 'girls-critical-style-loader.js?v=20260914-1' mobile-web/create-trip.html
-          grep -Fq 'girls-app-v2.js?v=7' mobile-web/create-trip.html
+          grep -Fq 'girls-app-v2.js?v=8' mobile-web/create-trip.html
           grep -Fq 'girls-home-social-hub-v3.js?v=20260914-1' mobile-web/create-trip.html
           grep -Fq 'girls-performance-loader.js?v=12' mobile-web/create-trip.html
           ! grep -Fq 'gtg-first-paint-cover' mobile-web/girls-critical-style-loader.js
