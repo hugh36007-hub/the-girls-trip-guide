@@ -5,6 +5,7 @@ const assert=require('assert/strict');
 const social=fs.readFileSync('girls-home-social-hub-v3.js','utf8');
 const parity=fs.readFileSync('girls-parity-refresh-20260904.js','utf8');
 const loader=fs.readFileSync('girls-performance-loader.js','utf8');
+const returnRefresh=fs.readFileSync('girls-home-poll-return-refresh.js','utf8');
 const helper=vm.runInNewContext(`${social.match(/function choosePollState[\s\S]*?\n}/)[0]};choosePollState`);
 const polls=[{id:'new'},{id:'old'}];
 
@@ -17,4 +18,8 @@ const html=fs.readFileSync('create-trip.html','utf8');
 assert(html.includes('/girls-home-social-hub-v3.js?v=20260914-1'));
 assert(!loader.includes('/girls-home-social-hub-v3.js'));
 assert(loader.includes('/girls-parity-refresh-20260904.js?v=4'));
-console.log('PASS Girls Home poll ownership covers prompt-only, scoreboard-only and mixed states');
+assert(loader.includes('/girls-home-poll-return-refresh.js?v=1'),'Home bundle must load the stale-poll return guard');
+assert(returnRefresh.includes("closest?.('[data-tab]')"),'return guard must react to trip-tab navigation');
+assert(returnRefresh.includes('clearPollUi();'),'return guard must clear stale poll UI before the Home query settles');
+assert(!returnRefresh.includes("dispatchEvent(new Event('pageshow'))"),'return guard must not fake page lifecycle events');
+console.log('PASS Girls Home poll ownership covers prompt-only, scoreboard-only, mixed and return-refresh states');

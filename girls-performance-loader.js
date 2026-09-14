@@ -52,6 +52,7 @@ const BUNDLES={
   reminders:[REMINDER_SRC],
   drawer:['/girls-free-entitlement-guard.js?v=1','/trip-export-menu-guard.js?v=1','/trip-export.js?v=1'],
   home:[
+    '/girls-home-poll-return-refresh.js?v=1',
     '/home-social-platform-guard.js?v=20260908-2',
     '/girls-live-dashboard-hero.js?v=13',
     '/girls-live-chat-sync.js?v=3',
