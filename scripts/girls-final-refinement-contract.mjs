@@ -56,7 +56,10 @@ for(const href of ['/girls-product-parity.css?v=1','/girls-inner-page-polish.css
 assert(!html.includes('/girls-inner-page-polish.js?v=2'),'inner-page DOM polish must not execute on Home startup');
 assert(deferred.includes('/girls-inner-page-polish.js?v=2'),'route loader must retain inner-page hierarchy polish');
 assert(html.includes('/girls-critical-style-loader.js?v=20260914-1'),'critical style loader missing');
-assert(html.includes('/girls-performance-loader.js?v=11'),'performance loader missing');
+assert(html.includes('/girls-home-social-hub-v3.js?v=20260914-1'),'Free Home chat must be part of core startup');
+assert(!deferred.includes('/girls-home-social-hub-v3.js'),'Free Home chat must not have a second deferred owner');
+assert(!deferred.includes('/girls-home-hero-layout-match.js'),'legacy black Free hero override must remain retired');
+assert(html.includes('/girls-performance-loader.js?v=12'),'performance loader missing');
 
 // Current critical-path safeguards: one light, geometry-stable boot shell until authenticated composition is ready.
 assert(html.includes('rel="stylesheet" href="/girls-app.css?v=20260909-1"'),'current private-app stylesheet must be explicitly versioned');
@@ -97,7 +100,7 @@ const parsed=JSON.parse(manifest);
 assert.equal(parsed.start_url,'/create-trip?source=pwa');
 assert.equal(parsed.display,'standalone');
 assert(html.includes('rel="manifest" href="/manifest.webmanifest"'),'private app must advertise manifest');
-assert(html.includes('/girls-pwa-register.js?v=4'),'service worker registration missing');
+assert(html.includes('/girls-pwa-register.js?v=5'),'service worker registration missing');
 assert(sw.includes("request.mode==='navigate'"),'PWA navigation must be network-first');
 assert(sw.includes("request.destination==='script'||request.destination==='style'"),'PWA scripts/styles must be network-first');
 assert(headers.includes('/sw.js'),'service worker cache header missing');
