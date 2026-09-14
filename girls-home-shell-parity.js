@@ -40,6 +40,18 @@ html.gtg-home-shell .dock button small{font-size:8px!important}
 document.head.appendChild(style);
 
 function action(){return new URL(location.href).searchParams.get('action')||'overview'}
+function parseMoney(value){const n=Number(String(value||'').replace(/[^0-9.-]/g,''));return Number.isFinite(n)?n:0}
+function formatMoney(value){return new Intl.NumberFormat('en-GB',{style:'currency',currency:'GBP'}).format(Number(value||0))}
+function syncHomeMoney(){
+ if(action()!=='overview')return;
+ const moneyStat=document.querySelector('.stat-row .stat[data-tab="money"] b');
+ const planStat=document.querySelector('.stat-row .stat[data-tab="plan"] small');
+ const expenseTotal=document.querySelector('[data-panel="money"] .balance-grid .card:first-child h3');
+ if(!moneyStat||!planStat||!expenseTotal)return;
+ const booked=parseMoney(String(planStat.textContent||'').split('booked')[0]);
+ const expenses=parseMoney(expenseTotal.textContent);
+ moneyStat.textContent=formatMoney(booked+expenses);
+}
 function sync(){
  const isHome=action()==='overview';
  document.documentElement.classList.toggle('gtg-home-shell',isHome);
@@ -49,6 +61,7 @@ function sync(){
  if(!isHome)return;
  const title=appbar.querySelector('.trip-title');
  if(title)title.style.removeProperty('display');
+ syncHomeMoney();
 }
 let queued=false;function schedule(){if(queued)return;queued=true;requestAnimationFrame(()=>{queued=false;sync()})}
 const root=document.getElementById('app')||document.body;
