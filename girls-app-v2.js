@@ -155,17 +155,6 @@ async function verifyStripe(){const u=new URL(location.href),sid=u.searchParams.
 async function refresh(){await loadTrip(S.trip.id)}
 async function boot(){try{const {data:{user}}=await db().auth.getUser();S.user=user||null;if(!S.user){authView();if(new URL(location.href).searchParams.get('join')==='1')signInModal('join');return}await Promise.all([loadProfile().catch(()=>null),listTrips()]);await verifyStripe();const u=new URL(location.href),tripId=u.searchParams.get('trip_id');if(u.searchParams.get('join')==='1'){joinModal();return}if(tripId&&S.trips.some(x=>x.id===tripId)){await loadTrip(tripId);return}if(S.trips.length===1){u.searchParams.set('trip_id',S.trips[0].id);history.replaceState({},'',u);await loadTrip(S.trips[0].id);return}tripPicker()}catch(e){console.error(e);say(e.message||'Something went wrong');authView()}}
 document.addEventListener('change',e=>{if(e.target?.id==='bookingKind')syncBookingFields()});
-// Plan and Money are core organiser functions. Handle them before optional
-// refinement layers so a later capture listener cannot swallow the action.
-document.addEventListener('click',e=>{
- const t=e.target.closest?.('[data-a="addBooking"],[data-a="addExpense"],[data-a="addRequest"]');
- if(!t)return;
- e.preventDefault();e.stopImmediatePropagation();
- if(!isOwner()){say('Only the organiser can change the trip plan or costs.');return}
- if(t.dataset.a==='addBooking')bookingModal();
- else if(t.dataset.a==='addExpense')expenseModal();
- else requestModal();
-},true);
 document.addEventListener('click',e=>{
  const t=e.target.closest('[data-delete-media],[data-a="deleteVaultMedia"]');
  if(!t)return;

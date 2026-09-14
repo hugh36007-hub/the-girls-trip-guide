@@ -1,7 +1,7 @@
-const CACHE_VERSION='gtg-pwa-v31-organiser-actions';
+const CACHE_VERSION='gtg-pwa-v30-free-home-consistency';
 const STATIC_CACHE=`${CACHE_VERSION}-static`;
 const PAGE_CACHE=`${CACHE_VERSION}-pages`;
-const APP_SHELL=['/create-trip','/create-trip.html','/invite-auth.html','/invite-return.html','/invite-auth.js?v=4','/invite-return.js?v=5','/manifest.webmanifest','/girls-app.css?v=20260909-1','/girls-critical-style-loader.js?v=20260914-1','/girls-app-v2.js?v=8','/girls-session-guard.js?v=2','/girls-home-social-hub-v3.js?v=20260914-1','/girls-performance-loader.js?v=12','/live-dashboard-hero.css?v=10','/assets/images/gtg-pwa-192.svg?v=1','/assets/images/girls-trip-guide-logo.webp'];
+const APP_SHELL=['/create-trip','/create-trip.html','/invite-auth.html','/invite-return.html','/invite-auth.js?v=4','/invite-return.js?v=5','/manifest.webmanifest','/girls-app.css?v=20260909-1','/girls-critical-style-loader.js?v=20260914-1','/girls-app-v2.js?v=7','/girls-session-guard.js?v=2','/girls-home-social-hub-v3.js?v=20260914-1','/girls-performance-loader.js?v=12','/live-dashboard-hero.css?v=10','/assets/images/gtg-pwa-192.svg?v=1','/assets/images/girls-trip-guide-logo.webp'];
 
 self.addEventListener('install',event=>{
  event.waitUntil(caches.open(STATIC_CACHE).then(cache=>cache.addAll(APP_SHELL)));
