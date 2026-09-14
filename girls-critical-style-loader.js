@@ -3,6 +3,14 @@
 'use strict';
 if(window.__GTG_CRITICAL_STYLE_LOADER__)return;
 window.__GTG_CRITICAL_STYLE_LOADER__=true;
+const route=()=>new globalThis.URL(location.href).searchParams.get('action')||'overview';
+const evidence=()=>route()==='evidence';
+if(evidence())document.documentElement.classList.add('gtg-evidence-route-pending');
+
+const routeGuard=document.createElement('style');
+routeGuard.id='gtg-route-paint-guard';
+routeGuard.textContent='.gtg-evidence-route-pending .dashboard[data-home-composition="full"] [data-panel="evidence"].active{visibility:hidden!important}';
+document.head.appendChild(routeGuard);
 
 const BASE_STYLES=[
  '/mobile-viewport-lock.css?v=2',

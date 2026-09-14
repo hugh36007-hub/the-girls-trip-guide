@@ -8,7 +8,7 @@ const app=fs.readFileSync('girls-app-v2.js','utf8');
 const html=fs.readFileSync('create-trip.html','utf8');
 const sw=fs.readFileSync('sw.js','utf8');
 
-assert.doesNotMatch(critical,/MutationObserver|gtg-first-paint-cover|finalReady|failsafeCheck|loadCriticalScript/,'critical styling must not control runtime readiness or execute Home scripts');
+assert.doesNotMatch(critical,/MutationObserver|gtg-first-paint-cover|finalReady|failsafeCheck|loadCriticalScript/,'critical styling must not control Home readiness or execute Home scripts');
 assert.match(critical,/const BASE_STYLES=/,'critical loader must be styling-only');
 assert.match(critical,/live-dashboard-hero\.css\?v=10/,'authoritative Home styling must be available before app paint');
 assert.equal((loader.match(/\/girls-live-dashboard-hero\.js/g)||[]).length,1,'Home hero runtime must have one loader owner');
