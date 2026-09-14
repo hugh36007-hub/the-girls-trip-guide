@@ -63,6 +63,14 @@ function selectedField(form){
  const people=form.querySelector('select[name="people"][multiple]');
  return people?.closest('.field')||null;
 }
+function enhanceBookingForm(form){
+ if(!form||form.getAttribute('id')!=='bookingForm')return;
+ const kind=form.querySelector('select[name="kind"]');
+ if(kind&&!kind.dataset.gtgCloseBound){
+  kind.dataset.gtgCloseBound='1';
+  kind.addEventListener('change',()=>requestAnimationFrame(()=>kind.blur()));
+ }
+}
 function enhanceExpenseForm(form){
  if(!form||form.getAttribute('id')!=='expenseForm')return;
  const payer=form.querySelector('select[name="payer"]');
@@ -121,6 +129,7 @@ function syncActiveForms(){
  installStyles();
  document.querySelectorAll(FORM_SELECTOR).forEach(form=>{
   form.querySelectorAll('input[type="number"][name="cost"],input[type="number"][name="amount"]').forEach(clearDefaultZero);
+  enhanceBookingForm(form);
   enhanceExpenseForm(form);
   syncSplit(form);
  });
