@@ -99,15 +99,18 @@ function enhanceExpenseForm(form){
  }
  people.insertAdjacentElement('afterend',checks);
 }
+function setText(el,text){
+ if(el&&el.textContent!==text)el.textContent=text;
+}
 function syncSplit(form){
  if(!form?.matches(FORM_SELECTOR))return;
  const split=form.querySelector('select[name="splitMode"]');
  if(!split)return;
  const field=selectedField(form);
  if(form.getAttribute('id')==='bookingForm'){
-  if(split.options[0])split.options[0].textContent='Entire group — including anyone added later';
-  if(split.options[1])split.options[1].textContent='Selected group only';
-  const label=field?.querySelector('label');if(label)label.textContent='Selected group';
+  setText(split.options[0],'Entire group — including anyone added later');
+  setText(split.options[1],'Selected group only');
+  const label=field?.querySelector('label');setText(label,'Selected group');
  }
  if(!field)return;
  const show=split.value==='selected';
