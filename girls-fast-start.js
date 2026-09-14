@@ -11,7 +11,6 @@ const KEY='sb_publishable_qBQzJjFxSToEGxPJEcmskg_GNd4M4cP';
 const UUID=/^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 const READ_RPC=new Set(['trip_storage_usage','vault_is_configured','has_active_vault_session','trip_media_contribution_breakdown']);
 const app=document.getElementById('app');
-const started=performance.now();
 let cacheActive=true;
 
 function setStatus(text){
@@ -46,14 +45,16 @@ window.fetch=function(input,init){
  const k=`${info.method}|${info.url}|${info.body}`;
  const hit=cached.get(k);
  if(hit&&Date.now()-hit.at<20000)return Promise.resolve(hit.response.clone());
- const pending=inflight.get(k);
- if(pending)return pending.then(r=>r.clone());
- const p=nativeFetch(input,init).then(r=>{
-  if(r?.ok)cached.set(k,{at:Date.now(),response:r.clone()});
-  return r;
- }).finally(()=>inflight.delete(k));
- inflight.set(k,p);
- return p;
+ let master=inflight.get(k);
+ if(!master){
+  master=nativeFetch(input,init).then(r=>{
+   if(r?.ok)cached.set(k,{at:Date.now(),response:r.clone()});
+   return r;
+  }).finally(()=>inflight.delete(k));
+  inflight.set(k,master);
+ }
+ /* Every consumer gets its own Response clone; the shared master is never read. */
+ return master.then(r=>r.clone());
 };
 
 function stopCachingSoon(){
@@ -114,9 +115,7 @@ async function prewarm(){
  if(!trip)return;
 
  setStatus('Finishing the details…');
- const extras=[
-  client.rpc('trip_storage_usage',{target_trip_id:tripId})
- ];
+ const extras=[client.rpc('trip_storage_usage',{target_trip_id:tripId})];
  if(trip.hero_storage_path)extras.push(client.storage.from('btg-evidence').createSignedUrl(trip.hero_storage_path,3600));
  for(const m of members){if(m.avatar_path)extras.push(client.storage.from('btg-documents').createSignedUrl(m.avatar_path,3600));}
  if(full){
