@@ -2,6 +2,8 @@ const fs=require('fs');
 const assert=require('assert');
 const js=fs.readFileSync('girls-product-parity.js','utf8');
 const css=fs.readFileSync('girls-product-parity.css','utf8');
+assert(js.includes('function addBookingForKind(kind)'),'empty plan categories must open the correctly typed booking form');
+assert(js.includes("!state.bookings.some(x=>x.kind===kind)"),'populated plan categories must remain filters');
 const html=fs.readFileSync('create-trip.html','utf8');
 const loader=fs.readFileSync('girls-performance-loader.js','utf8');
 const must=(text,token,label)=>assert(text.includes(token),`Missing ${label||token}`);
