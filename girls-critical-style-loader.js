@@ -19,7 +19,8 @@ const BASE_STYLES=[
  '/girls-hero-vault-ux.css?v=1',
  '/girls-final-refinement.css?v=1',
  '/girls-date-focus-fix.css?v=1',
- '/live-dashboard-hero.css?v=10'
+ '/live-dashboard-hero.css?v=10',
+ '/girls-free-poll-hero-position.css?v=20260914-1'
 ];
 
 for(const href of BASE_STYLES){
