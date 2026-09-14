@@ -24,7 +24,7 @@ assert(!guide.includes('max-width: 700px'),'Guide must behave consistently on mo
 assert(!vaultUx.includes('data-vault-privacy-note'),'Permanent duplicate privacy note must be removed');
 
 assert(loader.includes('/evidence-intro-dismiss.js?v=3'),'Guide cache version not current');
-assert(html.includes('/girls-app-v2.js?v=7')&&html.includes('/girls-hero-vault-ux.js?v=4')&&html.includes('/girls-performance-loader.js?v=12'),'Updated scripts must be cache-busted');
-assert(sw.includes("gtg-pwa-v30-free-home-consistency"),'PWA cache generation not bumped');
+assert(html.includes('/girls-app-v2.js?v=7')&&html.includes('/girls-hero-vault-ux.js?v=4')&&html.includes('/girls-performance-loader.js?v=13'),'Updated scripts must be cache-busted');
+assert(sw.includes("gtg-pwa-v31-plan-money-entry"),'PWA cache generation not bumped');
 
 console.log('Girls Hidden Gallery discretion contract PASS');

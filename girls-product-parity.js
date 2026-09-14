@@ -71,6 +71,16 @@ function sectionRoot(){return document.querySelector('.dashboard .panel.active')
 function removeOld(){document.querySelectorAll('[data-parity-block]').forEach(x=>x.remove())}
 function goto(section){const btn=document.querySelector(`.dock [data-tab="${section}"]`);if(btn){btn.click();return}const u=new URL(location.href);u.searchParams.set('action',section);history.pushState({},'',u);location.reload()}
 function triggerExisting(action){const el=document.querySelector(`[data-a="${action}"],[data-action="${action}"]`);if(el){el.click();return true}return false}
+function addBookingForKind(kind){
+ if(!state.owner||!triggerExisting('addBooking'))return false;
+ setTimeout(()=>{
+  const select=document.querySelector('#bookingForm select[name="kind"]');
+  if(!select)return;
+  select.value=kind;
+  select.dispatchEvent(new Event('change',{bubbles:true}));
+ },0);
+ return true
+}
 
 function overview(){
  if(tab()!=='overview')return;
@@ -196,7 +206,12 @@ document.addEventListener('click',e=>{
  if(target.dataset.parityComms!==undefined){e.preventDefault();openComms();return}
  if(target.dataset.parityClose!==undefined){e.preventDefault();document.getElementById('modalRoot')?.classList.remove('open');return}
  if(target.dataset.parityPreview){e.preventDefault();openPreview(target.dataset.parityPreview);return}
- if(target.dataset.parityFilterKind){e.preventDefault();filterKind(target.dataset.parityFilterKind);return}
+ if(target.dataset.parityFilterKind){
+  e.preventDefault();
+  const kind=target.dataset.parityFilterKind;
+  if(kind!=='all'&&state.owner&&!state.bookings.some(x=>x.kind===kind)){addBookingForKind(kind);return}
+  filterKind(kind);return
+ }
  if(target.closest('.dock [data-tab]')||a==='drawer')setTimeout(()=>schedule(40),0);else if(a)setTimeout(()=>schedule(350),0)
 },true);
 
