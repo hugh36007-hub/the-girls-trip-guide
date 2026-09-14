@@ -1,4 +1,4 @@
-/* Resend invitation repair: exact-member resend, resilient on slower mobile loads. */
+/* Resend invitation repair: exact-member resend with mobile-visible status. */
 (()=>{
 'use strict';
 if(window.__GTG_RESEND_INVITE_FIX__)return;window.__GTG_RESEND_INVITE_FIX__=true;
@@ -7,7 +7,7 @@ const KEY='sb_publishable_qBQzJjFxSToEGxPJEcmskg_GNd4M4cP';
 const ENDPOINT=`${URL}/functions/v1/girls-trip-email`;
 let client=null,pendingMemberId='';
 const db=()=>client||(client=window.supabase?.createClient?.(URL,KEY,{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true}}));
-function toast(msg){const el=document.getElementById('toast');if(!el)return;el.textContent=msg;el.classList.add('show');clearTimeout(el.__resendTimer);el.__resendTimer=setTimeout(()=>el.classList.remove('show'),3500)}
+function toast(msg){const el=document.getElementById('toast');if(!el)return;el.textContent=msg;el.setAttribute('role','status');Object.assign(el.style,{top:'max(18px, env(safe-area-inset-top))',bottom:'auto',zIndex:'10000',maxWidth:'calc(100vw - 24px)',whiteSpace:'normal',textAlign:'center'});el.classList.add('show');clearTimeout(el.__resendTimer);el.__resendTimer=setTimeout(()=>el.classList.remove('show'),6000)}
 function closeModal(){const root=document.getElementById('modalRoot');if(!root)return;root.classList.remove('open');root.innerHTML=''}
 function resendModalOpen(){return /resend invitation/i.test(document.querySelector('#modalRoot .modal h2')?.textContent||'')}
 async function resolveMemberId(form){
