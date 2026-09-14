@@ -19,7 +19,7 @@ const BUNDLES={
   onboarding:['/girls-batch1-parity-safe-v2.js?v=20260914-1','/girls-convince-copy-v2.js?v=20260907-1'],
   parity:['/girls-product-parity.js?v=5'],
   shell:['/girls-section-layout.js?v=1','/girls-inner-page-polish.js?v=2'],
-  planDocuments:[DOC_SRC],
+  planDocuments:[DOC_SRC,'/girls-booking-copy.js?v=1'],
   money:['/girls-payment-nudge.js?v=2'],
   groupCore:[
     '/girls-trip-social.js?v=3',
