@@ -7,13 +7,14 @@ const DOC_SRC='/girls-document-audience.js?v=20260908-2';
 const REMINDER_SRC='/girls-free-reminders-parity.js?v=20260908-7';
 const BUNDLES={
   appTheme:[
+    '/girls-resend-invite-fix.js?v=20260914-2',
+    '/girls-mobile-history-fix.js?v=1',
     '/logged-in-light-theme.js?v=20260909-1',
     '/logged-in-light-polish.js?v=20260908-4',
     '/girls-compact-inner-header.js?v=20260908-1',
     '/logged-in-light-theme-final-fix.js?v=20260907-1',
     '/logged-in-stat-icons.js?v=20260907-2',
     '/girls-direct-login-route.js?v=20260907-2',
-    '/girls-resend-invite-fix.js?v=20260907-1',
     '/girls-home-shell-parity.js?v=20260909-1'
   ],
   onboarding:['/girls-batch1-parity-safe-v2.js?v=20260914-1','/girls-convince-copy-v2.js?v=20260907-1'],
