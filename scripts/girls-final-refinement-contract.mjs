@@ -44,21 +44,19 @@ for(const href of ['/mobile-viewport-lock.css?v=2','/girls-final-refinement.css?
   assert(critical.includes(href),`critical loader must activate ${href}`);
 }
 assert(critical.includes('/live-dashboard-hero.css?v=10'),'final Home stylesheet must be activated by the first private startup script');
-assert(critical.includes('/girls-live-dashboard-hero.js?v=13'),'final Home hydrator must be registered before girls-app-v2 can render');
+assert(deferred.includes('/girls-live-dashboard-hero.js?v=13'),'unified runtime loader must own the final Home hydrator');
 assert(!fs.readFileSync('girls-date-flow.js','utf8').includes('girls-live-dashboard-hero.js'),'legacy date flow must not load a second Home transformer');
-assert(critical.includes('cover.innerHTML=boot.outerHTML')&&critical.includes('gtg-first-paint-cover'),'parsed private loading shell must remain as one stable paint cover during hydration');
-assert(critical.includes("hero.matches('.live-snapshot-hero[data-live-snapshot=\"1\"]')")&&critical.includes("hero.dataset.fullHeroOwner!=='girls-app-v2'"),'paid overview cover must remain until the core-owned Full Home shell exists');
-assert(critical.includes('requestAnimationFrame(()=>requestAnimationFrame'),'stable cover must release only after final layout settles across two frames');
-assert(!deferred.includes('installHomePaintGuard'),'deferred loader must not perform a second Home paint handoff');
-assert(!deferred.includes('girls-live-dashboard-hero'),'deferred loader must not trigger a late final-Home rewrite');
+assert(!critical.includes('gtg-first-paint-cover')&&!critical.includes('MutationObserver'),'critical styles must not block startup or own runtime readiness');
+assert(!deferred.includes('installHomePaintGuard'),'unified loader must not add a second Home paint handoff');
+assert.equal((deferred.match(/girls-live-dashboard-hero/g)||[]).length,1,'unified loader must register the Home hydrator exactly once');
 for(const href of ['/girls-product-parity.css?v=1','/girls-inner-page-polish.css?v=1','/girls-document-audience.css?v=20260908-2']){
   assert(!html.includes(`rel=\"preload\" as=\"style\" href=\"${href}\"`),`route CSS must not preload on Home: ${href}`);
   assert(deferred.includes(href),`route loader must retain ${href}`);
 }
 assert(!html.includes('/girls-inner-page-polish.js?v=2'),'inner-page DOM polish must not execute on Home startup');
 assert(deferred.includes('/girls-inner-page-polish.js?v=2'),'route loader must retain inner-page hierarchy polish');
-assert(html.includes('/girls-critical-style-loader.js?v=20260913-1'),'critical style loader missing');
-assert(html.includes('/girls-performance-loader.js?v=10'),'performance loader missing');
+assert(html.includes('/girls-critical-style-loader.js?v=20260914-1'),'critical style loader missing');
+assert(html.includes('/girls-performance-loader.js?v=11'),'performance loader missing');
 
 // Current critical-path safeguards: one light, geometry-stable boot shell until authenticated composition is ready.
 assert(html.includes('rel="stylesheet" href="/girls-app.css?v=20260909-1"'),'current private-app stylesheet must be explicitly versioned');
@@ -80,7 +78,7 @@ assert(deferred.includes('tus-js-client@4.3.1/dist/tus.min.js'),'upload intent m
 assert(!html.includes('defer src="/girls-product-parity.js?v=1"'),'supplementary parity data must not compete with initial dashboard load');
 assert(deferred.includes('/girls-product-parity.js?v=4'),'route loader must retain the parity layer');
 assert(!deferred.includes("route==='overview'?1200:220"),'Home parity must not auto-refresh the authoritative dashboard after paint');
-assert(deferred.includes('12000'),'Home thumbnail prime must wait beyond the Lighthouse critical window');
+assert(deferred.includes("if(route==='overview')afterDashboard(()=>void loadBundle('home'),0)"),'Home bundle must start once after the core dashboard');
 assert(!dateFlow.includes('data-payment-nudge-loader'),'date helper must not side-load payment scripts');
 assert(!dateFlow.includes('data-trip-social-loader'),'date helper must not side-load social scripts');
 assert(heroUx.includes("observe(app,{childList:true})")&&!heroUx.includes("observe(document.documentElement"),'hero controls must observe only authoritative app rerenders');

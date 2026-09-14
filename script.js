@@ -1,7 +1,7 @@
 (()=>{
 'use strict';
 if('serviceWorker' in navigator){navigator.serviceWorker.getRegistration('/').then(reg=>reg?.update()).catch(()=>{});}
-const core='/script-core.js?v=20260909-2';
+const core='/script-core.js?v=20260914-1';
 const theme='/sitewide-light.js?v=20260909-3';
 const heroSurface='/hero-surface-correction.js?v=20260907-1';
 const situation='/situation-image-fix.js?v=20260907-3';
@@ -70,7 +70,7 @@ const forceApprovedHeader=()=>{
     if(img)img.removeAttribute('style');
   }
   const navLinks=document.getElementById('navLinks');
-  if(navLinks){navLinks.innerHTML='<a href="/situation">So… what’s the plan?</a><a href="/the-gals#how-it-works">How It Works</a><a href="/free-vs-full">Free vs Full</a><a href="/gals">The GALS</a><a href="/briefing">The Briefing</a>';}
+  if(navLinks){navLinks.innerHTML='<a href="/situation">So… what’s the plan?</a><a href="/the-gals#how-it-works">How It Works</a><a href="/free-vs-full">Free vs Full</a><a href="/gals">The GALS</a><a href="/briefing">The Briefing</a>';navLinks.querySelectorAll('a').forEach(a=>{const href=cleanPath(new URL(a.href,location.origin).pathname);if((path==='/the-gals'&&href==='/the-gals')||path===href){a.classList.add('active');a.setAttribute('aria-current','page')}});}
   const desktopCta=header.querySelector('.nav-cta');
   if(desktopCta){desktopCta.href='/create-trip';desktopCta.textContent='Sign in';desktopCta.setAttribute('aria-label','Sign in');}
   const button=document.getElementById('menuButton');
@@ -83,7 +83,7 @@ const forceApprovedHeader=()=>{
     if(!header.querySelector('.mobile-drawer')){
       const d=document.createElement('nav');d.className='mobile-drawer';d.id='mobileNavigation';d.setAttribute('aria-label','Mobile navigation');d.innerHTML='<a href="/situation">So… what’s the plan?</a><a href="/the-gals#how-it-works">How It Works</a><a href="/free-vs-full">Free vs Full</a><a href="/gals">The GALS</a><a href="/briefing">The Briefing</a><a href="/create-trip">Create a Free Trip</a>';header.appendChild(d);d.querySelectorAll('a').forEach(a=>a.addEventListener('click',()=>{header.classList.remove('open');button.setAttribute('aria-expanded','false')}));
     }
-    if(isResearch&&!button.dataset.sharedShellBound){button.dataset.sharedShellBound='true';button.addEventListener('click',()=>{const open=header.classList.toggle('open');button.setAttribute('aria-expanded',String(open))});document.addEventListener('keydown',e=>{if(e.key==='Escape'&&header.classList.contains('open')){header.classList.remove('open');button.setAttribute('aria-expanded','false');button.focus()}});}
+    if(!button.dataset.gtgNavBound){button.dataset.gtgNavBound='1';button.addEventListener('click',()=>{const open=header.classList.toggle('open');button.setAttribute('aria-expanded',String(open))});document.addEventListener('keydown',e=>{if(e.key==='Escape'&&header.classList.contains('open')){header.classList.remove('open');button.setAttribute('aria-expanded','false');button.focus()}});}
   }
 };
 forceApprovedHeader();

@@ -51,7 +51,17 @@ const BUNDLES={
   ],
   reminders:[REMINDER_SRC],
   drawer:['/girls-free-entitlement-guard.js?v=1','/trip-export-menu-guard.js?v=1','/trip-export.js?v=1'],
-  home:['/girls-home-thumbnail-prime.js?v=1'],
+  home:[
+    '/home-social-platform-guard.js?v=20260908-2',
+    '/girls-home-hero-layout-match.js?v=20260909-1',
+    '/girls-live-dashboard-hero.js?v=13',
+    '/girls-live-chat-sync.js?v=3',
+    '/girls-home-refinements.js?v=2',
+    '/girls-home-social-hub-v3.js?v=20260908-4',
+    '/girls-home-scoreboard-fit.js?v=20260908-3',
+    '/girls-parity-refresh-20260904.js?v=4',
+    '/girls-home-thumbnail-prime.js?v=1'
+  ],
   upload:['https://cdn.jsdelivr.net/npm/tus-js-client@4.3.1/dist/tus.min.js']
 };
 const STYLES={
@@ -106,12 +116,7 @@ async function openEvidence(target=null){
  target.click();
 }
 async function openHome(target=null){
- if(isFull()){
-   document.documentElement.classList.add('gtg-home-route-pending');
-   await window.GTGCritical?.ensureHomeAssets?.();
- }
  await loadBundle('home');
- document.documentElement.classList.remove('gtg-home-route-pending');
  if(!target?.isConnected)return;
  target.dataset.gtgHomeReady='1';
  target.click();
@@ -132,7 +137,7 @@ function scheduleInitial(){
  if(route==='evidence')afterDashboard(()=>void openEvidence(),0);
  else if(route!=='overview')afterDashboard(()=>void loadRoute(route),0);
  if(['group','evidence','plan','money'].includes(route))afterDashboard(()=>idle(()=>void loadBundle('parity')),700);
- if(route==='overview')afterDashboard(()=>setTimeout(()=>{if(visible()&&action()==='overview')idle(()=>void loadBundle('home'))},12000),0);
+ if(route==='overview')afterDashboard(()=>void loadBundle('home'),0);
 }
 
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',scheduleInitial,{once:true});else scheduleInitial();
@@ -142,7 +147,7 @@ document.addEventListener('pointerdown',event=>{
  const target=event.target.closest?.('[data-tab],[data-a],[data-action],[data-trip-social-tab],[data-gtg-social-tab],[data-parity-comms],[data-parity-reminders],[data-role-money],[data-role-upload]');if(!target)return;
  const tab=target.dataset.tab||'';const a=target.dataset.a||target.dataset.action||'';
  if(['plan','money','group','evidence'].includes(tab)){void loadRoute(tab);void loadBundle('parity')}
- if(tab==='overview'&&isFull())void window.GTGCritical?.ensureHomeAssets?.();
+ if(tab==='overview')void loadBundle('home');
  if(target.matches('[data-role-money]')||a==='addExpense')void loadRoute('money');
  if(isFull()&&(target.matches('[data-role-upload]')||['upload','vault','vaultUpload'].includes(a))){void loadRoute('evidence');void loadBundle('upload')}
  if(a==='addDocument'||a==='openDocument')void loadBundle('planDocuments');

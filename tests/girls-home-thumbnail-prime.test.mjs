@@ -16,5 +16,6 @@ const readiness=deferred.indexOf('/girls-media-readiness.js?v=3'),viewer=deferre
 assert(readiness>0&&viewer>readiness,'Girls Evidence route must retain readiness before viewer');
 assert(!html.includes('defer src="/girls-home-thumbnail-prime.js?v=1"'),'Girls home thumbnail primer must not be a direct startup script');
 assert(deferred.includes('/girls-home-thumbnail-prime.js?v=1'),'Girls deferred loader must retain the home thumbnail primer');
-assert(deferred.includes('requestIdleCallback')&&deferred.includes('afterDashboard')&&deferred.includes('12000'),'Girls home thumbnail primer must wait for the dashboard, then a long post-paint idle window');
-console.log('PASS Girls home thumbnail prime: first 30 stored thumbnails, batch signing, two low-priority workers and delayed post-paint startup');
+assert(deferred.includes('afterDashboard')&&deferred.includes("if(route==='overview')afterDashboard(()=>void loadBundle('home'),0)"),'Girls home thumbnail primer must be registered only after the core dashboard');
+assert(prime.includes('requestIdleCallback'),'Girls home thumbnail work itself must remain idle-scheduled');
+console.log('PASS Girls home thumbnail prime: first 30 stored thumbnails, batch signing, two low-priority workers and post-dashboard idle work');

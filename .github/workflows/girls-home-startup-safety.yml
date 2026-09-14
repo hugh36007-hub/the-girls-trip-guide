@@ -4,6 +4,11 @@ on:
   pull_request:
     paths:
       - 'girls-critical-style-loader.js'
+      - 'girls-performance-loader.js'
+      - 'girls-app-v2.js'
+      - 'girls-session-guard.js'
+      - 'create-trip.html'
+      - 'sw.js'
       - 'girls-home-shell-parity.js'
       - 'tests/girls-home-startup-safety.test.cjs'
       - '.github/workflows/girls-home-startup-safety.yml'
@@ -11,6 +16,11 @@ on:
     branches: [main]
     paths:
       - 'girls-critical-style-loader.js'
+      - 'girls-performance-loader.js'
+      - 'girls-app-v2.js'
+      - 'girls-session-guard.js'
+      - 'create-trip.html'
+      - 'sw.js'
       - 'girls-home-shell-parity.js'
       - 'tests/girls-home-startup-safety.test.cjs'
       - '.github/workflows/girls-home-startup-safety.yml'
@@ -28,4 +38,7 @@ jobs:
       - name: Runtime syntax
         run: |
           node --check girls-critical-style-loader.js
+          node --check girls-performance-loader.js
+          node --check girls-app-v2.js
+          node --check girls-session-guard.js
           node --check girls-home-shell-parity.js
