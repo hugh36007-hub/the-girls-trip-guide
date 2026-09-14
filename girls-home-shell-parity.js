@@ -41,7 +41,7 @@ document.head.appendChild(style);
 
 function action(){return new URL(location.href).searchParams.get('action')||'overview'}
 function parseMoney(value){const n=Number(String(value||'').replace(/[^0-9.-]/g,''));return Number.isFinite(n)?n:0}
-function formatMoney(value){return new Intl.NumberFormat('en-GB',{style:'currency',currency:'GBP'}).format(Number(value||0))}
+function formatMoney(value){return new Intl.NumberFormat('en-GB',{style:'currency',currency:'GBP',minimumFractionDigits:0,maximumFractionDigits:0}).format(Number(value||0))}
 function syncHomeMoney(){
  if(action()!=='overview')return;
  const moneyStat=document.querySelector('.stat-row .stat[data-tab="money"] b');
