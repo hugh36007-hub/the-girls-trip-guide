@@ -34,7 +34,7 @@ async function rowsFor(ids){
   const tid=tripId(),missing=ids.filter(id=>id&&!rowCache.has(id));if(!tid||!missing.length)return;
   for(let offset=0;offset<missing.length;offset+=40){
     const batch=missing.slice(offset,offset+40);
-    const {data,error}=await db().from('media').select('id,trip_id,album,storage_path,thumbnail_path,mime_type,file_name').eq('trip_id',tid).eq('album','evidence').in('id',batch);
+    const {data,error}=await db().from('media').select('id,trip_id,album,storage_path,thumbnail_path,mime_type,file_name,created_by').eq('trip_id',tid).eq('album','evidence').in('id',batch);
     if(error)throw error;(data||[]).forEach(row=>rowCache.set(row.id,row));
   }
 }
@@ -81,6 +81,40 @@ async function hydrateVideo(row,node){
   }
   await decorateVideoButton(button,row);
 }
+function mediaTile(row,userId,owner){
+  const tile=document.createElement('div');tile.className='media';
+  let media;
+  if(isVideo(row)){
+    media=document.createElement('video');media.controls=true;media.preload='metadata';
+  }else{
+    media=document.createElement('img');media.alt=row.file_name||'Trip photo';media.loading='lazy';media.decoding='async';
+  }
+  media.dataset.mediaId=row.id;tile.append(media);
+  const tools=document.createElement('div');tools.className='media-tools';
+  if(owner&&!isVideo(row)){
+    const hero=document.createElement('button');hero.type='button';hero.dataset.a='setMediaHero';hero.dataset.id=row.id;hero.textContent='Hero';tools.append(hero);
+  }
+  if(owner||row.created_by===userId){
+    const del=document.createElement('button');del.type='button';del.dataset.deleteMedia=row.id;del.textContent='Delete';tools.append(del);
+  }
+  tile.append(tools);return tile;
+}
+async function ensureEvidenceDom(){
+  if(!evidenceOpen()||!db())return;
+  const panel=document.querySelector('[data-panel="evidence"]'),gallery=panel?.querySelector('.gallery');
+  if(!gallery||gallery.querySelector('[data-media-id]'))return;
+  const tid=tripId();if(!tid)return;
+  try{
+    const [{data:rows,error},{data:{user}}]=await Promise.all([
+      db().from('media').select('id,trip_id,album,storage_path,thumbnail_path,mime_type,file_name,created_by').eq('trip_id',tid).eq('album','evidence').order('created_at',{ascending:false}).limit(250),
+      db().auth.getUser()
+    ]);
+    if(error)throw error;if(!(rows||[]).length)return;
+    const owner=document.querySelector('.dashboard')?.dataset.tripRole==='owner';
+    gallery.replaceChildren();
+    for(const row of rows){rowCache.set(row.id,row);gallery.append(mediaTile(row,user?.id||'',owner))}
+  }catch(error){console.warn('Evidence gallery refresh unavailable.',error)}
+}
 async function hydrateEvidence(){
   if(!evidenceOpen()||!db())return;
   const panel=document.querySelector('[data-panel="evidence"]');if(!panel)return;
@@ -106,7 +140,7 @@ async function playVideo(button){
   }catch(error){console.warn('Evidence video unavailable.',error)}
 }
 function scheduleHydration(){
-  [0,80,350,1200,3000].forEach(delay=>setTimeout(()=>{syncBadge();void hydrateEvidence()},delay));
+  [0,80,350,1200,3000].forEach(delay=>setTimeout(async()=>{syncBadge();await ensureEvidenceDom();await hydrateEvidence()},delay));
 }
 
 document.addEventListener('click',event=>{
@@ -117,6 +151,7 @@ document.addEventListener('click',event=>{
 document.addEventListener('submit',event=>{if(event.target?.id==='uploadForm')scheduleHydration()},true);
 window.addEventListener('gtg:media-uploaded',event=>{if(event.detail?.album==='evidence'){rowCache.clear();scheduleHydration()}});
 window.addEventListener('gtg:thumbnail-ready',event=>{if(event.detail?.album==='evidence'){rowCache.delete(event.detail.mediaId);scheduleHydration()}});
+window.addEventListener('gtg:core-data-ready',()=>{rowCache.clear();scheduleHydration()});
 window.addEventListener('pageshow',()=>{rowCache.clear();scheduleHydration()});
 window.addEventListener('focus',scheduleHydration);
 document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible')scheduleHydration()});
