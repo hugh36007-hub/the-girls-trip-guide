@@ -31,6 +31,9 @@ function installStyles(){
 body.modal-open .bottom-dock{opacity:0!important;visibility:hidden!important;pointer-events:none!important}
 #modalRoot.modal-wrap.open{z-index:1200!important}
 .selected-crew[hidden],#bookingForm .field[hidden]{display:none!important}
+#expenseForm .gtg-expense-split-checks{display:grid;gap:8px}
+#expenseForm .gtg-expense-split-option{display:flex;align-items:center;gap:10px;min-height:44px;padding:10px 12px;border:1px solid rgba(255,79,163,.28);border-radius:12px;background:#fff;font-weight:600;cursor:pointer}
+#expenseForm .gtg-expense-split-option input{width:18px;height:18px;margin:0;flex:0 0 auto;accent-color:#ff4fa3}
 @media(max-width:700px){
  #modal-root .modal-backdrop{overflow-y:auto!important;padding-bottom:calc(24px + env(safe-area-inset-bottom))!important}
  #modal-root .modal,#modalRoot.open .modal{max-height:calc(100dvh - 24px - env(safe-area-inset-top))!important;overflow-y:auto!important;overscroll-behavior:contain;scroll-padding-bottom:calc(28px + env(safe-area-inset-bottom));padding-bottom:calc(28px + env(safe-area-inset-bottom))!important}
@@ -60,6 +63,42 @@ function selectedField(form){
  const people=form.querySelector('select[name="people"][multiple]');
  return people?.closest('.field')||null;
 }
+function enhanceExpenseForm(form){
+ if(!form||form.getAttribute('id')!=='expenseForm')return;
+ const payer=form.querySelector('select[name="payer"]');
+ if(payer&&!payer.dataset.gtgCloseBound){
+  payer.dataset.gtgCloseBound='1';
+  payer.addEventListener('change',()=>requestAnimationFrame(()=>payer.blur()));
+ }
+ const people=form.querySelector('select[name="people"][multiple]');
+ if(!people||people.dataset.gtgCheckboxSource==='1')return;
+ people.dataset.gtgCheckboxSource='1';
+ people.required=false;
+ people.style.display='none';
+ people.setAttribute('aria-hidden','true');
+ people.tabIndex=-1;
+ const checks=document.createElement('div');
+ checks.className='gtg-expense-split-checks';
+ checks.dataset.expenseSplitChecks='1';
+ for(const option of people.options){
+  const label=document.createElement('label');
+  label.className='gtg-expense-split-option';
+  const input=document.createElement('input');
+  input.type='checkbox';
+  input.checked=option.selected;
+  input.value=option.value;
+  input.setAttribute('aria-label',option.textContent||'Group member');
+  input.addEventListener('change',()=>{
+   option.selected=input.checked;
+   people.dispatchEvent(new Event('change',{bubbles:true}));
+  });
+  const text=document.createElement('span');
+  text.textContent=option.textContent||'';
+  label.append(input,text);
+  checks.append(label);
+ }
+ people.insertAdjacentElement('afterend',checks);
+}
 function syncSplit(form){
  if(!form?.matches(FORM_SELECTOR))return;
  const split=form.querySelector('select[name="splitMode"]');
@@ -79,6 +118,7 @@ function syncActiveForms(){
  installStyles();
  document.querySelectorAll(FORM_SELECTOR).forEach(form=>{
   form.querySelectorAll('input[type="number"][name="cost"],input[type="number"][name="amount"]').forEach(clearDefaultZero);
+  enhanceExpenseForm(form);
   syncSplit(form);
  });
 }
