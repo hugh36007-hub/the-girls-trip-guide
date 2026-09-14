@@ -7,6 +7,7 @@ const DOC_SRC='/girls-document-audience.js?v=20260908-2';
 const REMINDER_SRC='/girls-free-reminders-parity.js?v=20260908-7';
 const BUNDLES={
   appTheme:[
+    '/girls-fx-expenses-bootstrap.js?v=1',
     '/girls-resend-invite-fix.js?v=20260914-2',
     '/girls-mobile-history-fix.js?v=1',
     '/logged-in-light-theme.js?v=20260909-1',
@@ -21,7 +22,7 @@ const BUNDLES={
   parity:['/girls-product-parity.js?v=5','/girls-gals-selector-fix.js?v=1'],
   shell:['/girls-section-layout.js?v=1','/girls-inner-page-polish.js?v=2'],
   planDocuments:[DOC_SRC,'/girls-booking-copy.js?v=1'],
-  money:['/girls-payment-nudge.js?v=2','/girls-fx-expenses.js?v=1'],
+  money:['/girls-payment-nudge.js?v=2'],
   groupCore:[
     '/girls-trip-social.js?v=3',
     '/girls-chat-sheet.js?v=4',
@@ -51,7 +52,7 @@ const BUNDLES={
     '/girls-convince-copy-v2.js?v=20260907-1'
   ],
   reminders:[REMINDER_SRC],
-  drawer:['/girls-free-entitlement-guard.js?v=1','/trip-export-menu-guard.js?v=1','/trip-export.js?v=1','/girls-fx-expenses.js?v=1'],
+  drawer:['/girls-free-entitlement-guard.js?v=1','/trip-export-menu-guard.js?v=1','/trip-export.js?v=1'],
   home:[
     '/girls-home-poll-return-refresh.js?v=1',
     '/home-social-platform-guard.js?v=20260908-2',
