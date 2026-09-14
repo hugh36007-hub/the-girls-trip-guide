@@ -65,7 +65,7 @@ function syncSplit(form){
  const split=form.querySelector('select[name="splitMode"]');
  if(!split)return;
  const field=selectedField(form);
- if(form.id==='bookingForm'){
+ if(form.getAttribute('id')==='bookingForm'){
   if(split.options[0])split.options[0].textContent='Entire group — including anyone added later';
   if(split.options[1])split.options[1].textContent='Selected group only';
   const label=field?.querySelector('label');if(label)label.textContent='Selected group';
@@ -82,7 +82,8 @@ function syncActiveForms(){
   syncSplit(form);
  });
 }
-document.addEventListener('click',()=>queueMicrotask(syncActiveForms));
+const modalRoot=document.getElementById('modalRoot')||document.getElementById('modal-root');
+if(modalRoot)new MutationObserver(()=>queueMicrotask(syncActiveForms)).observe(modalRoot,{childList:true,subtree:true});
 document.addEventListener('change',e=>{const el=e.target;if(el instanceof HTMLSelectElement&&el.name==='splitMode')syncSplit(el.form)});
 document.addEventListener('focusin',e=>clearDefaultZero(e.target));
 document.addEventListener('input',e=>normaliseLeadingZeros(e.target));
