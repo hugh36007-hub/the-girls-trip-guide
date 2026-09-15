@@ -76,11 +76,11 @@ if(modal)new MutationObserver(()=>syncSelector(modal)).observe(modal,{childList:
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',()=>syncSelector(),{once:true});else syncSelector();
 })();
 
-/* Girls Plan category tiles: make the tap visibly open the matching section and prevent repeated filter-handler taps. */
+/* Girls Plan category tiles: coalesce rapid taps so category filtering cannot lock the UI. */
 (()=>{
 'use strict';
 if(window.__GTG_PLAN_CATEGORY_INTERACTION_FIX__)return;window.__GTG_PLAN_CATEGORY_INTERACTION_FIX__=true;
-let busy=false,releaseTimer=0;
+let queuedKind='',rafId=0;
 
 function installPlanStyles(){
  if(document.getElementById('gtg-plan-category-interaction-css'))return;
@@ -92,10 +92,9 @@ function installPlanStyles(){
  document.head.appendChild(style);
 }
 
-function release(ms=350){clearTimeout(releaseTimer);releaseTimer=setTimeout(()=>{busy=false},ms)}
 function kindOf(card){return String(card.querySelector('.kicker')?.textContent||'').trim().toLowerCase()}
-function setSelected(target){
- document.querySelectorAll('.gtg-plan-categories [data-parity-filter-kind]').forEach(button=>button.setAttribute('aria-pressed',button===target?'true':'false'));
+function setSelected(kind){
+ document.querySelectorAll('.gtg-plan-categories [data-parity-filter-kind]').forEach(button=>button.setAttribute('aria-pressed',button.dataset.parityFilterKind===kind?'true':'false'));
 }
 function openAdd(kind){
  const add=document.querySelector('.panel[data-panel="plan"].active [data-a="addBooking"],.panel[data-panel="plan"].active [data-action="addBooking"]');
@@ -109,28 +108,33 @@ function openAdd(kind){
  },60);
  return true;
 }
-function handle(button){
- const plan=document.querySelector('.panel[data-panel="plan"].active');if(!plan)return;
- const kind=String(button.dataset.parityFilterKind||'');
+function applyKind(kind){
+ const plan=document.querySelector('.panel[data-panel="plan"].active');
+ if(!plan)return;
  const cards=[...plan.querySelectorAll('.booking')];
  if(kind==='all'){
   cards.forEach(card=>card.hidden=false);
-  setSelected(null);
-  release(120);
+  setSelected('');
   return;
  }
  const matches=cards.filter(card=>kindOf(card)===kind);
  if(!matches.length){
+  setSelected(kind);
   openAdd(kind);
-  release(450);
   return;
  }
  cards.forEach(card=>card.hidden=!matches.includes(card));
- setSelected(button);
+ setSelected(kind);
  const first=matches[0];
  first.scrollIntoView({block:'start'});
  window.scrollBy({top:-84,left:0,behavior:'auto'});
- release(220);
+}
+function flush(){
+ rafId=0;
+ const kind=queuedKind;
+ queuedKind='';
+ if(!kind)return;
+ try{applyKind(kind)}catch(err){console.warn('Girls plan category interaction failed',err)}
 }
 
 window.addEventListener('click',event=>{
@@ -138,9 +142,8 @@ window.addEventListener('click',event=>{
  if(!button)return;
  event.preventDefault();
  event.stopImmediatePropagation();
- if(busy)return;
- busy=true;
- requestAnimationFrame(()=>handle(button));
+ queuedKind=String(button.dataset.parityFilterKind||'');
+ if(!rafId)rafId=requestAnimationFrame(flush);
 },true);
 
 installPlanStyles();
