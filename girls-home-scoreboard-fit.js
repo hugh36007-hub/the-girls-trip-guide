@@ -180,9 +180,17 @@ async function refine(){
   actions?.remove();moneyCard.dataset.gtgTopRefined='1';
  }
  const data=await snapshot();if(!data||!moneyCard.isConnected)return;
- const heading=moneyCard.querySelector('.gtg-overview-title-row h2');if(heading)heading.textContent=`${money(data.outstanding)} outstanding`;
+ const heading=moneyCard.querySelector('.gtg-overview-title-row h2');
+ const nextText=`${money(data.outstanding)} outstanding`;
+ if(heading&&heading.textContent!==nextText)heading.textContent=nextText;
 }
 function schedule(ms=40){clearTimeout(observerTimer);observerTimer=setTimeout(()=>void refine(),ms)}
-const observer=new MutationObserver(()=>schedule());observer.observe(document.body,{childList:true,subtree:true});
+function touchesOverview(mutation){
+ const target=mutation.target?.nodeType===1?mutation.target:mutation.target?.parentElement;
+ if(target?.closest?.('.gtg-parity-overview'))return true;
+ return [...mutation.addedNodes].some(node=>node.nodeType===1&&(node.matches?.('.gtg-parity-overview,.gtg-overview-card')||node.querySelector?.('.gtg-parity-overview')));
+}
+const observer=new MutationObserver(mutations=>{if(mutations.some(touchesOverview))schedule()});
+observer.observe(document.body,{childList:true,subtree:true});
 schedule(0);window.addEventListener('pageshow',()=>{snapshotPromise=null;schedule(80)});window.addEventListener('popstate',()=>schedule(80));
 })();
