@@ -28,6 +28,8 @@ assert.equal(hooks.tripId(),'dc81b495-65fb-41a6-9dbf-2eb5572ab18e','tripId must 
 assert.equal(hooks.inferCurrency('Ibiza'),'EUR','Ibiza must resolve to EUR');
 assert(!/const\s+URL\s*=/.test(source),'FX runtime must not shadow the native URL constructor');
 assert(source.includes('new globalThis.URL(location.href)'),'tripId must explicitly use the global URL constructor');
+assert(!source.includes(".eq('currency_override',false).catch"),'Supabase post-save update must not call .catch on the query builder');
+assert(source.includes("const {error:currencyError}=await c.from('trips').update({currency})"),'Post-save trip currency update must be awaited as a Supabase result');
 assert(feedback.includes("window.__GTG_FX_EXPENSES__ = true"),'Broken legacy FX runtime must be disabled before it executes');
 assert(feedback.includes('/girls-fx-expenses-fixed.js?v=20260915-1'),'Corrected FX runtime must be loaded by the early core layer');
-console.log('PASS Girls FX URL constructor and corrected runtime bootstrap');
+console.log('PASS Girls FX URL constructor, post-save update and corrected runtime bootstrap');
