@@ -1,4 +1,4 @@
-/* Girls Trip Guide — one-time Full Trip Hidden Gallery explainer on Evidence. */
+/* Girls Trip Guide — one-time Full Trip Hidden Gallery explainer and discreet Home-only view entry. */
 (()=>{
 'use strict';
 if(window.__GTG_HIDDEN_GALLERY_INTRO__)return;
@@ -8,6 +8,7 @@ const tripId=()=>new URL(location.href).searchParams.get('trip_id')||'';
 const key=()=>`gtg:hidden-gallery-intro:${tripId()}`;
 const seen=()=>{try{return localStorage.getItem(key())==='1'}catch{return false}};
 const markSeen=()=>{try{localStorage.setItem(key(),'1')}catch{}};
+const toast=msg=>{const el=document.getElementById('toast');if(!el)return;el.textContent=msg;el.classList.add('show');setTimeout(()=>el.classList.remove('show'),3000)};
 
 function installStyle(){
  if(document.getElementById('gtg-hidden-gallery-intro-css'))return;
@@ -18,7 +19,7 @@ function installStyle(){
 .gtg-hidden-gallery-intro__top{display:flex;align-items:flex-start;gap:11px}
 .gtg-hidden-gallery-intro__icon{flex:0 0 34px;width:34px;height:34px;border-radius:11px;display:grid;place-items:center;background:#ff4fa3;color:#fff;font-size:17px;font-weight:900}
 .gtg-hidden-gallery-intro h3{margin:1px 0 4px;font:900 21px/1 'Barlow Condensed',sans-serif;text-transform:uppercase;color:#191316}
-.gtg-hidden-gallery-intro p{margin:0;color:#67535d;font-size:11px;line-height:1.45}
+.gtg-hidden-gallery-intro p{margin:0;color:#67535d;font-size:11px;line-height:1.5}
 .gtg-hidden-gallery-intro strong{color:#ed2f8b}
 .gtg-hidden-gallery-intro__actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:11px;padding-left:45px}
 .gtg-hidden-gallery-intro__actions button{min-height:34px}
@@ -27,20 +28,25 @@ function installStyle(){
  document.head.appendChild(s);
 }
 
+function stripDirectEntries(){
+ document.querySelectorAll('#drawerRoot [data-a="vault"]').forEach(button=>button.remove());
+}
+
 function install(){
+ stripDirectEntries();
  if(seen())return;
  const dash=document.querySelector('.dashboard[data-home-composition="full"]');
- const panel=document.querySelector('.panel[data-panel="evidence"]');
- if(!dash||!panel||panel.querySelector('[data-hidden-gallery-intro]'))return;
- const head=panel.querySelector('.section-head');
- if(!head)return;
+ if(!dash||dash.querySelector('[data-hidden-gallery-intro]'))return;
+ const shell=dash.querySelector('.shell');
+ const active=dash.querySelector('.panel.active');
+ if(!shell||!active)return;
  installStyle();
  const box=document.createElement('aside');
  box.className='gtg-hidden-gallery-intro';
  box.dataset.hiddenGalleryIntro='1';
  box.setAttribute('role','note');
- box.innerHTML=`<div class="gtg-hidden-gallery-intro__top"><div class="gtg-hidden-gallery-intro__icon" aria-hidden="true">🔒</div><div><h3>There’s also a Hidden Gallery</h3><p>Full Trip includes a separate <strong>PIN-protected album</strong> for photos or videos you do not want in the main Evidence gallery. The organiser sets the trip PIN and the gallery stays hidden until someone unlocks it. Find it anytime from <strong>☰ Menu → Hidden Gallery</strong>.</p></div></div><div class="gtg-hidden-gallery-intro__actions"><button type="button" class="btn primary" data-a="vault" data-hidden-gallery-open>Open Hidden Gallery</button><button type="button" class="btn" data-hidden-gallery-dismiss>Got it</button></div>`;
- head.insertAdjacentElement('afterend',box);
+ box.innerHTML=`<div class="gtg-hidden-gallery-intro__top"><div class="gtg-hidden-gallery-intro__icon" aria-hidden="true">🔒</div><div><h3>There’s also a Hidden Gallery</h3><p>Full Trip includes a separate <strong>PIN-protected album</strong> for photos or videos you do not want in the main Evidence gallery. To view it, go to <strong>Home</strong> and <strong>press and hold the Latest Photo panel for 4 seconds</strong>. The organiser sets the trip PIN. You can still send photos or videos to the Hidden Gallery from Upload without unlocking it.</p></div></div><div class="gtg-hidden-gallery-intro__actions"><button type="button" class="btn primary" data-hidden-gallery-dismiss>Got it</button></div>`;
+ shell.insertBefore(box,active);
 }
 
 function schedule(){[0,80,240,650].forEach(ms=>setTimeout(install,ms))}
@@ -48,9 +54,19 @@ function schedule(){[0,80,240,650].forEach(ms=>setTimeout(install,ms))}
 document.addEventListener('click',event=>{
  const dismiss=event.target.closest?.('[data-hidden-gallery-dismiss]');
  if(dismiss){markSeen();dismiss.closest('[data-hidden-gallery-intro]')?.remove();return}
- const open=event.target.closest?.('[data-hidden-gallery-open]');
- if(open){markSeen();open.closest('[data-hidden-gallery-intro]')?.remove()}
+
+ const direct=event.target.closest?.('[data-a="vault"]');
+ if(direct&&!direct.hidden){
+   event.preventDefault();
+   event.stopImmediatePropagation();
+   stripDirectEntries();
+   toast('Hidden Gallery: go to Home and hold Latest Photo for 4 seconds.');
+   return;
+ }
+
+ if(event.target.closest?.('[data-a="drawer"],[data-tab]'))setTimeout(()=>{stripDirectEntries();install()},0);
 },true);
+
 window.addEventListener('popstate',schedule);
 window.addEventListener('pageshow',schedule);
 window.addEventListener('gtg:core-data-ready',schedule);
