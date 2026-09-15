@@ -47,3 +47,9 @@ verify_jwt = false
 
 [functions.media-action]
 verify_jwt = true
+
+[functions.push-register]
+verify_jwt = true
+
+[functions.push-send]
+verify_jwt = false

@@ -1,27 +1,10 @@
-const CACHE_VERSION='gtg-pwa-v32-hidden-gallery-home-entry';
+const CACHE_VERSION='gtg-pwa-v33-push';
 const STATIC_CACHE=`${CACHE_VERSION}-static`;
 const PAGE_CACHE=`${CACHE_VERSION}-pages`;
 const APP_SHELL=['/create-trip','/create-trip.html','/invite-auth.html','/invite-return.html','/invite-auth.js?v=4','/invite-return.js?v=5','/manifest.webmanifest','/girls-app.css?v=20260909-1','/girls-critical-style-loader.js?v=20260914-1','/girls-action-feedback.js?v=1','/girls-app-v2.js?v=7','/girls-session-guard.js?v=2','/girls-home-social-hub-v3.js?v=20260914-1','/girls-performance-loader.js?v=14','/live-dashboard-hero.css?v=10','/assets/images/gtg-pwa-192.svg?v=1','/assets/images/girls-trip-guide-logo.webp'];
-
-self.addEventListener('install',event=>{
- event.waitUntil(caches.open(STATIC_CACHE).then(cache=>cache.addAll(APP_SHELL)));
- self.skipWaiting();
-});
-self.addEventListener('activate',event=>{
- event.waitUntil(caches.keys().then(keys=>Promise.all(keys.filter(key=>key.startsWith('gtg-pwa-')&&![STATIC_CACHE,PAGE_CACHE].includes(key)).map(key=>caches.delete(key)))).then(()=>self.clients.claim()));
-});
-self.addEventListener('fetch',event=>{
- const request=event.request;if(request.method!=='GET')return;
- const url=new URL(request.url);if(url.origin!==self.location.origin)return;
- if(url.pathname.startsWith('/functions/')||url.pathname.startsWith('/api/'))return;
- if(request.mode==='navigate'){
-  event.respondWith(fetch(request).then(response=>{if(response?.ok){const copy=response.clone();caches.open(PAGE_CACHE).then(cache=>cache.put(request,copy))}return response}).catch(async()=>await caches.match(request)||await caches.match('/create-trip.html')));return;
- }
- if(request.destination==='script'||request.destination==='style'){
-  event.respondWith(fetch(request,{cache:'reload'}).then(response=>{if(response?.ok){const copy=response.clone();caches.open(STATIC_CACHE).then(cache=>cache.put(request,copy))}return response}).catch(()=>caches.match(request)));return;
- }
- if(request.destination==='image'||request.destination==='font'){
-  event.respondWith(caches.match(request).then(cached=>{const network=fetch(request).then(response=>{if(response?.ok){const copy=response.clone();caches.open(STATIC_CACHE).then(cache=>cache.put(request,copy))}return response}).catch(()=>cached);return cached||network}));
- }
-});
+self.addEventListener('install',event=>{event.waitUntil(caches.open(STATIC_CACHE).then(cache=>cache.addAll(APP_SHELL)));self.skipWaiting()});
+self.addEventListener('activate',event=>{event.waitUntil(caches.keys().then(keys=>Promise.all(keys.filter(key=>key.startsWith('gtg-pwa-')&&![STATIC_CACHE,PAGE_CACHE].includes(key)).map(key=>caches.delete(key)))).then(()=>self.clients.claim()))});
+self.addEventListener('fetch',event=>{const request=event.request;if(request.method!=='GET')return;const url=new URL(request.url);if(url.origin!==self.location.origin)return;if(url.pathname.startsWith('/functions/')||url.pathname.startsWith('/api/'))return;if(request.mode==='navigate'){event.respondWith(fetch(request).then(response=>{if(response?.ok){const copy=response.clone();caches.open(PAGE_CACHE).then(cache=>cache.put(request,copy))}return response}).catch(async()=>await caches.match(request)||await caches.match('/create-trip.html')));return}if(request.destination==='script'||request.destination==='style'){event.respondWith(fetch(request,{cache:'reload'}).then(response=>{if(response?.ok){const copy=response.clone();caches.open(STATIC_CACHE).then(cache=>cache.put(request,copy))}return response}).catch(()=>caches.match(request)));return}if(request.destination==='image'||request.destination==='font'){event.respondWith(caches.match(request).then(cached=>{const network=fetch(request).then(response=>{if(response?.ok){const copy=response.clone();caches.open(STATIC_CACHE).then(cache=>cache.put(request,copy))}return response}).catch(()=>cached);return cached||network}))}});
+self.addEventListener('push',event=>{let data={};try{data=event.data?.json?.()||{}}catch{data={body:event.data?.text?.()||''}}const title=String(data.title||'The Girls Trip Guide').slice(0,140),body=String(data.body||'').slice(0,320);let url='/create-trip';try{const target=new URL(String(data.url||'/create-trip'),self.location.origin);if(target.origin===self.location.origin)url=`${target.pathname}${target.search}${target.hash}`}catch{}event.waitUntil(self.registration.showNotification(title,{body,icon:'/assets/images/girls-trip-guide-logo.webp',badge:'/assets/images/girls-trip-guide-logo.webp',tag:String(data.tag||'gtg-trip-update'),renotify:false,data:{url}}))});
+self.addEventListener('notificationclick',event=>{event.notification.close();const raw=event.notification?.data?.url||'/create-trip';let target='/create-trip';try{const url=new URL(raw,self.location.origin);if(url.origin===self.location.origin)target=url.href}catch{}event.waitUntil((async()=>{const windows=await self.clients.matchAll({type:'window',includeUncontrolled:true});for(const client of windows){if('navigate'in client)await client.navigate(target);if('focus'in client)await client.focus();return}if(self.clients.openWindow)await self.clients.openWindow(target)})())});
 self.addEventListener('message',event=>{if(event.data?.type==='SKIP_WAITING')self.skipWaiting()});

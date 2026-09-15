@@ -34,6 +34,7 @@ jobs:
           node --check girls-payment-nudge.js
           node --check girls-trip-social.js
           node --check girls-chat-sheet.js
+          node --check girls-push-notifications.js
           node --check girls-product-parity.js
           node --check girls-member-view-parity.js
           node --check girls-inner-page-polish.js
@@ -91,6 +92,8 @@ jobs:
           deno check supabase/functions/girls-stripe-checkout/index.ts
           deno check supabase/functions/girls-contact-email/index.ts
           deno check supabase/functions/media-action/index.ts
+          deno check supabase/functions/push-register/index.ts
+          deno check supabase/functions/push-send/index.ts
       - name: Girls backend source parity contract
         run: node tests/girls-backend-source-parity.test.cjs
       - name: Girls payment lifecycle regression

@@ -37,6 +37,8 @@ jobs:
           deno check supabase/functions/girls-stripe-checkout/index.ts
           deno check supabase/functions/girls-contact-email/index.ts
           deno check supabase/functions/media-action/index.ts
+          deno check supabase/functions/push-register/index.ts
+          deno check supabase/functions/push-send/index.ts
       - name: Verify deployment credentials
         shell: bash
         run: |
@@ -59,3 +61,7 @@ jobs:
         run: npx supabase@2.115.0 functions deploy girls-contact-email --project-ref "$PROJECT_REF" --no-verify-jwt
       - name: Deploy shared media action
         run: npx supabase@2.115.0 functions deploy media-action --project-ref "$PROJECT_REF"
+      - name: Deploy push registration
+        run: npx supabase@2.115.0 functions deploy push-register --project-ref "$PROJECT_REF"
+      - name: Deploy push delivery
+        run: npx supabase@2.115.0 functions deploy push-send --project-ref "$PROJECT_REF" --no-verify-jwt
