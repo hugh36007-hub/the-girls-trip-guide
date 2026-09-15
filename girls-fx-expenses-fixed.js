@@ -88,7 +88,11 @@ async function saveExpense(form){
  if(!description)throw Error('What was it? is required.');if(!(amount>0))throw Error('Enter the amount you paid.');if(!payer)throw Error('Choose who paid.');if(!people.length)throw Error('Choose at least one group member.');
  let settled=[];if(existing){const {data,error}=await c.from('expense_participants').select('member_id,settled_at').eq('expense_id',existing).eq('trip_id',t.id);if(error)throw error;settled=(data||[]).filter(x=>x.settled_at&&people.includes(x.member_id)).map(x=>x.member_id)}
  const fx=await fxRate(currency,amount);const {error}=await c.rpc('save_girls_expense_fx',{p_expense_id:existing,p_trip_id:t.id,p_description:description,p_local_amount:amount,p_currency:currency,p_gbp_rate:fx.rate,p_rate_date:fx.rate_date,p_fx_source:fx.source,p_payer_member_id:payer,p_participant_ids:people,p_settled_member_ids:settled});if(error)throw error;
- if(!t.currency_override){await c.from('trips').update({currency}).eq('id',t.id).eq('product_key','girls').eq('currency_override',false).catch(()=>{});tripCache={...t,currency}}
+ if(!t.currency_override){
+  const {error:currencyError}=await c.from('trips').update({currency}).eq('id',t.id).eq('product_key','girls').eq('currency_override',false);
+  if(currencyError)console.warn('Girls trip currency update failed after expense save',currencyError);
+  else tripCache={...t,currency};
+ }
  location.reload();
 }
 
