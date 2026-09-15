@@ -11,8 +11,11 @@ assert(fx.includes("'north cyprus'")&&fx.includes("return'TRY'"),'North Cyprus m
 assert(fx.includes("save_girls_expense_fx"),'Girls expenses must use the FX-aware RPC');
 assert(fx.includes('original_currency')&&fx.includes('gbp_rate'),'Money rows must preserve/show local currency metadata');
 assert(fx.includes('currency_override'),'Trip settings must support organiser currency override');
-assert(loader.includes("money:['/girls-payment-nudge.js?v=2','/girls-fx-expenses.js?v=1']"),'Money route must load FX expenses');
-assert(loader.includes("'/girls-fx-expenses.js?v=1'"),'Trip drawer must be able to load currency settings');
+assert(fx.includes('waitForSession'),'FX trip reads must wait for the authenticated session');
+assert(fx.includes('finally{delete form.dataset.gtgFxLoading'),'FX enhancement must always release its loading lock');
+assert(fx.includes('dedupePeople(form)'),'Expense participants must be de-duplicated before display/save');
+assert(loader.includes("'/girls-fx-expenses-bootstrap.js?v=1'"),'Core app theme must load the FX bootstrap');
+assert(!loader.includes("'/girls-fx-expenses.js?v=1'"),'Old direct FX loader must stay removed');
 assert(migration.includes('original_amount numeric')&&migration.includes('original_currency text')&&migration.includes('gbp_rate numeric'),'FX storage columns missing');
 assert(migration.includes("t.product_key = 'girls'"),'FX save RPC must be Girls-only');
 assert(migration.includes('v_gbp_amount := round(p_local_amount * v_rate, 2)'),'GBP accounting amount must be computed server-side');
