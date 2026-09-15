@@ -5,7 +5,7 @@ if(window.__GTG_HIDDEN_GALLERY_INTRO__)return;
 window.__GTG_HIDDEN_GALLERY_INTRO__=true;
 
 const tripId=()=>new URL(location.href).searchParams.get('trip_id')||'';
-const key=()=>`gtg:hidden-gallery-intro:${tripId()}`;
+const key=()=>`gtg:hidden-gallery-intro-v2:${tripId()}`;
 const seen=()=>{try{return localStorage.getItem(key())==='1'}catch{return false}};
 const markSeen=()=>{try{localStorage.setItem(key(),'1')}catch{}};
 const toast=msg=>{const el=document.getElementById('toast');if(!el)return;el.textContent=msg;el.classList.add('show');setTimeout(()=>el.classList.remove('show'),3000)};
