@@ -12,7 +12,7 @@
     "mobile:open:ios": "npx cap open ios",
     "mobile:open:android": "npx cap open android",
     "mobile:doctor": "npx cap doctor",
-    "native:push:install": "npm install --no-save --package-lock=false @capacitor/push-notifications@8.1.2",
+    "native:push:install": "npm install --prefix .native-push-package --package-lock=false",
     "native:push:configure": "node scripts/configure-native-push.mjs",
     "test:native": "node --test tests/native/*.test.mjs"
   },
