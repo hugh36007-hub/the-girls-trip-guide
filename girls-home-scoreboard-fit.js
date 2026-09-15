@@ -129,9 +129,14 @@ document.head.appendChild(style);
 const SB_URL='https://vtcmvwixfqyxqghibsla.supabase.co';
 const SB_KEY='sb_publishable_qBQzJjFxSToEGxPJEcmskg_GNd4M4cP';
 const money=v=>new Intl.NumberFormat('en-GB',{style:'currency',currency:'GBP'}).format(Number(v||0));
-let client=null,snapshotPromise=null,observerTimer=0;
+let client=null,snapshotPromise=null;
+let burstTimers=[];
 function db(){if(!client&&window.supabase?.createClient)client=window.supabase.createClient(SB_URL,SB_KEY,{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true}});return client}
 function tripId(){return new URLSearchParams(location.search).get('trip_id')||''}
+function homeOpen(){
+ const action=new URLSearchParams(location.search).get('action')||'overview';
+ return action==='overview'&&Boolean(document.querySelector('.panel[data-panel="overview"].active,.gtg-parity-overview'));
+}
 function compute(members,bookings,bp,expenses,ep){
  const map=new Map(members.map(m=>[m.id,0]));
  const apply=(rows,people,amountKey,idKey)=>{for(const row of rows){const payer=row.payer_member_id;if(!payer||!map.has(payer))continue;const ps=people.filter(p=>p[idKey]===row.id);if(!ps.length)continue;const share=Number(row[amountKey]||0)/ps.length;if(!Number.isFinite(share)||share<=0)continue;for(const p of ps){if(p.member_id===payer||p.settled_at||!map.has(p.member_id))continue;map.set(payer,map.get(payer)+share);map.set(p.member_id,map.get(p.member_id)-share)}}};
@@ -162,7 +167,8 @@ function titleRow(card,button){
  row.appendChild(button);
 }
 async function refine(){
- const cards=[...document.querySelectorAll('.gtg-parity-overview .gtg-overview-card')];if(cards.length<2)return;
+ if(!homeOpen())return false;
+ const cards=[...document.querySelectorAll('.gtg-parity-overview .gtg-overview-card')];if(cards.length<2)return false;
  const plan=cards[0],moneyCard=cards[1];
  if(!plan.dataset.gtgTopRefined){
   const actions=plan.querySelector(':scope > .gtg-inline-actions');
@@ -179,18 +185,27 @@ async function refine(){
   if(openMoney)titleRow(moneyCard,openMoney);
   actions?.remove();moneyCard.dataset.gtgTopRefined='1';
  }
- const data=await snapshot();if(!data||!moneyCard.isConnected)return;
+ const data=await snapshot();if(!data||!moneyCard.isConnected||!homeOpen())return true;
  const heading=moneyCard.querySelector('.gtg-overview-title-row h2');
  const nextText=`${money(data.outstanding)} outstanding`;
  if(heading&&heading.textContent!==nextText)heading.textContent=nextText;
+ return true;
 }
-function schedule(ms=40){clearTimeout(observerTimer);observerTimer=setTimeout(()=>void refine(),ms)}
-function touchesOverview(mutation){
- const target=mutation.target?.nodeType===1?mutation.target:mutation.target?.parentElement;
- if(target?.closest?.('.gtg-parity-overview'))return true;
- return [...mutation.addedNodes].some(node=>node.nodeType===1&&(node.matches?.('.gtg-parity-overview,.gtg-overview-card')||node.querySelector?.('.gtg-parity-overview')));
+function cancelBurst(){burstTimers.forEach(clearTimeout);burstTimers=[]}
+function scheduleBurst(resetData=false){
+ cancelBurst();
+ if(resetData)snapshotPromise=null;
+ if(!homeOpen())return;
+ for(const ms of [0,120,350,800,1600])burstTimers.push(setTimeout(()=>void refine(),ms));
 }
-const observer=new MutationObserver(mutations=>{if(mutations.some(touchesOverview))schedule()});
-observer.observe(document.body,{childList:true,subtree:true});
-schedule(0);window.addEventListener('pageshow',()=>{snapshotPromise=null;schedule(80)});window.addEventListener('popstate',()=>schedule(80));
+
+/* Deliberately no persistent MutationObserver here. This feature only needs a short
+   bounded startup retry window and explicit navigation/lifecycle events. */
+scheduleBurst();
+window.addEventListener('pageshow',()=>scheduleBurst(true));
+window.addEventListener('popstate',()=>scheduleBurst());
+document.addEventListener('click',event=>{
+ if(event.target.closest?.('[data-tab="overview"],[data-parity-go="overview"]'))setTimeout(()=>scheduleBurst(),0);
+},true);
+document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible'&&homeOpen())scheduleBurst(true)});
 })();
