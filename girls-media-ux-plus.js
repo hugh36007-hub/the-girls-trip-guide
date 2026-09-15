@@ -75,7 +75,7 @@ async function persist(file,album,onProgress){
     const p=`${tripId()}/${session.user.id}/thumb-${uid()}.webp`;
     try{
       await storageUpload(bucket,p,new File([blob],'thumbnail.webp',{type:'image/webp'}));
-      const {error}=await db().from('media').update({thumbnail_path:p}).eq('id',row.id).eq('trip_id',tripId());if(error)throw error;
+      const {error}=await db().rpc('set_girls_media_thumbnail',{p_media_id:row.id,p_thumbnail_path:p});if(error)throw error;
       window.dispatchEvent(new CustomEvent('gtg:thumbnail-ready',{detail:{mediaId:row.id,album}}));
     }catch(error){console.warn('Deferred preview skipped.',error);await db().storage.from(bucket).remove([p]).catch(()=>{})}
   });
