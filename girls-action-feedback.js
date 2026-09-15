@@ -1,6 +1,18 @@
 (() => {
   'use strict';
 
+  // Disable the broken direct FX runtime before it executes, then load the corrected
+  // controller. The corrected controller uses globalThis.URL for trip URL parsing.
+  if (!window.__GTG_FX_FIXED_BOOTSTRAP__) {
+    window.__GTG_FX_FIXED_BOOTSTRAP__ = true;
+    window.__GTG_FX_EXPENSES__ = true;
+    const fxScript = document.createElement('script');
+    fxScript.src = '/girls-fx-expenses-fixed.js?v=20260915-1';
+    fxScript.async = false;
+    fxScript.dataset.gtgFxFixed = '1';
+    document.head.appendChild(fxScript);
+  }
+
   // Resend is a core organiser action, not a route enhancement. Start its handler
   // with the core form layer so a slow/deferred theme bundle cannot miss submit.
   if (!document.querySelector('script[data-gtg-resend-core]')) {
