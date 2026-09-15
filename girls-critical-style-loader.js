@@ -21,7 +21,7 @@ const BASE_STYLES=[
  '/girls-date-focus-fix.css?v=1',
  '/live-dashboard-hero.css?v=10',
  '/girls-free-poll-hero-position.css?v=20260914-1',
- '/girls-chat-bubble-refinement.css?v=20260915-1'
+ '/girls-chat-bubble-refinement.css?v=20260915-2'
 ];
 
 for(const href of BASE_STYLES){
