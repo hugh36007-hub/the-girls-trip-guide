@@ -47,19 +47,25 @@ function updatePhotoLabel(){
 function install(){
  stripDirectEntries();
  updatePhotoLabel();
- if(seen())return;
  const dash=document.querySelector('.dashboard[data-home-composition="full"]');
- if(!dash||dash.querySelector('[data-hidden-gallery-intro]'))return;
- const shell=dash.querySelector('.shell');
- const active=dash.querySelector('.panel.active');
- if(!shell||!active)return;
+ const existing=dash?.querySelector('[data-hidden-gallery-intro]');
+ const evidence=dash?.querySelector('.panel[data-panel="evidence"]');
+ const evidenceActive=Boolean(evidence?.classList.contains('active'));
+
+ // The explainer belongs only at the top of Evidence, never on Home/Plan/Money/Group.
+ if(!evidenceActive){existing?.remove();return}
+ if(seen()){existing?.remove();return}
+ if(existing)return;
+
+ const head=evidence.querySelector('.section-head');
+ if(!head)return;
  installStyle();
  const box=document.createElement('aside');
  box.className='gtg-hidden-gallery-intro';
  box.dataset.hiddenGalleryIntro='1';
  box.setAttribute('role','note');
  box.innerHTML=`<div class="gtg-hidden-gallery-intro__top"><div class="gtg-hidden-gallery-intro__icon" aria-hidden="true">🔒</div><div><h3>There’s also a Hidden Gallery</h3><p>Full Trip includes a separate <strong>PIN-protected album</strong> for photos or videos you do not want in the main Evidence gallery. To view it, go to <strong>Home</strong>, <strong>tap Latest Photo once to expand it</strong>, then <strong>press and hold the expanded photo for 4 seconds</strong>. The organiser sets the trip PIN. You can still send photos or videos to the Hidden Gallery from Upload without unlocking it.</p></div></div><div class="gtg-hidden-gallery-intro__actions"><button type="button" class="btn primary" data-hidden-gallery-dismiss>Got it</button></div>`;
- shell.insertBefore(box,active);
+ head.insertAdjacentElement('afterend',box);
 }
 
 function schedule(){[0,80,240,650].forEach(ms=>setTimeout(install,ms))}
