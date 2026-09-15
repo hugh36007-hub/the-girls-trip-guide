@@ -2,14 +2,15 @@ const fs=require('fs');
 const assert=require('assert');
 
 const html=fs.readFileSync('create-trip.html','utf8');
+const critical=fs.readFileSync('girls-critical-style-loader.js','utf8');
 const feedback=fs.readFileSync('girls-action-feedback.js','utf8');
 const feedbackCss=fs.readFileSync('girls-action-feedback.css','utf8');
 const otp=fs.readFileSync('supabase/functions/girls-auth-otp/index.ts','utf8');
 const invite=fs.readFileSync('supabase/functions/girls-trip-email/index.ts','utf8');
 const migration=fs.readFileSync('supabase/migrations/20260829070000_fix_girls_trip_rpc_wrapper_permissions.sql','utf8');
 
-assert(html.includes('/girls-action-feedback.css?v=1'),'action feedback CSS must be loaded');
-assert(html.includes('/girls-action-feedback.js?v=1'),'action feedback JS must be loaded');
+assert(critical.includes('/girls-action-feedback.css?v=1'),'action feedback CSS must be owned by the critical style loader');
+assert(html.includes('/girls-action-feedback.js?v=2'),'action feedback JS must be loaded');
 assert(feedback.includes("document.addEventListener('submit'"),'form submissions must receive immediate feedback');
 assert(feedback.includes("button.disabled = true"),'busy submits must be disabled');
 assert(feedback.includes("aria-busy"),'busy state must be accessible');
