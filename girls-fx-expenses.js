@@ -1,7 +1,9 @@
-/* Girls local-currency expenses: enter spend in destination currency, account in GBP. */
+/* Girls local-currency expenses: authoritative Add Expense flow. */
 (()=>{
 'use strict';
-if(window.__GTG_FX_EXPENSES__)return;window.__GTG_FX_EXPENSES__=true;
+if(window.__GTG_FX_EXPENSES__)return;
+window.__GTG_FX_EXPENSES__=true;
+window.__GTG_FX_EXPENSES_NATIVE__=true;
 
 const URL='https://vtcmvwixfqyxqghibsla.supabase.co';
 const KEY='sb_publishable_qBQzJjFxSToEGxPJEcmskg_GNd4M4cP';
@@ -10,30 +12,25 @@ const CURRENCIES=['GBP','EUR','USD','TRY','AED','CHF','JPY','THB','AUD','CAD','N
 const SYMBOL={GBP:'£',EUR:'€',USD:'$',TRY:'₺',AED:'د.إ',CHF:'CHF',JPY:'¥',THB:'฿',AUD:'A$',CAD:'C$',NZD:'NZ$',SEK:'kr',NOK:'kr',DKK:'kr',PLN:'zł',CZK:'Kč',HUF:'Ft',RON:'lei',ISK:'kr',ZAR:'R',MAD:'DH',EGP:'E£',MXN:'Mex$',BRL:'R$',INR:'₹',SGD:'S$',HKD:'HK$',IDR:'Rp',MYR:'RM',CNY:'¥',KRW:'₩'};
 let client=null,tripCache=null,tripCacheId='',rowTimer=0;
 const rateCache=new Map();
-function db(){if(!client&&window.supabase?.createClient)client=window.supabase.createClient(URL,KEY,{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true}});return client}
+const sleep=ms=>new Promise(resolve=>setTimeout(resolve,ms));
+
+function db(){
+ if(!client&&window.supabase?.createClient)client=window.supabase.createClient(URL,KEY,{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true}});
+ return client;
+}
 function tripId(){return new URL(location.href).searchParams.get('trip_id')||''}
 function esc(v){return String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]||c))}
 function toast(msg){const el=document.getElementById('toast');if(!el)return;el.textContent=msg;el.classList.add('show');setTimeout(()=>el.classList.remove('show'),3600)}
-function resetBusy(form){form.removeAttribute('aria-busy');delete form.dataset.actionBusy;const b=form.querySelector('button[type="submit"],.modal-actions .btn.primary');if(!b)return;b.disabled=false;b.removeAttribute('aria-disabled');b.classList.remove('is-busy');if(b.dataset.busyOriginal){b.innerHTML=b.dataset.busyOriginal;delete b.dataset.busyOriginal}}
-const sleep=ms=>new Promise(resolve=>setTimeout(resolve,ms));
+function resetBusy(form){form?.removeAttribute?.('aria-busy');if(form?.dataset)delete form.dataset.actionBusy;const b=form?.querySelector?.('button[type="submit"],.modal-actions .btn.primary');if(!b)return;b.disabled=false;b.removeAttribute('aria-disabled');b.classList.remove('is-busy');if(b.dataset.busyOriginal){b.innerHTML=b.dataset.busyOriginal;delete b.dataset.busyOriginal}}
 async function waitForSession(c,attempts=16){
- for(let i=0;i<attempts;i+=1){
-  const {data,error}=await c.auth.getSession();if(error)throw error;
-  if(data?.session?.access_token)return data.session;
-  if(i<attempts-1)await sleep(100);
- }
+ for(let i=0;i<attempts;i+=1){const {data,error}=await c.auth.getSession();if(error)throw error;if(data?.session?.access_token)return data.session;if(i<attempts-1)await sleep(100)}
  return null;
 }
-function dedupePeople(form){
- const select=form?.querySelector('select[name="people"][multiple]');if(!select)return;
+function dedupePeople(selectOrForm){
+ const select=selectOrForm?.matches?.('select[name="people"][multiple]')?selectOrForm:selectOrForm?.querySelector?.('select[name="people"][multiple]');
+ if(!select)return;
  const seen=new Set();
- [...select.options].forEach(option=>{const key=String(option.value||option.textContent||'').trim();if(!key)return;if(seen.has(key))option.remove();else seen.add(key)});
-}
-function retryEnhancement(form,key,fn){
- if(!form?.isConnected||form.dataset[key]==='1')return;
- const tries=Number(form.dataset.gtgFxRetries||0);if(tries>=8)return;
- form.dataset.gtgFxRetries=String(tries+1);
- setTimeout(()=>{if(form.isConnected&&form.dataset[key]!=='1')void fn(form)},180);
+ [...select.options].forEach(option=>{const key=String(option.value||'').trim();if(!key||seen.has(key))option.remove();else seen.add(key)});
 }
 function inferCurrency(destination){
  const s=String(destination||'').trim().toLowerCase();if(!s)return'';
@@ -66,6 +63,10 @@ async function trip(){
  const {data,error}=await c.from('trips').select('id,owner_id,product_key,destination,currency,currency_override').eq('id',id).eq('product_key','girls').maybeSingle();if(error)throw error;
  tripCache=data||null;tripCacheId=id;return tripCache;
 }
+async function tripMembers(id){
+ const c=db();if(!c)return[];const {data,error}=await c.from('trip_members').select('id,name,status,role,created_at').eq('trip_id',id).order('created_at');if(error)throw error;
+ const seen=new Set();return(data||[]).filter(m=>{const key=String(m.id||'');if(!key||seen.has(key))return false;seen.add(key);return true});
+}
 function effectiveCurrency(t){if(!t)return'GBP';if(t.currency_override&&t.currency)return String(t.currency).toUpperCase();return inferCurrency(t.destination)||String(t.currency||'GBP').toUpperCase()}
 async function fxRate(currency,amount){
  const code=String(currency||'GBP').toUpperCase();if(code==='GBP')return{rate:1,rate_date:new Date().toISOString().slice(0,10),source:'GBP',gbp_amount:Number(amount||0)};
@@ -74,39 +75,61 @@ async function fxRate(currency,amount){
  const res=await fetch(FX,{method:'POST',headers:{'Content-Type':'application/json','apikey':KEY,'Authorization':`Bearer ${session.access_token}`},body:JSON.stringify({from_currency:code,amount:Number(amount||0)})});
  const out=await res.json().catch(()=>({}));if(!res.ok||!Number(out.rate))throw Error(out.error||'Exchange rate unavailable.');cached={rate:Number(out.rate),rate_date:String(out.rate_date||new Date().toISOString().slice(0,10)),source:String(out.source||'FX rate')};rateCache.set(code,cached);return{...cached,gbp_amount:Number(amount||0)*cached.rate};
 }
-function installStyles(){if(document.getElementById('gtg-fx-expense-css'))return;const s=document.createElement('style');s.id='gtg-fx-expense-css';s.textContent=`#expenseForm .gtg-fx-preview{margin:-2px 0 4px;padding:10px 12px;border:1px solid rgba(255,79,163,.22);border-radius:11px;background:#fff8fb;color:#75636c;font-size:11px;line-height:1.45}#expenseForm .gtg-fx-preview b{color:#191316}.gtg-local-spend{margin-top:4px;color:#9a7487;font-size:10px;line-height:1.35}.gtg-currency-note{margin-top:5px;color:#9a7487;font-size:10px;line-height:1.35}`;document.head.appendChild(s)}
-function recordId(form){return form.querySelector('[name="__gtg_record_id"],[name="id"]')?.value||''}
-async function enhanceExpense(form){
- if(!form||form.dataset.gtgFxReady||form.dataset.gtgFxLoading)return;form.dataset.gtgFxLoading='1';installStyles();dedupePeople(form);let retry=false;
- try{
-  const t=await trip();if(!t){retry=true;return}const id=recordId(form);let existing=null;if(id){const {data}=await db().from('expenses').select('id,amount,original_amount,original_currency,gbp_rate,fx_rate_date,fx_source').eq('id',id).eq('trip_id',t.id).maybeSingle();existing=data||null}
-  const amount=form.querySelector('input[name="amount"]');if(!amount)return;const amountField=amount.closest('.field');const currency=String(existing?.original_currency||effectiveCurrency(t)||'GBP').toUpperCase();
-  if(existing?.original_amount!=null)amount.value=String(existing.original_amount);const label=amountField?.querySelector('label');if(label)label.textContent=`Amount (${currency})`;
-  form.querySelector('.gtg-fx-currency')?.remove();form.querySelector('.gtg-fx-preview')?.remove();
-  const currencyField=document.createElement('div');currencyField.className='field gtg-fx-currency';currencyField.innerHTML=`<label>Currency</label><select name="currency">${currencyOptions(currency)}</select><div class="gtg-currency-note">${t.currency_override?'Trip currency set by organiser':inferCurrency(t.destination)?`Suggested from ${esc(t.destination)}`:'Choose the currency you paid in'}</div>`;amountField?.insertAdjacentElement('beforebegin',currencyField);
-  const preview=document.createElement('div');preview.className='gtg-fx-preview';preview.textContent='Enter the amount to see the GBP equivalent.';amountField?.insertAdjacentElement('afterend',preview);
-  const select=currencyField.querySelector('select');let timer=0;
-  const update=()=>{clearTimeout(timer);timer=setTimeout(async()=>{const code=select.value,number=Number(amount.value||0);if(label)label.textContent=`Amount (${code})`;if(!(number>0)){preview.textContent='Enter the amount to see the GBP equivalent.';return}preview.textContent='Checking exchange rate…';try{const fx=await fxRate(code,number);preview.innerHTML=code==='GBP'?`Recorded as <b>${gbp(number)}</b>.`:`${localMoney(number,code)} ≈ <b>${gbp(fx.gbp_amount)}</b><br>Rate ${fx.rate.toFixed(6)} · ${esc(fx.rate_date)} · locked when saved.`}catch(err){preview.textContent=err.message||'Exchange rate unavailable.'}},260)};
-  select.addEventListener('change',()=>{rateCache.delete(select.value);update();requestAnimationFrame(()=>select.blur())});amount.addEventListener('input',update);form.dataset.gtgFxReady='1';delete form.dataset.gtgFxRetries;dedupePeople(form);update();
- }catch(err){console.warn('Girls FX expense enhancement unavailable',err)}finally{delete form.dataset.gtgFxLoading;if(retry)retryEnhancement(form,'gtgFxReady',enhanceExpense)}
+function installStyles(){
+ if(document.getElementById('gtg-fx-expense-css'))return;
+ const s=document.createElement('style');s.id='gtg-fx-expense-css';s.textContent=`#expenseForm .gtg-fx-preview{margin:-2px 0 4px;padding:10px 12px;border:1px solid rgba(255,79,163,.22);border-radius:11px;background:#fff8fb;color:#75636c;font-size:11px;line-height:1.45}#expenseForm .gtg-fx-preview b{color:#191316}.gtg-local-spend{margin-top:4px;color:#9a7487;font-size:10px;line-height:1.35}.gtg-currency-note{margin-top:5px;color:#9a7487;font-size:10px;line-height:1.35}#expenseForm .gtg-expense-split-checks{display:grid;gap:8px}#expenseForm .gtg-expense-split-option{display:flex;align-items:center;gap:10px;min-height:44px;padding:10px 12px;border:1px solid rgba(255,79,163,.28);border-radius:12px;background:#fff;font-weight:600;cursor:pointer}#expenseForm .gtg-expense-split-option input{width:18px;height:18px;margin:0;flex:0 0 auto;accent-color:#ff4fa3}`;document.head.appendChild(s);
 }
-async function enhanceTripSettings(form){
- if(!form||form.dataset.gtgCurrencyReady||form.dataset.gtgCurrencyLoading)return;form.dataset.gtgCurrencyLoading='1';let retry=false;
- try{const t=await trip();if(!t){retry=true;return}const destination=form.querySelector('input[name="destination"]');if(!destination)return;const chosen=effectiveCurrency(t);form.querySelector('.gtg-trip-currency')?.remove();const field=document.createElement('div');field.className='field gtg-trip-currency';field.innerHTML=`<label>Trip spending currency</label><select name="tripCurrency">${currencyOptions(chosen)}</select><div class="gtg-currency-note">Suggested from destination. You can override it.</div>`;destination.closest('.field')?.insertAdjacentElement('afterend',field);const select=field.querySelector('select');let manual=false;select.addEventListener('change',()=>{manual=true;requestAnimationFrame(()=>select.blur())});destination.addEventListener('input',()=>{if(manual)return;const suggested=inferCurrency(destination.value);if(suggested&&CURRENCIES.includes(suggested))select.value=suggested});form.dataset.gtgCurrencyReady='1';delete form.dataset.gtgFxRetries}catch(err){console.warn('Girls trip currency setting unavailable',err)}finally{delete form.dataset.gtgCurrencyLoading;if(retry)retryEnhancement(form,'gtgCurrencyReady',enhanceTripSettings)}
+function expenseMarkup(t,members){
+ const currency=effectiveCurrency(t);const opts=members.map(m=>`<option value="${esc(m.id)}">${esc(m.name)}</option>`).join('');const split=members.map(m=>`<label class="gtg-expense-split-option"><input type="checkbox" data-gtg-split-member="${esc(m.id)}" checked><span>${esc(m.name)}</span></label>`).join('');
+ return `<div class="modal"><h2>Add expense</h2><form id="expenseForm" class="form" data-gtg-fx-native="1" data-gtg-fx-ready="1"><div class="field"><label>What was it?</label><input name="description" type="text" required></div><div class="field gtg-fx-currency"><label>Currency</label><select name="currency">${currencyOptions(currency)}</select><div class="gtg-currency-note">${t.currency_override?'Trip currency set by organiser':inferCurrency(t.destination)?`Suggested from ${esc(t.destination)}`:'Choose the currency you paid in'}</div></div><div class="field"><label data-gtg-amount-label>Amount (${esc(currency)})</label><input name="amount" type="number" required min="0.01" step="0.01" inputmode="decimal" placeholder="0.00"></div><div class="gtg-fx-preview">Enter the amount to see the GBP equivalent.</div><div class="field"><label>Paid by</label><select name="payer" required>${opts}</select></div><div class="field"><label>Split between</label><select name="people" multiple data-gtg-checkbox-source="1" style="display:none" aria-hidden="true" tabindex="-1">${members.map(m=>`<option value="${esc(m.id)}" selected>${esc(m.name)}</option>`).join('')}</select><div class="gtg-expense-split-checks" data-expense-split-checks="1">${split}</div></div><div class="modal-actions"><button type="button" class="btn" data-a="close">Cancel</button><button type="submit" class="btn primary">Save</button></div></form></div>`;
 }
-async function saveExpense(form){
- const c=db(),t=await trip();if(!c||!t)throw Error('Trip could not be loaded.');const amount=Number(form.querySelector('input[name="amount"]')?.value||0),currency=form.querySelector('select[name="currency"]')?.value||effectiveCurrency(t),description=String(form.querySelector('input[name="description"]')?.value||'').trim(),payer=String(form.querySelector('select[name="payer"]')?.value||''),peopleSelect=form.querySelector('select[name="people"][multiple]'),people=[...new Set([...(peopleSelect?.selectedOptions||[])].map(o=>o.value).filter(Boolean))],existing=recordId(form)||null;if(!description)throw Error('What was it? is required.');if(!(amount>0))throw Error('Enter the amount you paid.');if(!payer)throw Error('Choose who paid.');if(!people.length)throw Error('Choose at least one group member.');
- let settled=[];if(existing){const {data,error}=await c.from('expense_participants').select('member_id,settled_at').eq('expense_id',existing).eq('trip_id',t.id);if(error)throw error;settled=(data||[]).filter(x=>x.settled_at&&people.includes(x.member_id)).map(x=>x.member_id)}
- const fx=await fxRate(currency,amount);const {error}=await c.rpc('save_girls_expense_fx',{p_expense_id:existing,p_trip_id:t.id,p_description:description,p_local_amount:amount,p_currency:currency,p_gbp_rate:fx.rate,p_rate_date:fx.rate_date,p_fx_source:fx.source,p_payer_member_id:payer,p_participant_ids:people,p_settled_member_ids:settled});if(error)throw error;
+function syncSplit(form){
+ const people=form.querySelector('select[name="people"][multiple]');if(!people)return;dedupePeople(people);
+ form.querySelectorAll('[data-gtg-split-member]').forEach(box=>{const option=[...people.options].find(o=>o.value===box.dataset.gtgSplitMember);if(option)option.selected=box.checked});
+}
+function bindExpenseForm(form,t){
+ if(!form)return;installStyles();dedupePeople(form);
+ const amount=form.querySelector('input[name="amount"]'),currency=form.querySelector('select[name="currency"]'),label=form.querySelector('[data-gtg-amount-label]'),preview=form.querySelector('.gtg-fx-preview'),payer=form.querySelector('select[name="payer"]');let timer=0;
+ const update=()=>{clearTimeout(timer);timer=setTimeout(async()=>{const code=String(currency.value||'GBP').toUpperCase(),number=Number(amount.value||0);if(label)label.textContent=`Amount (${code})`;if(!(number>0)){preview.textContent='Enter the amount to see the GBP equivalent.';return}preview.textContent='Checking exchange rate…';try{const fx=await fxRate(code,number);preview.innerHTML=code==='GBP'?`Recorded as <b>${gbp(number)}</b>.`:`${localMoney(number,code)} ≈ <b>${gbp(fx.gbp_amount)}</b><br>Rate ${fx.rate.toFixed(6)} · ${esc(fx.rate_date)} · locked when saved.`}catch(err){preview.textContent=err.message||'Exchange rate unavailable.'}},220)};
+ currency.addEventListener('change',()=>{rateCache.delete(currency.value);update();requestAnimationFrame(()=>currency.blur())});amount.addEventListener('input',update);payer?.addEventListener('change',()=>requestAnimationFrame(()=>payer.blur()));form.querySelectorAll('[data-gtg-split-member]').forEach(box=>box.addEventListener('change',()=>syncSplit(form)));
+ form.addEventListener('submit',event=>{event.preventDefault();event.stopImmediatePropagation();syncSplit(form);void saveExpense(form,t).catch(err=>{console.error(err);resetBusy(form);toast(err.message||'Could not save expense.')})},true);
+ update();
+}
+async function saveExpense(form,t){
+ const c=db();if(!c||!t)throw Error('Trip could not be loaded.');const amount=Number(form.querySelector('input[name="amount"]')?.value||0),currency=String(form.querySelector('select[name="currency"]')?.value||effectiveCurrency(t)).toUpperCase(),description=String(form.querySelector('input[name="description"]')?.value||'').trim(),payer=String(form.querySelector('select[name="payer"]')?.value||''),peopleSelect=form.querySelector('select[name="people"][multiple]'),people=[...new Set([...(peopleSelect?.selectedOptions||[])].map(o=>o.value).filter(Boolean))];
+ if(!description)throw Error('What was it? is required.');if(!(amount>0))throw Error('Enter the amount you paid.');if(!payer)throw Error('Choose who paid.');if(!people.length)throw Error('Choose at least one group member.');
+ const fx=await fxRate(currency,amount);const {error}=await c.rpc('save_girls_expense_fx',{p_expense_id:null,p_trip_id:t.id,p_description:description,p_local_amount:amount,p_currency:currency,p_gbp_rate:fx.rate,p_rate_date:fx.rate_date,p_fx_source:fx.source,p_payer_member_id:payer,p_participant_ids:people,p_settled_member_ids:[]});if(error)throw error;
  if(!t.currency_override){await c.from('trips').update({currency}).eq('id',t.id).eq('product_key','girls').eq('currency_override',false).catch(()=>{});tripCache={...t,currency}}
  location.reload();
 }
-async function saveTripSettings(form){const c=db(),t=await trip();if(!c||!t)throw Error('Trip could not be loaded.');const d=new FormData(form),currency=String(d.get('tripCurrency')||effectiveCurrency(t)).toUpperCase();const {error}=await c.from('trips').update({name:String(d.get('name')||'').trim(),destination:String(d.get('destination')||'').trim(),start_date:d.get('start'),end_date:d.get('end'),currency,currency_override:true}).eq('id',t.id).eq('product_key','girls');if(error)throw error;tripCache=null;toast('Trip settings saved.');location.reload()}
-async function annotateExpenses(){clearTimeout(rowTimer);const root=document.querySelector('.panel[data-panel="money"].active');if(!root)return;try{const t=await trip();if(!t)return;const {data,error}=await db().from('expenses').select('id,amount,original_amount,original_currency,gbp_rate,fx_rate_date').eq('trip_id',t.id).order('created_at');if(error)throw error;const rows=[...root.querySelectorAll('.balance-grid>.card:first-child .money-row')];(data||[]).forEach((e,i)=>{const row=rows[i];if(!row)return;row.querySelector('.gtg-local-spend')?.remove();const code=String(e.original_currency||'GBP').toUpperCase();if(code==='GBP'||e.original_amount==null)return;const note=document.createElement('div');note.className='gtg-local-spend';note.textContent=`${localMoney(e.original_amount,code)} local · rate ${Number(e.gbp_rate||0).toFixed(6)} · ${e.fx_rate_date||''}`;row.querySelector('div:first-child')?.appendChild(note)})}catch(err){console.warn('Girls FX expense labels unavailable',err)}}
+async function openNativeExpense(){
+ const root=document.getElementById('modalRoot')||document.getElementById('modal-root');if(!root)throw Error('Expense window could not be opened.');installStyles();root.innerHTML='<div class="modal"><h2>Add expense</h2><div class="empty">Loading…</div></div>';root.classList.add('open');
+ const t=await trip();if(!t)throw Error('Trip could not be loaded.');const members=await tripMembers(t.id);if(!members.length)throw Error('No group members are available for this trip.');root.innerHTML=expenseMarkup(t,members);root.classList.add('open');const form=root.querySelector('#expenseForm');bindExpenseForm(form,t);requestAnimationFrame(()=>form?.querySelector('input[name="description"]')?.focus());
+}
+async function enhanceTripSettings(form){
+ if(!form||form.dataset.gtgCurrencyReady==='1'||form.dataset.gtgCurrencyLoading==='1')return;form.dataset.gtgCurrencyLoading='1';
+ try{const t=await trip();if(!t)return;const destination=form.querySelector('input[name="destination"]');if(!destination)return;const chosen=effectiveCurrency(t);form.querySelector('.gtg-trip-currency')?.remove();const field=document.createElement('div');field.className='field gtg-trip-currency';field.innerHTML=`<label>Trip spending currency</label><select name="tripCurrency">${currencyOptions(chosen)}</select><div class="gtg-currency-note">Suggested from destination. You can override it.</div>`;destination.closest('.field')?.insertAdjacentElement('afterend',field);const select=field.querySelector('select');let manual=false;select.addEventListener('change',()=>{manual=true;requestAnimationFrame(()=>select.blur())});destination.addEventListener('input',()=>{if(manual)return;const suggested=inferCurrency(destination.value);if(suggested&&CURRENCIES.includes(suggested))select.value=suggested});form.dataset.gtgCurrencyReady='1'}catch(err){console.warn('Girls trip currency setting unavailable',err)}finally{delete form.dataset.gtgCurrencyLoading}
+}
+async function saveTripSettings(form){
+ const c=db(),t=await trip();if(!c||!t)throw Error('Trip could not be loaded.');const d=new FormData(form),currency=String(d.get('tripCurrency')||effectiveCurrency(t)).toUpperCase();const {error}=await c.from('trips').update({name:String(d.get('name')||'').trim(),destination:String(d.get('destination')||'').trim(),start_date:d.get('start'),end_date:d.get('end'),currency,currency_override:true}).eq('id',t.id).eq('product_key','girls');if(error)throw error;tripCache=null;toast('Trip settings saved.');location.reload();
+}
+async function annotateExpenses(){
+ clearTimeout(rowTimer);const root=document.querySelector('.panel[data-panel="money"].active');if(!root)return;try{const t=await trip();if(!t)return;const {data,error}=await db().from('expenses').select('id,amount,original_amount,original_currency,gbp_rate,fx_rate_date').eq('trip_id',t.id).order('created_at');if(error)throw error;const rows=[...root.querySelectorAll('.balance-grid>.card:first-child .money-row')];(data||[]).forEach((e,i)=>{const row=rows[i];if(!row)return;row.querySelector('.gtg-local-spend')?.remove();const code=String(e.original_currency||'GBP').toUpperCase();if(code==='GBP'||e.original_amount==null)return;const note=document.createElement('div');note.className='gtg-local-spend';note.textContent=`${localMoney(e.original_amount,code)} local · rate ${Number(e.gbp_rate||0).toFixed(6)} · ${e.fx_rate_date||''}`;row.querySelector('div:first-child')?.appendChild(note)})}catch(err){console.warn('Girls FX expense labels unavailable',err)}
+}
 function scheduleRows(ms=300){clearTimeout(rowTimer);rowTimer=setTimeout(()=>void annotateExpenses(),ms)}
-function scanModal(){const root=document.getElementById('modalRoot')||document.getElementById('modal-root');if(!root)return;const expense=root.querySelector('#expenseForm');dedupePeople(expense);void enhanceExpense(expense);void enhanceTripSettings(root.querySelector('#editTripForm'))}
+function scanModal(){
+ const root=document.getElementById('modalRoot')||document.getElementById('modal-root');if(!root)return;void enhanceTripSettings(root.querySelector('#editTripForm'));
+ const legacy=root.querySelector('#expenseForm:not([data-gtg-fx-native="1"])');if(legacy)void openNativeExpense().catch(err=>{console.error(err);toast(err.message||'Could not open expense.')});
+}
+
+document.addEventListener('click',event=>{
+ const target=event.target.closest?.('[data-a="addExpense"],[data-action="addExpense"],[data-parity-existing="addExpense"]');if(!target)return;
+ event.preventDefault();event.stopImmediatePropagation();void openNativeExpense().catch(err=>{console.error(err);toast(err.message||'Could not open expense.')});
+},true);
+document.addEventListener('submit',event=>{const form=event.target;if(!(form instanceof HTMLFormElement)||form.id!=='editTripForm'||form.dataset.gtgCurrencyReady!=='1')return;event.preventDefault();event.stopImmediatePropagation();void saveTripSettings(form).catch(err=>{console.error(err);resetBusy(form);toast(err.message||'Could not save trip settings.')})},true);
+document.addEventListener('click',event=>{if(event.target.closest?.('[data-tab="money"]'))scheduleRows(500)},true);
 const modal=document.getElementById('modalRoot')||document.getElementById('modal-root');if(modal)new MutationObserver(()=>queueMicrotask(scanModal)).observe(modal,{childList:true,subtree:true});
-document.addEventListener('submit',event=>{const form=event.target;if(!(form instanceof HTMLFormElement))return;const id=form.getAttribute('id');if(id==='expenseForm'&&form.dataset.gtgFxReady==='1'){event.preventDefault();event.stopImmediatePropagation();dedupePeople(form);void saveExpense(form).catch(err=>{console.error(err);resetBusy(form);toast(err.message||'Could not save expense.')});return}if(id==='editTripForm'&&form.dataset.gtgCurrencyReady==='1'){event.preventDefault();event.stopImmediatePropagation();void saveTripSettings(form).catch(err=>{console.error(err);resetBusy(form);toast(err.message||'Could not save trip settings.')})}},true);
-document.addEventListener('click',event=>{if(event.target.closest?.('[data-tab="money"]'))scheduleRows(500);if(event.target.closest?.('[data-a="addExpense"],[data-a="editTrip"]'))setTimeout(scanModal,0)},true);
 window.addEventListener('pageshow',()=>scheduleRows(700));window.addEventListener('popstate',()=>scheduleRows(400));installStyles();scanModal();scheduleRows(900);
+
+if(window.__GTG_FX_TEST__)window.__GTG_FX_TEST_HOOKS__={inferCurrency,effectiveCurrency,expenseMarkup};
 })();

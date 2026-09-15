@@ -23,7 +23,10 @@ jobs:
         run: |
           node --check girls-fx-expenses.js
           node --check girls-fx-expenses-bootstrap.js
+          node --check girls-date-flow.js
       - name: FX expense contract
         run: node tests/girls-fx-expenses.test.cjs
-      - name: FX mobile bootstrap contract
+      - name: FX direct mobile runtime contract
         run: node tests/girls-fx-mobile-bootstrap.test.cjs
+      - name: FX runtime regression
+        run: node tests/girls-fx-runtime-regression.test.cjs
