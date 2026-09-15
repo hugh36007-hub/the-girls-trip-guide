@@ -88,6 +88,7 @@ function installPlanStyles(){
  style.id='gtg-plan-category-interaction-css';
  style.textContent=`
 .gtg-plan-categories button[aria-pressed="true"]{border-color:var(--pink)!important;box-shadow:0 0 0 2px rgba(255,79,163,.10)!important;background:#fff4f8!important}
+.gtg-plan-category-empty{margin:10px 0 14px;padding:11px 12px;border:1px solid rgba(255,79,163,.22);border-radius:12px;background:#fff8fb;color:#75636c;font-size:12px;line-height:1.4}
 `;
  document.head.appendChild(style);
 }
@@ -96,33 +97,34 @@ function kindOf(card){return String(card.querySelector('.kicker')?.textContent||
 function setSelected(kind){
  document.querySelectorAll('.gtg-plan-categories [data-parity-filter-kind]').forEach(button=>button.setAttribute('aria-pressed',button.dataset.parityFilterKind===kind?'true':'false'));
 }
-function openAdd(kind){
- const add=document.querySelector('.panel[data-panel="plan"].active [data-a="addBooking"],.panel[data-panel="plan"].active [data-action="addBooking"]');
- if(!add)return false;
- add.click();
- setTimeout(()=>{
-  const select=document.querySelector('#bookingForm select[name="kind"]');
-  if(!select)return;
-  select.value=kind;
-  select.dispatchEvent(new Event('change',{bubbles:true}));
- },60);
- return true;
+function clearEmpty(plan){plan.querySelector('.gtg-plan-category-empty')?.remove()}
+function showEmpty(plan,kind){
+ clearEmpty(plan);
+ const labels={flight:'Travel',hotel:'Accommodation',transfer:'Local transport',activity:'Activities',other:'Other'};
+ const empty=document.createElement('div');
+ empty.className='gtg-plan-category-empty';
+ empty.textContent=`No ${labels[kind]||'category'} items yet — use Add Item to add one.`;
+ const summary=plan.querySelector('.gtg-plan-summary');
+ if(summary)summary.insertAdjacentElement('afterend',empty);else plan.prepend(empty);
 }
 function applyKind(kind){
  const plan=document.querySelector('.panel[data-panel="plan"].active');
  if(!plan)return;
  const cards=[...plan.querySelectorAll('.booking')];
  if(kind==='all'){
+  clearEmpty(plan);
   cards.forEach(card=>card.hidden=false);
   setSelected('');
   return;
  }
  const matches=cards.filter(card=>kindOf(card)===kind);
  if(!matches.length){
+  cards.forEach(card=>card.hidden=true);
   setSelected(kind);
-  openAdd(kind);
+  showEmpty(plan,kind);
   return;
  }
+ clearEmpty(plan);
  cards.forEach(card=>card.hidden=!matches.includes(card));
  setSelected(kind);
  const first=matches[0];
