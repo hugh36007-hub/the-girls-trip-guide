@@ -22,6 +22,7 @@ jobs:
       - name: FX JavaScript syntax
         run: |
           node --check girls-fx-expenses.js
+          node --check girls-fx-expenses-fixed.js
           node --check girls-fx-expenses-bootstrap.js
           node --check girls-date-flow.js
       - name: FX expense contract
@@ -30,3 +31,5 @@ jobs:
         run: node tests/girls-fx-mobile-bootstrap.test.cjs
       - name: FX runtime regression
         run: node tests/girls-fx-runtime-regression.test.cjs
+      - name: FX native URL constructor regression
+        run: node tests/girls-fx-url-constructor.test.cjs
