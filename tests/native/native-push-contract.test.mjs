@@ -4,10 +4,13 @@ import test from 'node:test';
 
 const read = (path) => readFile(new URL(`../../${path}`, import.meta.url), 'utf8');
 
-test('native push uses the pinned Capacitor 8 plugin without changing the lockfile', async () => {
+test('native push dependency is isolated from the locked app dependency graph', async () => {
   const pkg = JSON.parse(await read('package.json'));
-  assert.match(pkg.scripts['native:push:install'], /@capacitor\/push-notifications@8\.1\.2/);
+  const pushPkg = JSON.parse(await read('.native-push-package/package.json'));
+  assert.equal(pushPkg.dependencies['@capacitor/push-notifications'], '8.1.2');
+  assert.match(pkg.scripts['native:push:install'], /--prefix \.native-push-package/);
   assert.match(pkg.scripts['native:push:install'], /--package-lock=false/);
+  assert.equal(pkg.dependencies['@capacitor/push-notifications'], undefined);
 });
 
 test('native push bridge is explicit opt-in and securely registers the signed-in device', async () => {
@@ -39,16 +42,25 @@ test('iOS shell forwards APNs registration to Capacitor and declares push entitl
   assert.match(delegate, /capacitorDidFailToRegisterForRemoteNotifications/);
   assert.match(entitlements, /<key>aps-environment<\/key>/);
   assert.match(swiftPackage, /CapacitorPushNotifications/);
+  assert.match(swiftPackage, /\.native-push-package\/node_modules\/@capacitor\/push-notifications/);
 });
 
-test('Android shell links Capacitor push and keeps Firebase configuration outside source control', async () => {
+test('Android shell links isolated Capacitor push and keeps Firebase configuration outside source control', async () => {
   const settings = await read('android/capacitor.settings.gradle');
   const appGradle = await read('android/app/capacitor.build.gradle');
   const buildGradle = await read('android/app/build.gradle');
-  assert.match(settings, /capacitor-push-notifications/);
+  assert.match(settings, /\.native-push-package\/node_modules\/@capacitor\/push-notifications\/android/);
   assert.match(appGradle, /capacitor-push-notifications/);
   assert.match(buildGradle, /google-services\.json/);
   await assert.rejects(access(new URL('../../android/app/google-services.json', import.meta.url)));
+});
+
+test('native push configuration restores generated plugin references after Capacitor sync', async () => {
+  const source = await read('scripts/configure-native-push.mjs');
+  assert.match(source, /android\/capacitor\.settings\.gradle/);
+  assert.match(source, /android\/app\/capacitor\.build\.gradle/);
+  assert.match(source, /ios\/App\/CapApp-SPM\/Package\.swift/);
+  assert.match(source, /\.native-push-package/);
 });
 
 test('foreground notification presentation is enabled for the native shell', async () => {
