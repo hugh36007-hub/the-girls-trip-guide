@@ -23,7 +23,7 @@ const BUNDLES={
   parity:['/girls-product-parity.js?v=5','/girls-gals-selector-fix.js?v=1'],
   shell:['/girls-section-layout.js?v=1','/girls-inner-page-polish.js?v=2'],
   planDocuments:[DOC_SRC,'/girls-booking-copy.js?v=1'],
-  money:['/girls-payment-nudge.js?v=2'],
+  money:['/girls-payment-nudge.js?v=3'],
   groupCore:[
     '/girls-trip-social.js?v=3',
     '/girls-chat-sheet.js?v=4',
