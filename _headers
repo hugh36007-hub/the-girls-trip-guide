@@ -4,7 +4,7 @@
   X-Frame-Options: DENY
   Permissions-Policy: camera=(self), microphone=(), geolocation=()
   Strict-Transport-Security: max-age=31536000; includeSubDomains
-  Content-Security-Policy: default-src 'self'; img-src 'self' data: blob: https://vtcmvwixfqyxqghibsla.supabase.co; media-src 'self' blob: https://vtcmvwixfqyxqghibsla.supabase.co; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://vtcmvwixfqyxqghibsla.supabase.co; font-src 'self' data: https://fonts.gstatic.com; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://vtcmvwixfqyxqghibsla.supabase.co; connect-src 'self' https://vtcmvwixfqyxqghibsla.supabase.co https://vtcmvwixfqyxqghibsla.storage.supabase.co wss://vtcmvwixfqyxqghibsla.supabase.co; frame-src https://*.stripe.com; frame-ancestors 'none'; base-uri 'none'; form-action 'self' https://checkout.stripe.com
+  Content-Security-Policy: default-src 'self'; img-src 'self' data: blob: https://vtcmvwixfqyxqghibsla.supabase.co; media-src 'self' blob: https://vtcmvwixfqyxqghibsla.supabase.co; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://vtcmvwixfqyxqghibsla.supabase.co; font-src 'self' data: https://fonts.gstatic.com; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://vtcmvwixfqyxqghibsla.supabase.co; connect-src 'self' https://cdn.jsdelivr.net https://vtcmvwixfqyxqghibsla.supabase.co https://vtcmvwixfqyxqghibsla.storage.supabase.co wss://vtcmvwixfqyxqghibsla.supabase.co; frame-src https://*.stripe.com; frame-ancestors 'none'; base-uri 'none'; form-action 'self' https://checkout.stripe.com
 
 /
   Link: <https://thegirlstripguide.com/>; rel="canonical", </assets/images/hero.webp>; rel=preload; as=image; type=image/webp; fetchpriority=high
@@ -13,16 +13,16 @@
   Link: <https://thegirlstripguide.com/situation>; rel="canonical", </assets/images/girls-trip-plan-hero.webp>; rel=preload; as=image; type=image/webp
 
 /the-gals
-  Link: <https://thegirlstripguide.com/the-gals>; rel="canonical", </assets/images/how-it-works-hero.webp>; rel=preload; as=image; type=image/webp
+  Link: <https://thegirlstripguide.com/the-gals>; rel="canonical", </assets/images/how-it-works-hero.webp>; rel=preload; as=image/webp
 
 /free-vs-full
   Link: <https://thegirlstripguide.com/free-vs-full>; rel="canonical"
 
 /gals
-  Link: <https://thegirlstripguide.com/gals>; rel="canonical", </assets/images/group-drinks.webp>; rel=preload; as=image; type=image/webp
+  Link: <https://thegirlstripguide.com/gals>; rel="canonical", </assets/images/group-drinks.webp>; rel=preload; as=image/webp
 
 /briefing
-  Link: <https://thegirlstripguide.com/briefing>; rel="canonical", </assets/images/briefing-hero.webp>; rel=preload; as=image; type=image/webp
+  Link: <https://thegirlstripguide.com/briefing>; rel="canonical", </assets/images/briefing-hero.webp>; rel=preload; as=image/webp
 
 /contact
   Link: <https://thegirlstripguide.com/contact>; rel="canonical", </assets/images/neville.webp?v=2>; rel=preload; as=image
