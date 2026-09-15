@@ -1,0 +1,73 @@
+name: Native push build
+
+on:
+  push:
+    branches:
+      - feature/push-notifications-2026-09-15-native
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: girls-native-push-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  contract:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: npm ci
+      - run: npm run test:native
+      - run: npm run native:push:install
+      - run: npm run mobile:prepare
+      - run: npx cap sync android
+      - run: node scripts/configure-native-platforms.mjs && node scripts/configure-native-push.mjs
+      - name: Verify generated Android push wiring
+        run: |
+          grep -Fq "capacitor-push-notifications" android/capacitor.settings.gradle
+          grep -Fq "capacitor-push-notifications" android/app/capacitor.build.gradle
+          test -f mobile-web/native-push.js
+          test ! -f mobile-web/girls-push-notifications.js
+      - uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: '21'
+      - name: Compile Android debug
+        working-directory: android
+        run: ./gradlew assembleDebug
+
+  ios-simulator:
+    runs-on: macos-15
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: npm ci
+      - run: npm run native:push:install
+      - run: npm run mobile:prepare
+      - run: npx cap sync ios
+      - run: node scripts/configure-native-platforms.mjs && node scripts/configure-native-push.mjs
+      - run: npm run test:native
+      - name: Compile iOS simulator
+        run: >-
+          xcodebuild
+          -project ios/App/App.xcodeproj
+          -scheme App
+          -configuration Debug
+          -sdk iphonesimulator
+          -destination 'generic/platform=iOS Simulator'
+          -derivedDataPath "$RUNNER_TEMP/gtg-native-push"
+          CODE_SIGNING_ALLOWED=NO
+          build
