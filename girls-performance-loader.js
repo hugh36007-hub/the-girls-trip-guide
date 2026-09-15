@@ -16,7 +16,8 @@ const BUNDLES={
     '/logged-in-light-theme-final-fix.js?v=20260907-1',
     '/logged-in-stat-icons.js?v=20260907-2',
     '/girls-direct-login-route.js?v=20260907-2',
-    '/girls-home-shell-parity.js?v=20260909-1'
+    '/girls-home-shell-parity.js?v=20260909-1',
+    '/girls-hidden-gallery-intro.js?v=20260915-2'
   ],
   onboarding:['/girls-batch1-parity-safe-v2.js?v=20260914-1','/girls-convince-copy-v2.js?v=20260907-1'],
   parity:['/girls-product-parity.js?v=5','/girls-gals-selector-fix.js?v=1'],
@@ -33,7 +34,6 @@ const BUNDLES={
   groupPollExtras:['/girls-poll-nudge.js?v=2'],
   evidenceShared:['/evidence-intro-dismiss.js?v=3'],
   evidenceFull:[
-    '/girls-hidden-gallery-intro.js?v=20260915-1',
     '/girls-vault-contract-fix.js?v=2',
     '/girls-hidden-upload-choice.js?v=1',
     '/girls-media-performance-max.js?v=2',
