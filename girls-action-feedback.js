@@ -127,14 +127,9 @@
     event.formData.set('id', recordId.value);
   });
 
-  // Native select popups can remain visually open in mobile/emulated Chrome even
-  // after a currency has committed. Close it synchronously once the selection
-  // changes; the FX controller still receives the same change event afterwards.
-  document.addEventListener('change', event => {
-    const select = event.target?.closest?.('#expenseForm select[name="currency"]');
-    if (!select) return;
-    select.blur();
-  }, true);
+  // Do not blur native currency selects during the capture phase. Chrome/mobile
+  // needs to finish committing the chosen option before the FX controller handles
+  // the normal change event and closes the picker.
 
   document.addEventListener('submit', event => {
     const form = event.target;
