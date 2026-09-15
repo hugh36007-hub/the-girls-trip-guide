@@ -5,7 +5,7 @@ if(window.__GTG_HIDDEN_GALLERY_INTRO__)return;
 window.__GTG_HIDDEN_GALLERY_INTRO__=true;
 
 const tripId=()=>new URL(location.href).searchParams.get('trip_id')||'';
-const key=()=>`gtg:hidden-gallery-intro-v2:${tripId()}`;
+const key=()=>`gtg:hidden-gallery-intro-v3:${tripId()}`;
 const seen=()=>{try{return localStorage.getItem(key())==='1'}catch{return false}};
 const markSeen=()=>{try{localStorage.setItem(key(),'1')}catch{}};
 const toast=msg=>{const el=document.getElementById('toast');if(!el)return;el.textContent=msg;el.classList.add('show');setTimeout(()=>el.classList.remove('show'),3000)};
@@ -45,7 +45,7 @@ function install(){
  box.className='gtg-hidden-gallery-intro';
  box.dataset.hiddenGalleryIntro='1';
  box.setAttribute('role','note');
- box.innerHTML=`<div class="gtg-hidden-gallery-intro__top"><div class="gtg-hidden-gallery-intro__icon" aria-hidden="true">🔒</div><div><h3>There’s also a Hidden Gallery</h3><p>Full Trip includes a separate <strong>PIN-protected album</strong> for photos or videos you do not want in the main Evidence gallery. To view it, go to <strong>Home</strong> and <strong>press and hold the Latest Photo panel for 4 seconds</strong>. The organiser sets the trip PIN. You can still send photos or videos to the Hidden Gallery from Upload without unlocking it.</p></div></div><div class="gtg-hidden-gallery-intro__actions"><button type="button" class="btn primary" data-hidden-gallery-dismiss>Got it</button></div>`;
+ box.innerHTML=`<div class="gtg-hidden-gallery-intro__top"><div class="gtg-hidden-gallery-intro__icon" aria-hidden="true">🔒</div><div><h3>There’s also a Hidden Gallery</h3><p>Full Trip includes a separate <strong>PIN-protected album</strong> for photos or videos you do not want in the main Evidence gallery. To view it, go to <strong>Home</strong>, <strong>tap Latest Photo once to expand it</strong>, then <strong>press and hold the expanded photo for 4 seconds</strong>. The organiser sets the trip PIN. You can still send photos or videos to the Hidden Gallery from Upload without unlocking it.</p></div></div><div class="gtg-hidden-gallery-intro__actions"><button type="button" class="btn primary" data-hidden-gallery-dismiss>Got it</button></div>`;
  shell.insertBefore(box,active);
 }
 
@@ -60,7 +60,7 @@ document.addEventListener('click',event=>{
    event.preventDefault();
    event.stopImmediatePropagation();
    stripDirectEntries();
-   toast('Hidden Gallery: go to Home and hold Latest Photo for 4 seconds.');
+   toast('Hidden Gallery: on Home, tap Latest Photo once, then hold the expanded photo for 4 seconds.');
    return;
  }
 
