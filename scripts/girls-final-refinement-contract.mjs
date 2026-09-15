@@ -40,8 +40,8 @@ assert(polishCss.includes('text-align:left'),'inner page titles must return to a
 assert(polishCss.includes('min-width:430px'),'wider phone summaries should compact into one row where appropriate');
 
 for(const href of ['/mobile-viewport-lock.css?v=2','/girls-final-refinement.css?v=1','/girls-hero-vault-ux.css?v=1']){
-  assert(html.includes(`rel=\"preload\" as=\"style\" href=\"${href}\"`),`missing Home-shell preload ${href}`);
   assert(critical.includes(href),`critical loader must activate ${href}`);
+  assert(!html.includes(`rel=\"stylesheet\" href=\"${href}\"`),`critical style owner must not be duplicated in the private shell: ${href}`);
 }
 assert(critical.includes('/live-dashboard-hero.css?v=10'),'final Home stylesheet must be activated by the first private startup script');
 assert(deferred.includes('/girls-live-dashboard-hero.js?v=13'),'unified runtime loader must own the final Home hydrator');
@@ -59,7 +59,7 @@ assert(html.includes('/girls-critical-style-loader.js?v=20260914-1'),'critical s
 assert(html.includes('/girls-home-social-hub-v3.js?v=20260914-1'),'Free Home chat must be part of core startup');
 assert(!deferred.includes('/girls-home-social-hub-v3.js'),'Free Home chat must not have a second deferred owner');
 assert(!deferred.includes('/girls-home-hero-layout-match.js'),'legacy black Free hero override must remain retired');
-assert(html.includes('/girls-performance-loader.js?v=13'),'performance loader missing');
+assert(html.includes('/girls-performance-loader.js?v=14'),'performance loader missing');
 
 // Current critical-path safeguards: one light, geometry-stable boot shell until authenticated composition is ready.
 assert(html.includes('rel="stylesheet" href="/girls-app.css?v=20260909-1"'),'current private-app stylesheet must be explicitly versioned');
@@ -88,7 +88,7 @@ assert(heroUx.includes("observe(app,{childList:true})")&&!heroUx.includes("obser
 assert(roleDock.includes("observe(app,{childList:true,subtree:false})")&&!roleDock.includes("observe(document.documentElement"),'dock normalisation must observe only authoritative app rerenders');
 
 for(const src of [
- '/girls-vault-contract-fix.js?v=2','/girls-section-layout.js?v=1','/girls-free-entitlement-guard.js?v=1','/girls-inner-page-polish.js?v=2','/girls-document-audience.js?v=20260908-2','/girls-hidden-upload-choice.js?v=1','/girls-media-performance-max.js?v=2','/girls-media-ux-plus.js?v=2','/girls-evidence-parity.js?v=2','/girls-media-quality-fix.js?v=5','/girls-media-readiness.js?v=3','/girls-direct-photo-viewer.js?v=5','/girls-media-flow-refinement.js?v=2','/girls-trip-social.js?v=3','/girls-chat-sheet.js?v=4','/girls-media-social.js?v=1','/girls-poll-nudge.js?v=2','/girls-home-thumbnail-prime.js?v=1','/evidence-intro-dismiss.js?v=3'
+ '/girls-vault-contract-fix.js?v=2','/girls-section-layout.js?v=1','/girls-free-entitlement-guard.js?v=1','/girls-inner-page-polish.js?v=2','/girls-document-audience.js?v=20260908-2','/girls-hidden-upload-choice.js?v=1','/girls-media-performance-max.js?v=2','/girls-media-ux-plus.js?v=3','/girls-evidence-parity.js?v=2','/girls-media-quality-fix.js?v=5','/girls-media-readiness.js?v=3','/girls-direct-photo-viewer.js?v=5','/girls-media-flow-refinement.js?v=2','/girls-trip-social.js?v=3','/girls-chat-sheet.js?v=4','/girls-media-social.js?v=1','/girls-poll-nudge.js?v=2','/girls-home-thumbnail-prime.js?v=1','/evidence-intro-dismiss.js?v=3'
 ]){
   assert(!html.includes(`defer src=\"${src}\"`),`noncritical script must not execute on Home startup: ${src}`);
   assert(deferred.includes(src),`route loader must retain ${src}`);
