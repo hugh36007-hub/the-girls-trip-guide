@@ -71,6 +71,11 @@ function enhanceBookingForm(form){
   kind.addEventListener('change',()=>requestAnimationFrame(()=>kind.blur()));
  }
 }
+function dedupePeopleOptions(people){
+ if(!people)return;
+ const seen=new Set();
+ [...people.options].forEach(option=>{const key=String(option.value||'').trim();if(!key||seen.has(key))option.remove();else seen.add(key)});
+}
 function enhanceExpenseForm(form){
  if(!form||form.getAttribute('id')!=='expenseForm')return;
  const payer=form.querySelector('select[name="payer"]');
@@ -79,16 +84,23 @@ function enhanceExpenseForm(form){
   payer.addEventListener('change',()=>requestAnimationFrame(()=>payer.blur()));
  }
  const people=form.querySelector('select[name="people"][multiple]');
- if(!people||people.dataset.gtgCheckboxSource==='1')return;
+ if(!people)return;
+ dedupePeopleOptions(people);
+ if(people.dataset.gtgCheckboxSource==='1')return;
  people.dataset.gtgCheckboxSource='1';
  people.required=false;
  people.style.display='none';
  people.setAttribute('aria-hidden','true');
  people.tabIndex=-1;
+ const oldChecks=form.querySelector('[data-expense-split-checks="1"]');
+ if(oldChecks)oldChecks.remove();
  const checks=document.createElement('div');
  checks.className='gtg-expense-split-checks';
  checks.dataset.expenseSplitChecks='1';
+ const rendered=new Set();
  for(const option of people.options){
+  if(rendered.has(option.value))continue;
+  rendered.add(option.value);
   const label=document.createElement('label');
   label.className='gtg-expense-split-option';
   const input=document.createElement('input');
