@@ -7,6 +7,7 @@ const DOC_SRC='/girls-document-audience.js?v=20260908-2';
 const REMINDER_SRC='/girls-free-reminders-parity.js?v=20260908-7';
 const BUNDLES={
   appTheme:[
+    '/girls-push-notifications.js?v=1',
     '/girls-fx-expenses-bootstrap.js?v=1',
     '/girls-resend-invite-fix.js?v=20260914-2',
     '/girls-mobile-history-fix.js?v=1',
