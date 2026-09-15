@@ -2,7 +2,7 @@
 (()=>{
 'use strict';
 if(window.__GTG_FX_EXPENSES_BOOTSTRAP__)return;window.__GTG_FX_EXPENSES_BOOTSTRAP__=true;
-const SRC='/girls-fx-expenses.js?v=2';
+const SRC='/girls-fx-expenses.js?v=3';
 let timer=0,attempts=0;
 function loaded(){return Boolean(window.__GTG_FX_EXPENSES__)}
 function load(){
