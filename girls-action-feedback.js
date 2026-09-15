@@ -117,6 +117,15 @@
     event.formData.set('id', recordId.value);
   });
 
+  // Native select popups can remain visually open in mobile/emulated Chrome even
+  // after a currency has committed. Close it synchronously once the selection
+  // changes; the FX controller still receives the same change event afterwards.
+  document.addEventListener('change', event => {
+    const select = event.target?.closest?.('#expenseForm select[name="currency"]');
+    if (!select) return;
+    select.blur();
+  }, true);
+
   document.addEventListener('submit', event => {
     const form = event.target;
     if (!(form instanceof HTMLFormElement)) return;
