@@ -1,6 +1,6 @@
 /* Girls Trip Guide — compact, wider group-chat message bubbles. */
 .gtg-chat-feed{
-  gap:7px!important;
+  gap:6px!important;
   align-items:start;
 }
 .gtg-chat-msg{
@@ -8,21 +8,43 @@
   max-width:none!important;
   justify-self:start;
   box-sizing:border-box;
-  padding:8px 12px!important;
-  border-radius:12px!important;
+  display:grid!important;
+  grid-template-columns:auto minmax(0,1fr) auto;
+  align-items:center;
+  gap:8px;
+  padding:5px 10px!important;
+  border-radius:11px!important;
 }
 .gtg-chat-msg.own{
   width:min(82%,620px)!important;
   justify-self:end;
   margin-left:0!important;
 }
+.gtg-chat-msg b{
+  display:block!important;
+  margin:0!important;
+  line-height:1.15!important;
+}
+.gtg-chat-msg p{
+  margin:0!important;
+  line-height:1.25!important;
+  min-width:0;
+}
 .gtg-chat-msg small{
+  display:block!important;
+  margin:0!important;
+  white-space:nowrap;
   text-align:right;
+  line-height:1.15!important;
 }
 @media(max-width:600px){
   .gtg-chat-msg,
   .gtg-chat-msg.own{
     width:88%!important;
     max-width:none!important;
+    padding:5px 9px!important;
+    gap:7px!important;
   }
+  .gtg-chat-msg p{font-size:13px!important}
+  .gtg-chat-msg small{font-size:8px!important}
 }
