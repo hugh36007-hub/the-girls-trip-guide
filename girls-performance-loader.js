@@ -33,6 +33,7 @@ const BUNDLES={
   groupPollExtras:['/girls-poll-nudge.js?v=2'],
   evidenceShared:['/evidence-intro-dismiss.js?v=3'],
   evidenceFull:[
+    '/girls-hidden-gallery-intro.js?v=20260915-1',
     '/girls-vault-contract-fix.js?v=2',
     '/girls-hidden-upload-choice.js?v=1',
     '/girls-media-performance-max.js?v=2',
