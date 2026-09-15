@@ -13,6 +13,16 @@
     document.head.appendChild(fxScript);
   }
 
+  // Load the organiser-controlled member expense permission layer with the core
+  // Money runtime. It is event-driven and does not install a persistent page observer.
+  if (!document.querySelector('script[data-gtg-member-expenses]')) {
+    const memberExpenseScript = document.createElement('script');
+    memberExpenseScript.src = '/girls-member-expense-permissions.js?v=20260915-1';
+    memberExpenseScript.async = false;
+    memberExpenseScript.dataset.gtgMemberExpenses = '1';
+    document.head.appendChild(memberExpenseScript);
+  }
+
   // Resend is a core organiser action, not a route enhancement. Start its handler
   // with the core form layer so a slow/deferred theme bundle cannot miss submit.
   if (!document.querySelector('script[data-gtg-resend-core]')) {
