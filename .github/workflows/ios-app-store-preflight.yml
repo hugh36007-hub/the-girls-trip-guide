@@ -27,8 +27,7 @@ permissions:
   contents: read
 
 env:
-  WEB_SOURCE_SHA: c65b306996e5c4a92556862a52428a1d2aed2cc4
-  GTG_WEB_SOURCE_DIR: approved-web
+  GTG_WEB_SOURCE_SHA: c65b306996e5c4a92556862a52428a1d2aed2cc4
   VERSION_NAME: 1.0.3
   BUILD_NUMBER: '6'
 
@@ -46,13 +45,13 @@ jobs:
       - name: Checkout approved Girls web release
         uses: actions/checkout@v4
         with:
-          ref: ${{ env.WEB_SOURCE_SHA }}
+          ref: ${{ env.GTG_WEB_SOURCE_SHA }}
           path: approved-web
           fetch-depth: 1
 
       - name: Verify approved source and Xcode
         run: |
-          test "$(git -C approved-web rev-parse HEAD)" = "$WEB_SOURCE_SHA"
+          test "$(git -C approved-web rev-parse HEAD)" = "$GTG_WEB_SOURCE_SHA"
           xcodebuild -version
           XCODE_MAJOR="$(xcodebuild -version | awk '/Xcode/{split($2,a,"."); print a[1]}')"
           test "$XCODE_MAJOR" -ge 26
