@@ -149,6 +149,26 @@ jobs:
               xcrun simctl delete "$DEVICE_ID" >/dev/null 2>&1 || true
             fi
           }
+
+          launch_app() {
+            xcrun simctl launch "$DEVICE_ID" com.storystone.thegirlstripguide &
+            LAUNCH_PID=$!
+            (
+              sleep 30
+              kill "$LAUNCH_PID" >/dev/null 2>&1 || true
+            ) &
+            WATCHDOG_PID=$!
+            if wait "$LAUNCH_PID"; then
+              kill "$WATCHDOG_PID" >/dev/null 2>&1 || true
+              wait "$WATCHDOG_PID" >/dev/null 2>&1 || true
+              return 0
+            fi
+            STATUS=$?
+            kill "$WATCHDOG_PID" >/dev/null 2>&1 || true
+            wait "$WATCHDOG_PID" >/dev/null 2>&1 || true
+            return "$STATUS"
+          }
+
           trap cleanup_simulator EXIT
 
           for simulator_attempt in 1 2 3; do
@@ -167,22 +187,7 @@ jobs:
             fi
 
             if test -n "$READY" && xcrun simctl install "$DEVICE_ID" "$DERIVED_DATA/Build/Products/Debug-iphonesimulator/App.app"; then
-              if python3 - "$DEVICE_ID" <<'PY'
-import subprocess
-import sys
-
-try:
-    result = subprocess.run(
-        ["xcrun", "simctl", "launch", sys.argv[1], "com.storystone.thegirlstripguide"],
-        timeout=30,
-        check=False,
-    )
-    raise SystemExit(result.returncode)
-except subprocess.TimeoutExpired:
-    print("simctl launch timed out after 30 seconds; retrying with a fresh simulator.", file=sys.stderr)
-    raise SystemExit(124)
-PY
-              then
+              if launch_app; then
                 sleep 8
                 if xcrun simctl io "$DEVICE_ID" screenshot "$RUNNER_TEMP/gtg-ios-launch.png"; then
                   LAUNCHED=1
