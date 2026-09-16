@@ -22,7 +22,8 @@ test('completion is account-level with a local per-account fallback',()=>{
   assert.match(tour,/gtg_dashboard_intro_v1/);
   assert.match(tour,/gtg_full_intro_v1/);
   assert.match(tour,/auth\.updateUser\(\{data:next\}\)/);
-  assert.match(tour,/localStorage\.setItem\(localKey\(key,user\.id\),'1'\)/);
+  assert.match(tour,/localStorage\.setItem\(localKey\(key,userId\),'1'\)/);
+  assert.match(tour,/markLocal\(key,user\.id\)/);
 });
 
 test('Girls auth bridge exposes the existing cached authenticated client',()=>{
