@@ -132,11 +132,15 @@ jobs:
           API_KEY_ID: ${{ secrets.APP_STORE_CONNECT_API_KEY_ID }}
           API_ISSUER_ID: ${{ secrets.APP_STORE_CONNECT_ISSUER_ID }}
           API_PRIVATE_KEY: ${{ secrets.APP_STORE_CONNECT_API_PRIVATE_KEY }}
+          DISTRIBUTION_P12: ${{ secrets.APPLE_DISTRIBUTION_P12_BASE64 }}
+          DISTRIBUTION_P12_PASSWORD: ${{ secrets.APPLE_DISTRIBUTION_P12_PASSWORD }}
         run: |
           test -n "$TEAM_ID"
           test -n "$API_KEY_ID"
           test -n "$API_ISSUER_ID"
           test -n "$API_PRIVATE_KEY"
+          test -n "$DISTRIBUTION_P12"
+          test -n "$DISTRIBUTION_P12_PASSWORD"
       - run: npm ci
       - run: npm run native:push:install
       - name: Prepare native iOS payload
@@ -166,6 +170,24 @@ jobs:
           printf '%s\n' "$API_PRIVATE_KEY" > "$KEY_PATH"
           grep -Fq -- '-----BEGIN PRIVATE KEY-----' "$KEY_PATH"
           grep -Fq -- '-----END PRIVATE KEY-----' "$KEY_PATH"
+      - name: Import Apple Distribution certificate
+        env:
+          DISTRIBUTION_P12: ${{ secrets.APPLE_DISTRIBUTION_P12_BASE64 }}
+          DISTRIBUTION_P12_PASSWORD: ${{ secrets.APPLE_DISTRIBUTION_P12_PASSWORD }}
+        run: |
+          CERT_DIR="$RUNNER_TEMP/apple-signing"
+          KEYCHAIN_PATH="$RUNNER_TEMP/app-signing.keychain-db"
+          KEYCHAIN_PASSWORD="$(openssl rand -base64 32)"
+          mkdir -p "$CERT_DIR"
+          umask 077
+          printf '%s' "$DISTRIBUTION_P12" | base64 --decode > "$CERT_DIR/distribution.p12"
+          security create-keychain -p "$KEYCHAIN_PASSWORD" "$KEYCHAIN_PATH"
+          security set-keychain-settings -lut 21600 "$KEYCHAIN_PATH"
+          security unlock-keychain -p "$KEYCHAIN_PASSWORD" "$KEYCHAIN_PATH"
+          security import "$CERT_DIR/distribution.p12" -k "$KEYCHAIN_PATH" -P "$DISTRIBUTION_P12_PASSWORD" -A -t cert -f pkcs12
+          security set-key-partition-list -S apple-tool:,apple: -s -k "$KEYCHAIN_PASSWORD" "$KEYCHAIN_PATH"
+          security list-keychains -d user -s "$KEYCHAIN_PATH"
+          security find-identity -v -p codesigning "$KEYCHAIN_PATH" | grep -Fq 'Apple Distribution: Storystone Ltd (25NJJVNZPZ)'
       - name: Archive signed iOS package
         env:
           TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
@@ -234,6 +256,8 @@ jobs:
           path: ios/build/export/*.ipa
           if-no-files-found: error
           retention-days: 7
-      - name: Remove App Store Connect key
+      - name: Remove Apple signing material
         if: always()
-        run: rm -rf "$RUNNER_TEMP/private_keys"
+        run: |
+          rm -rf "$RUNNER_TEMP/private_keys" "$RUNNER_TEMP/apple-signing"
+          security delete-keychain "$RUNNER_TEMP/app-signing.keychain-db" >/dev/null 2>&1 || true
