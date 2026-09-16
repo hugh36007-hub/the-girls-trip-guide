@@ -134,25 +134,71 @@ jobs:
           build
 
       - name: Smoke-test iOS app launch
-        timeout-minutes: 5
+        timeout-minutes: 8
         env:
           DERIVED_DATA: ${{ runner.temp }}/gtg-ios-build
         run: |
           RUNTIME_ID=$(xcrun simctl list runtimes --json | python3 -c "import json,sys; r=[x for x in json.load(sys.stdin)['runtimes'] if x.get('isAvailable') and x.get('platform')=='iOS']; print(r[-1]['identifier'])")
           DEVICE_TYPE_ID=$(xcrun simctl list devicetypes --json | python3 -c "import json,sys; d=[x for x in json.load(sys.stdin)['devicetypes'] if x['name'].startswith('iPhone')]; print(next((x['identifier'] for x in d if x['name']=='iPhone 16 Pro'),d[0]['identifier']))")
-          DEVICE_ID=$(xcrun simctl create 'GTG CI iPhone' "$DEVICE_TYPE_ID" "$RUNTIME_ID")
-          trap 'xcrun simctl shutdown "$DEVICE_ID" >/dev/null 2>&1 || true; xcrun simctl delete "$DEVICE_ID" >/dev/null 2>&1 || true' EXIT
-          xcrun simctl boot "$DEVICE_ID"
-          READY=''
-          for attempt in {1..24}; do
-            if xcrun simctl spawn "$DEVICE_ID" launchctl print system >/dev/null 2>&1; then READY=1; break; fi
+          DEVICE_ID=''
+          LAUNCHED=''
+
+          cleanup_simulator() {
+            if test -n "$DEVICE_ID"; then
+              xcrun simctl shutdown "$DEVICE_ID" >/dev/null 2>&1 || true
+              xcrun simctl delete "$DEVICE_ID" >/dev/null 2>&1 || true
+            fi
+          }
+          trap cleanup_simulator EXIT
+
+          for simulator_attempt in 1 2 3; do
+            READY=''
+            DEVICE_ID=$(xcrun simctl create "GTG CI iPhone $simulator_attempt" "$DEVICE_TYPE_ID" "$RUNTIME_ID")
+            echo "Starting hosted iOS simulator attempt $simulator_attempt/3 ($DEVICE_ID)"
+
+            if xcrun simctl boot "$DEVICE_ID"; then
+              for ready_attempt in {1..12}; do
+                if xcrun simctl spawn "$DEVICE_ID" launchctl print system >/dev/null 2>&1; then
+                  READY=1
+                  break
+                fi
+                sleep 5
+              done
+            fi
+
+            if test -n "$READY" && xcrun simctl install "$DEVICE_ID" "$DERIVED_DATA/Build/Products/Debug-iphonesimulator/App.app"; then
+              if python3 - "$DEVICE_ID" <<'PY'
+import subprocess
+import sys
+
+try:
+    result = subprocess.run(
+        ["xcrun", "simctl", "launch", sys.argv[1], "com.storystone.thegirlstripguide"],
+        timeout=30,
+        check=False,
+    )
+    raise SystemExit(result.returncode)
+except subprocess.TimeoutExpired:
+    print("simctl launch timed out after 30 seconds; retrying with a fresh simulator.", file=sys.stderr)
+    raise SystemExit(124)
+PY
+              then
+                sleep 8
+                if xcrun simctl io "$DEVICE_ID" screenshot "$RUNNER_TEMP/gtg-ios-launch.png"; then
+                  LAUNCHED=1
+                  break
+                fi
+              fi
+            fi
+
+            echo "Simulator attempt $simulator_attempt failed; resetting CoreSimulator before retry."
+            cleanup_simulator
+            DEVICE_ID=''
+            killall -9 com.apple.CoreSimulator.CoreSimulatorService >/dev/null 2>&1 || true
             sleep 5
           done
-          test -n "$READY" || { echo 'The hosted simulator did not become ready within two minutes.'; exit 1; }
-          xcrun simctl install "$DEVICE_ID" "$DERIVED_DATA/Build/Products/Debug-iphonesimulator/App.app"
-          xcrun simctl launch "$DEVICE_ID" com.storystone.thegirlstripguide
-          sleep 8
-          xcrun simctl io "$DEVICE_ID" screenshot "$RUNNER_TEMP/gtg-ios-launch.png"
+
+          test -n "$LAUNCHED" || { echo 'The Girls iOS app did not launch successfully after three fresh simulator attempts.'; exit 1; }
 
       - name: Verify reproducible platform projects
         run: |
