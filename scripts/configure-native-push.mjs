@@ -8,6 +8,11 @@ async function ensureText(file, token, insertBefore, addition) {
   await writeFile(file, source, 'utf8');
 }
 
+const apnsEnvironment = process.env.NATIVE_PUSH_APNS_ENVIRONMENT || 'development';
+if (!['development', 'production'].includes(apnsEnvironment)) {
+  throw new Error(`Unsupported NATIVE_PUSH_APNS_ENVIRONMENT: ${apnsEnvironment}`);
+}
+
 const entitlementsPath = 'ios/App/App/App.entitlements';
 let entitlements = await readFile(entitlementsPath, 'utf8');
 entitlements = entitlements.replace(/\s*<key>aps-environment<\/key>\s*<string>(?:development|production)<\/string>\s*/g, '\n');
@@ -15,9 +20,24 @@ const dictOpen = '<dict>';
 if (!entitlements.includes(dictOpen)) throw new Error('iOS entitlements dictionary is missing.');
 entitlements = entitlements.replace(
   dictOpen,
-  `${dictOpen}\n\t<key>aps-environment</key>\n\t<string>development</string>`
+  `${dictOpen}\n\t<key>aps-environment</key>\n\t<string>${apnsEnvironment}</string>`
 );
 await writeFile(entitlementsPath, entitlements, 'utf8');
+
+const projectPath = 'ios/App/App.xcodeproj/project.pbxproj';
+let project = await readFile(projectPath, 'utf8');
+if (!project.includes('CODE_SIGN_ENTITLEMENTS = App/App.entitlements;')) {
+  throw new Error('iOS target is not configured to sign App.entitlements.');
+}
+if (!project.includes('com.apple.Push = {')) {
+  const targetAnchor = '\t\t\t\t\t\tProvisioningStyle = Automatic;\n\t\t\t\t\t};';
+  if (!project.includes(targetAnchor)) throw new Error('iOS target capability anchor is missing.');
+  project = project.replace(
+    targetAnchor,
+    `\t\t\t\t\t\tProvisioningStyle = Automatic;\n\t\t\t\t\t\tSystemCapabilities = {\n\t\t\t\t\t\t\tcom.apple.AssociatedDomains = {\n\t\t\t\t\t\t\t\tenabled = 1;\n\t\t\t\t\t\t\t};\n\t\t\t\t\t\t\tcom.apple.Push = {\n\t\t\t\t\t\t\t\tenabled = 1;\n\t\t\t\t\t\t\t};\n\t\t\t\t\t\t};\n\t\t\t\t\t};`
+  );
+  await writeFile(projectPath, project, 'utf8');
+}
 
 const delegate = await readFile('ios/App/App/AppDelegate.swift', 'utf8');
 for (const token of [
@@ -66,4 +86,4 @@ if (!swiftPackage.includes('../../../.native-push-package/node_modules/@capacito
   throw new Error('iOS Capacitor push package path is wrong.');
 }
 
-console.log('Applied deterministic native push configuration.');
+console.log(`Applied deterministic native push configuration (${apnsEnvironment} APNs).`);
