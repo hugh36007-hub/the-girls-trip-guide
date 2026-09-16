@@ -70,3 +70,13 @@ const schedule=()=>{
 new MutationObserver(schedule).observe(document.documentElement,{childList:true,subtree:true,characterData:true});
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',refine,{once:true});else refine();
 })();
+
+// Late-load the account-level dashboard tutorials after the core app has initialised.
+(()=>{
+  if(document.querySelector('script[data-gtg-dashboard-onboarding]'))return;
+  const script=document.createElement('script');
+  script.src='/girls-dashboard-onboarding.js?v=1';
+  script.defer=true;
+  script.dataset.gtgDashboardOnboarding='1';
+  document.head.appendChild(script);
+})();
