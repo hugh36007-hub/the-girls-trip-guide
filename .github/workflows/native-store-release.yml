@@ -21,7 +21,7 @@ permissions:
 jobs:
   android:
     if: inputs.platform == 'both' || inputs.platform == 'android'
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 40
     steps:
       - uses: actions/checkout@v4
@@ -37,16 +37,16 @@ jobs:
           java-version: '21'
       - name: Confirm Play signing and Firebase access
         env:
-          KEYSTORE: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
-          STORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
-          KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
-          KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
+          KEYSTORE: ${{ secrets.GTG_ANDROID_UPLOAD_KEYSTORE_BASE64 }}
+          STORE_PASSWORD: ${{ secrets.GTG_ANDROID_UPLOAD_KEYSTORE_PASSWORD }}
+          KEY_ALIAS: ${{ secrets.GTG_ANDROID_UPLOAD_KEY_ALIAS }}
+          KEY_PASSWORD: ${{ secrets.GTG_ANDROID_UPLOAD_KEY_PASSWORD }}
           FIREBASE_JSON: ${{ secrets.FIREBASE_GOOGLE_SERVICES_JSON_BASE64 }}
         run: |
-          test -n "$KEYSTORE" || { echo 'Missing ANDROID_KEYSTORE_BASE64.'; exit 1; }
-          test -n "$STORE_PASSWORD" || { echo 'Missing ANDROID_KEYSTORE_PASSWORD.'; exit 1; }
-          test -n "$KEY_ALIAS" || { echo 'Missing ANDROID_KEY_ALIAS.'; exit 1; }
-          test -n "$KEY_PASSWORD" || { echo 'Missing ANDROID_KEY_PASSWORD.'; exit 1; }
+          test -n "$KEYSTORE" || { echo 'Missing GTG_ANDROID_UPLOAD_KEYSTORE_BASE64.'; exit 1; }
+          test -n "$STORE_PASSWORD" || { echo 'Missing GTG_ANDROID_UPLOAD_KEYSTORE_PASSWORD.'; exit 1; }
+          test -n "$KEY_ALIAS" || { echo 'Missing GTG_ANDROID_UPLOAD_KEY_ALIAS.'; exit 1; }
+          test -n "$KEY_PASSWORD" || { echo 'Missing GTG_ANDROID_UPLOAD_KEY_PASSWORD.'; exit 1; }
           test -n "$FIREBASE_JSON" || { echo 'Missing FIREBASE_GOOGLE_SERVICES_JSON_BASE64.'; exit 1; }
       - run: npm ci
       - run: npm run native:push:install
@@ -57,32 +57,57 @@ jobs:
           node scripts/configure-native-platforms.mjs
           node scripts/configure-native-push.mjs
           npm run test:native
+          grep -Fq 'applicationId "com.storystone.thegirlstripguide"' android/app/build.gradle
+          grep -Fq 'versionCode 6' android/app/build.gradle
+          grep -Fq 'versionName "1.0.3"' android/app/build.gradle
+          grep -Fq 'capacitor-push-notifications' android/capacitor.settings.gradle
       - name: Install Firebase Android configuration
         env:
           FIREBASE_JSON: ${{ secrets.FIREBASE_GOOGLE_SERVICES_JSON_BASE64 }}
         run: |
           printf '%s' "$FIREBASE_JSON" | base64 --decode > android/app/google-services.json
           node -e "const j=require('./android/app/google-services.json');const clients=j.client||[];if(!clients.some(c=>c?.client_info?.android_client_info?.package_name==='com.storystone.thegirlstripguide'))process.exit(1)"
+      - name: Materialize and verify upload key
+        env:
+          ANDROID_UPLOAD_KEYSTORE_PATH: /tmp/gtg-upload-key.jks
+          ANDROID_UPLOAD_KEYSTORE_BASE64: ${{ secrets.GTG_ANDROID_UPLOAD_KEYSTORE_BASE64 }}
+          ANDROID_UPLOAD_KEYSTORE_PASSWORD: ${{ secrets.GTG_ANDROID_UPLOAD_KEYSTORE_PASSWORD }}
+          ANDROID_UPLOAD_KEY_ALIAS: ${{ secrets.GTG_ANDROID_UPLOAD_KEY_ALIAS }}
+          ANDROID_UPLOAD_KEY_PASSWORD: ${{ secrets.GTG_ANDROID_UPLOAD_KEY_PASSWORD }}
+        run: |
+          printf '%s' "$ANDROID_UPLOAD_KEYSTORE_BASE64" | base64 --decode > "$ANDROID_UPLOAD_KEYSTORE_PATH"
+          chmod 600 "$ANDROID_UPLOAD_KEYSTORE_PATH"
+          test -s "$ANDROID_UPLOAD_KEYSTORE_PATH"
+          keytool -list -keystore "$ANDROID_UPLOAD_KEYSTORE_PATH" -storepass "$ANDROID_UPLOAD_KEYSTORE_PASSWORD" -alias "$ANDROID_UPLOAD_KEY_ALIAS" >/dev/null
       - name: Build signed Play bundle
         env:
-          KEYSTORE: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
-          STORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
-          KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
-          KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
+          ANDROID_UPLOAD_KEYSTORE_PATH: /tmp/gtg-upload-key.jks
+          ANDROID_UPLOAD_KEYSTORE_PASSWORD: ${{ secrets.GTG_ANDROID_UPLOAD_KEYSTORE_PASSWORD }}
+          ANDROID_UPLOAD_KEY_ALIAS: ${{ secrets.GTG_ANDROID_UPLOAD_KEY_ALIAS }}
+          ANDROID_UPLOAD_KEY_PASSWORD: ${{ secrets.GTG_ANDROID_UPLOAD_KEY_PASSWORD }}
         working-directory: android
+        run: ./gradlew bundleRelease
+      - name: Verify AAB signature
+        env:
+          ANDROID_UPLOAD_KEYSTORE_PATH: /tmp/gtg-upload-key.jks
+          ANDROID_UPLOAD_KEYSTORE_PASSWORD: ${{ secrets.GTG_ANDROID_UPLOAD_KEYSTORE_PASSWORD }}
+          ANDROID_UPLOAD_KEY_ALIAS: ${{ secrets.GTG_ANDROID_UPLOAD_KEY_ALIAS }}
         run: |
-          echo "$KEYSTORE" | base64 --decode > app/gtg-upload.keystore
-          ./gradlew bundleRelease \
-            -Pandroid.injected.signing.store.file="$PWD/app/gtg-upload.keystore" \
-            -Pandroid.injected.signing.store.password="$STORE_PASSWORD" \
-            -Pandroid.injected.signing.key.alias="$KEY_ALIAS" \
-            -Pandroid.injected.signing.key.password="$KEY_PASSWORD"
+          AAB='android/app/build/outputs/bundle/release/app-release.aab'
+          test -s "$AAB"
+          jarsigner -verify "$AAB"
+          EXPECTED_SHA256="$(keytool -list -v -keystore "$ANDROID_UPLOAD_KEYSTORE_PATH" -storepass "$ANDROID_UPLOAD_KEYSTORE_PASSWORD" -alias "$ANDROID_UPLOAD_KEY_ALIAS" | sed -n 's/^[[:space:]]*SHA256: //p' | head -n 1)"
+          ACTUAL_SHA256="$(keytool -printcert -jarfile "$AAB" | sed -n 's/^[[:space:]]*SHA256: //p' | head -n 1)"
+          test -n "$EXPECTED_SHA256" && test "$EXPECTED_SHA256" = "$ACTUAL_SHA256"
       - uses: actions/upload-artifact@v4
         with:
           name: girls-trip-guide-play-release-1.0.3-build-6
           path: android/app/build/outputs/bundle/release/app-release.aab
           if-no-files-found: error
           retention-days: 14
+      - name: Remove upload key
+        if: always()
+        run: rm -f /tmp/gtg-upload-key.jks
 
   ios:
     if: inputs.platform == 'both' || inputs.platform == 'ios'
