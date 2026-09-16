@@ -24,6 +24,7 @@ on:
       - 'scripts/configure-native-platforms.mjs'
       - 'scripts/configure-native-push.mjs'
       - 'tests/native/**'
+      - 'tests/girls-pwa-security-contract.test.cjs'
       - 'ios/**'
       - 'android/**'
       - '.github/workflows/native-platform-build.yml'
