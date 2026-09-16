@@ -180,11 +180,38 @@ jobs:
           KEYCHAIN_PASSWORD="$(openssl rand -base64 32)"
           mkdir -p "$CERT_DIR"
           umask 077
-          printf '%s' "$DISTRIBUTION_P12" | base64 -D > "$CERT_DIR/distribution.p12"
+          python3 - <<'PY'
+          import os, base64, re
+          from pathlib import Path
+          cert_dir = Path(os.environ['RUNNER_TEMP']) / 'apple-signing'
+          raw = os.environ['DISTRIBUTION_P12'].strip()
+          prefix = 'APPLE_DISTRIBUTION_P12_BASE64='
+          if raw.startswith(prefix):
+              raw = raw[len(prefix):]
+          raw = raw.strip().strip('"').strip("'")
+          if '\n' in raw:
+              raw = raw.splitlines()[0].strip()
+          raw = re.sub(r'\s+', '', raw)
+          data = base64.b64decode(raw, validate=True)
+          if len(data) < 1000 or data[:1] != b'0':
+              raise SystemExit('Decoded Apple signing package is invalid')
+          (cert_dir / 'distribution.p12').write_bytes(data)
+          pw = os.environ['DISTRIBUTION_P12_PASSWORD'].strip()
+          pp = 'APPLE_DISTRIBUTION_P12_PASSWORD='
+          if pw.startswith(pp):
+              pw = pw[len(pp):]
+          pw = pw.strip().strip('"').strip("'")
+          if '\n' in pw:
+              pw = pw.splitlines()[0].strip()
+          if not pw:
+              raise SystemExit('Apple signing password is empty')
+          (cert_dir / 'password.txt').write_text(pw)
+          PY
+          P12_PASSWORD="$(cat "$CERT_DIR/password.txt")"
           security create-keychain -p "$KEYCHAIN_PASSWORD" "$KEYCHAIN_PATH"
           security set-keychain-settings -lut 21600 "$KEYCHAIN_PATH"
           security unlock-keychain -p "$KEYCHAIN_PASSWORD" "$KEYCHAIN_PATH"
-          security import "$CERT_DIR/distribution.p12" -k "$KEYCHAIN_PATH" -P "$DISTRIBUTION_P12_PASSWORD" -A -t cert -f pkcs12
+          security import "$CERT_DIR/distribution.p12" -k "$KEYCHAIN_PATH" -P "$P12_PASSWORD" -A -t cert -f pkcs12
           security set-key-partition-list -S apple-tool:,apple: -s -k "$KEYCHAIN_PASSWORD" "$KEYCHAIN_PATH"
           security list-keychains -d user -s "$KEYCHAIN_PATH"
           security find-identity -v -p codesigning "$KEYCHAIN_PATH" | grep -Fq 'Apple Distribution: Storystone Ltd (25NJJVNZPZ)'
