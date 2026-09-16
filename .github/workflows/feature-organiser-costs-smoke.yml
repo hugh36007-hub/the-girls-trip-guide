@@ -1,0 +1,39 @@
+name: Organiser costs feature smoke
+
+on:
+  push:
+    branches:
+      - feature/organiser-costs-default-push-2026-09-16-native
+
+permissions:
+  contents: read
+
+jobs:
+  smoke:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Install dependencies
+        run: npm install --ignore-scripts --package-lock=false
+      - name: Syntax check native push
+        run: node --check native-push.js
+      - name: Prepare native payload
+        run: npm run mobile:prepare
+      - name: Verify organiser feature payload
+        run: |
+          node --check mobile-web/organiser-trip-summary.js
+          grep -q '13337e72a9762700486c241af181e37170a3c991' .gtg-web-source-sha
+          grep -q 'organiser-trip-summary.js' mobile-web/girls-action-feedback.js
+          grep -q 'Download PDF' mobile-web/organiser-trip-summary.js
+          grep -q 'Download CSV' mobile-web/organiser-trip-summary.js
+          test ! -f mobile-web/girls-push-notifications.js
+          grep -q "localStorage.getItem(prefKey) === null" native-push.js
+          grep -q "requestPermissions" native-push.js
+      - name: Run native contract tests
+        run: npm run test:native
