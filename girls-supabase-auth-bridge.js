@@ -44,7 +44,11 @@ const originalCreateClient=window.supabase.createClient.bind(window.supabase);
 const clients=new Map();
 window.supabase.createClient=(...args)=>{
   const cacheKey=`${String(args[0]||'')}|${String(args[1]||'')}`;
-  if(clients.has(cacheKey))return clients.get(cacheKey);
+  if(clients.has(cacheKey)){
+    const existing=clients.get(cacheKey);
+    window.GTGAuthClient=existing;
+    return existing;
+  }
   const client=originalCreateClient(...args);
   client.auth.signInWithOtp=async({email})=>{
     try{
@@ -54,6 +58,7 @@ window.supabase.createClient=(...args)=>{
       return {data:{user:null,session:null},error:null};
     }catch(error){return {data:{user:null,session:null},error:{message:error?.message||'Could not send sign-in code.'}};}
   };
+  window.GTGAuthClient=client;
   clients.set(cacheKey,client);
   return client;
 };
