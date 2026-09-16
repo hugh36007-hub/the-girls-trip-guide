@@ -157,7 +157,10 @@ jobs:
           PROFILE_UUID="$(/usr/libexec/PlistBuddy -c 'Print :UUID' "$RUNNER_TEMP/archive-profile.plist")"
           PROFILE_NAME="$(/usr/libexec/PlistBuddy -c 'Print :Name' "$RUNNER_TEMP/archive-profile.plist")"
           PROFILE_BUNDLE="$(/usr/libexec/PlistBuddy -c 'Print :Entitlements:application-identifier' "$RUNNER_TEMP/archive-profile.plist")"
-          test "${PROFILE_BUNDLE#*.}" = "$BUNDLE_ID"
+          case "$PROFILE_BUNDLE" in
+            *".$BUNDLE_ID") ;;
+            *) echo "Embedded profile application identifier does not match $BUNDLE_ID"; exit 1 ;;
+          esac
           test "$(/usr/libexec/PlistBuddy -c 'Print :Entitlements:aps-environment' "$RUNNER_TEMP/archive-profile.plist")" = production
           mkdir -p "$HOME/Library/MobileDevice/Provisioning Profiles"
           mkdir -p "$HOME/Library/Developer/Xcode/UserData/Provisioning Profiles"
