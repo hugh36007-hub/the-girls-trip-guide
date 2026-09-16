@@ -23,6 +23,14 @@ jobs:
         run: npm install --ignore-scripts --package-lock=false
       - name: Syntax check native push
         run: node --check native-push.js
+      - name: Syntax check pinned web feature
+        run: |
+          git show 13337e72a9762700486c241af181e37170a3c991:girls-push-notifications.js > /tmp/girls-web-push.js
+          git show 13337e72a9762700486c241af181e37170a3c991:girls-action-feedback.js > /tmp/girls-core-loader.js
+          git show 13337e72a9762700486c241af181e37170a3c991:organiser-trip-summary.js > /tmp/girls-organiser-summary.js
+          node --check /tmp/girls-web-push.js
+          node --check /tmp/girls-core-loader.js
+          node --check /tmp/girls-organiser-summary.js
       - name: Prepare native payload
         run: npm run mobile:prepare
       - name: Verify organiser feature payload
@@ -30,10 +38,14 @@ jobs:
           node --check mobile-web/organiser-trip-summary.js
           grep -q '13337e72a9762700486c241af181e37170a3c991' .gtg-web-source-sha
           grep -q 'organiser-trip-summary.js' mobile-web/girls-action-feedback.js
+          grep -q 'Trip running total' mobile-web/organiser-trip-summary.js
           grep -q 'Download PDF' mobile-web/organiser-trip-summary.js
           grep -q 'Download CSV' mobile-web/organiser-trip-summary.js
+          grep -q 'Date' mobile-web/organiser-trip-summary.js
+          grep -q 'Time' mobile-web/organiser-trip-summary.js
           test ! -f mobile-web/girls-push-notifications.js
           grep -q "localStorage.getItem(prefKey) === null" native-push.js
+          grep -q "localStorage.setItem(prefKey, '0')" native-push.js
           grep -q "requestPermissions" native-push.js
       - name: Run native contract tests
         run: npm run test:native
