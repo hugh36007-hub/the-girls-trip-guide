@@ -5,7 +5,7 @@ import path from 'node:path';
 
 const nativeRoot = process.cwd();
 const out = path.join(nativeRoot, 'mobile-web');
-const webSourceSha = process.env.GTG_WEB_SOURCE_SHA || '67d54633576b06c8652292ee5f61b794f1cf3446';
+const webSourceSha = process.env.GTG_WEB_SOURCE_SHA || '13337e72a9762700486c241af181e37170a3c991';
 const sourceRoot = path.join(os.tmpdir(), `gtg-web-${webSourceSha.slice(0, 12)}`);
 const excludedRootFiles = new Set(['worker.js', 'service-worker.js', 'sw.js', 'girls-pwa-register.js', 'girls-push-notifications.js']);
 const allowedRootExtensions = new Set(['.html', '.css', '.js', '.webmanifest']);
