@@ -137,7 +137,7 @@ jobs:
         run: |
           grep -Fq 'applicationId "com.storystone.thegirlstripguide"' android/app/build.gradle
           grep -Fq '"appId": "com.storystone.thegirlstripguide"' capacitor.config.json
-          grep -Fq 'versionCode 5' android/app/build.gradle
+          grep -Fq 'versionCode 6' android/app/build.gradle
           grep -Fq 'versionName "1.0.3"' android/app/build.gradle
 
       - name: Validate and materialize upload key
@@ -204,7 +204,7 @@ jobs:
       - name: Upload signed Android release bundle
         uses: actions/upload-artifact@v4
         with:
-          name: girls-trip-guide-android-1.0.3-build-5-signed
+          name: girls-trip-guide-android-1.0.3-build-6-signed
           path: |
             android/app/build/outputs/bundle/release/app-release.aab
             release-provenance.json
