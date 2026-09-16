@@ -1,4 +1,4 @@
-/* Capacitor-only native push bridge. */
+/* Capacitor-only native push bridge. Notifications default ON; OS permission remains user-controlled. */
 (() => {
   'use strict';
 
@@ -19,6 +19,9 @@
   let client = null;
   let lastAccessToken = '';
   let listenersInstalled = false;
+
+  if (localStorage.getItem(prefKey) === null) localStorage.setItem(prefKey, '1');
+  const wanted = () => localStorage.getItem(prefKey) !== '0';
 
   const safeCall = async (fn) => {
     try { return await fn(); }
@@ -63,13 +66,7 @@
     const response = await fetch(registerEndpoint, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
-      body: JSON.stringify({
-        action,
-        product_key: productKey,
-        platform,
-        provider,
-        endpoint
-      })
+      body: JSON.stringify({ action, product_key: productKey, platform, provider, endpoint })
     });
     const result = await response.json().catch(() => ({}));
     if (!response.ok) throw new Error(result.error || 'Notification registration failed.');
@@ -87,14 +84,13 @@
   }
 
   async function registerToken(value) {
+    if (!wanted()) return;
     const token = String(value || '').trim();
     if (!token || !provider) return;
     const currentSession = await session();
     if (!currentSession?.access_token) return;
     const previous = localStorage.getItem(tokenKey) || '';
-    if (previous && previous !== token) {
-      await post('unregister', previous, currentSession.access_token).catch(() => {});
-    }
+    if (previous && previous !== token) await post('unregister', previous, currentSession.access_token).catch(() => {});
     await post('register', token, currentSession.access_token);
     localStorage.setItem(tokenKey, token);
     localStorage.setItem(prefKey, '1');
@@ -110,13 +106,13 @@
 
   async function enable() {
     if (!PushNotifications || !provider) throw new Error('Native notifications are unavailable in this build.');
+    localStorage.setItem(prefKey, '1');
     let state = await permissionState();
     if (state === 'prompt' || state === 'prompt-with-rationale') {
       const result = await PushNotifications.requestPermissions();
       state = result?.receive || 'denied';
     }
     if (state !== 'granted') throw new Error('Notifications are blocked in phone settings.');
-    localStorage.setItem(prefKey, '1');
     localStorage.removeItem(errorKey);
     await PushNotifications.register();
     refreshAll();
@@ -124,38 +120,34 @@
 
   async function disable() {
     const currentSession = await session();
-    await unregisterStored(currentSession?.access_token || lastAccessToken).catch((error) => {
-      console.warn('[GTG native push] unregister failed', error);
-    });
-    localStorage.removeItem(prefKey);
+    await unregisterStored(currentSession?.access_token || lastAccessToken).catch((error) => console.warn('[GTG native push] unregister failed', error));
+    localStorage.setItem(prefKey, '0');
+    localStorage.removeItem(errorKey);
     refreshAll();
   }
 
   function statusText() {
     if (!PushNotifications || !provider) return 'Native notifications unavailable in this build';
+    if (!wanted()) return 'Off';
     const error = localStorage.getItem(errorKey);
     if (error) return error;
-    const on = localStorage.getItem(prefKey) === '1';
     const token = localStorage.getItem(tokenKey);
-    if (on && token) return 'On for this device';
-    if (on) return 'Waiting for device registration';
-    return 'Off';
+    if (token) return 'On for this device';
+    return 'On by default · waiting for phone permission';
   }
 
   function refresh(root) {
     const status = root?.querySelector('[data-gtg-native-push-status]');
     const button = root?.querySelector('[data-gtg-native-push-toggle]');
     if (!status || !button) return;
-    const on = localStorage.getItem(prefKey) === '1';
+    const on = wanted();
     status.textContent = statusText();
     button.textContent = on ? 'Turn off notifications' : 'Turn on notifications';
     button.dataset.pushOn = on ? '1' : '0';
     button.disabled = !PushNotifications || !provider;
   }
 
-  function refreshAll() {
-    document.querySelectorAll('[data-gtg-native-push-settings]').forEach(refresh);
-  }
+  function refreshAll() { document.querySelectorAll('[data-gtg-native-push-settings]').forEach(refresh); }
 
   function decorateProfile() {
     const form = document.querySelector('#profileForm');
@@ -165,7 +157,7 @@
     const section = document.createElement('div');
     section.className = 'field';
     section.dataset.gtgNativePushSettings = '1';
-    section.innerHTML = '<label>Push notifications</label><p class="field-note">Get trip updates on this device. Notifications are only enabled when you choose them.</p><button class="ghost" type="button" data-gtg-native-push-toggle>Turn on notifications</button><small class="field-note" data-gtg-native-push-status>Checking…</small>';
+    section.innerHTML = '<label>Push notifications</label><p class="field-note">Notifications are on by default. Your phone will ask permission the first time.</p><button class="ghost" type="button" data-gtg-native-push-toggle>Checking…</button><small class="field-note" data-gtg-native-push-status>Checking…</small>';
     if (actions) form.insertBefore(section, actions); else form.append(section);
     refresh(section);
   }
@@ -187,9 +179,27 @@
   }
 
   async function silentRefresh() {
-    if (localStorage.getItem(prefKey) !== '1' || !PushNotifications) return;
+    if (!wanted() || !PushNotifications) return;
     if (await permissionState() !== 'granted') return;
+    localStorage.removeItem(errorKey);
     await safeCall(() => PushNotifications.register());
+  }
+
+  async function ensureDefaultEnabled() {
+    if (!wanted() || !PushNotifications || !provider) return;
+    const currentSession = await session();
+    if (!currentSession?.access_token) return;
+    const state = await permissionState();
+    if (state === 'granted') { await silentRefresh(); return; }
+    if (state === 'prompt' || state === 'prompt-with-rationale') {
+      try { await enable(); }
+      catch (error) { localStorage.setItem(errorKey, error?.message || 'Phone permission is required.'); refreshAll(); }
+      return;
+    }
+    if (state === 'denied') {
+      localStorage.setItem(errorKey, 'On in app · blocked in phone settings');
+      refreshAll();
+    }
   }
 
   async function installListeners() {
@@ -208,9 +218,7 @@
       refreshAll();
     });
     await PushNotifications.addListener('pushNotificationActionPerformed', (action) => routeNotification(action?.notification));
-    await PushNotifications.addListener('pushNotificationReceived', (notification) => {
-      window.dispatchEvent(new CustomEvent('gtg:native-push-received', { detail: notification || {} }));
-    });
+    await PushNotifications.addListener('pushNotificationReceived', (notification) => window.dispatchEvent(new CustomEvent('gtg:native-push-received', { detail: notification || {} })));
   }
 
   function installAuthBoundary() {
@@ -219,7 +227,7 @@
     void session();
     c.auth.onAuthStateChange((event, nextSession) => {
       if (nextSession?.access_token) lastAccessToken = nextSession.access_token;
-      if (event === 'SIGNED_IN' && localStorage.getItem(prefKey) === '1') void silentRefresh();
+      if (event === 'SIGNED_IN' && wanted()) void ensureDefaultEnabled();
       if (event === 'SIGNED_OUT') {
         const token = lastAccessToken;
         void unregisterStored(token).catch(() => {}).finally(() => refreshAll());
@@ -227,9 +235,7 @@
     });
   }
 
-  function scheduleProfileCheck() {
-    [0, 80, 240, 600].forEach((ms) => setTimeout(decorateProfile, ms));
-  }
+  function scheduleProfileCheck() { [0, 80, 240, 600].forEach((ms) => setTimeout(decorateProfile, ms)); }
 
   document.addEventListener('click', (event) => {
     const toggle = event.target.closest?.('[data-gtg-native-push-toggle]');
@@ -248,12 +254,9 @@
     await installListeners();
     installAuthBoundary();
     scheduleProfileCheck();
-    await silentRefresh();
+    await ensureDefaultEnabled();
   }
 
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', () => void initialise(), { once: true });
-  } else {
-    void initialise();
-  }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', () => void initialise(), { once: true });
+  else void initialise();
 })();
