@@ -133,12 +133,47 @@ jobs:
       - name: Run native contract tests
         run: npm run test:native
 
+      - name: Materialize Firebase Android config
+        env:
+          FIREBASE_GOOGLE_SERVICES_JSON_BASE64: ${{ secrets.FIREBASE_GOOGLE_SERVICES_JSON_BASE64 }}
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          import base64
+          import json
+          import os
+          from pathlib import Path
+          raw=os.environ.get('FIREBASE_GOOGLE_SERVICES_JSON_BASE64','')
+          if not raw:
+              raise SystemExit('Missing required GitHub secret: FIREBASE_GOOGLE_SERVICES_JSON_BASE64')
+          try:
+              data=base64.b64decode(raw, validate=True)
+          except Exception as exc:
+              raise SystemExit(f'Firebase Android config secret is not valid base64: {exc}')
+          try:
+              payload=json.loads(data)
+          except Exception as exc:
+              raise SystemExit(f'Firebase Android config is not valid JSON: {exc}')
+          expected='com.storystone.thegirlstripguide'
+          packages=[
+              client.get('client_info',{}).get('android_client_info',{}).get('package_name')
+              for client in payload.get('client',[])
+          ]
+          if expected not in packages:
+              raise SystemExit(f'Firebase Android config does not contain {expected}')
+          path=Path('android/app/google-services.json')
+          path.write_bytes(data)
+          path.chmod(0o600)
+          print('Firebase Android config materialized securely on the runner.')
+          PY
+
       - name: Verify Android package identity and version
         run: |
           grep -Fq 'applicationId "com.storystone.thegirlstripguide"' android/app/build.gradle
           grep -Fq '"appId": "com.storystone.thegirlstripguide"' capacitor.config.json
           grep -Fq 'versionCode 6' android/app/build.gradle
           grep -Fq 'versionName "1.0.3"' android/app/build.gradle
+          test -s android/app/google-services.json
 
       - name: Validate and materialize upload key
         env:
@@ -196,10 +231,11 @@ jobs:
           test "$(git rev-parse HEAD)" = "$GITHUB_SHA"
           node scripts/release-provenance.mjs
 
-      - name: Verify no signing material entered the repository
+      - name: Verify no signing or Firebase material entered the repository
         run: |
           test -z "$(git status --porcelain -- '*.jks' '*.keystore')"
           ! git ls-files | grep -E '\.(jks|keystore)$'
+          ! git ls-files | grep -F 'google-services.json'
 
       - name: Upload signed Android release bundle
         uses: actions/upload-artifact@v4
@@ -221,8 +257,10 @@ jobs:
           if-no-files-found: warn
           retention-days: 14
 
-      - name: Remove upload key
+      - name: Remove transient build credentials
         env:
           ANDROID_UPLOAD_KEYSTORE_PATH: /tmp/gtg-upload-key.jks
         if: always()
-        run: rm -f "$ANDROID_UPLOAD_KEYSTORE_PATH"
+        run: |
+          rm -f "$ANDROID_UPLOAD_KEYSTORE_PATH"
+          rm -f android/app/google-services.json
