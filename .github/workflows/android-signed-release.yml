@@ -7,6 +7,9 @@ on:
       - native-app-isolated
     paths:
       - '.github/workflows/android-signed-release.yml'
+      - '.native-push-package/package.json'
+      - 'scripts/configure-native-push.mjs'
+      - 'native-push.js'
       - 'package.json'
       - 'package-lock.json'
       - 'capacitor.config.json'
@@ -56,7 +59,9 @@ jobs:
           java-version: '21'
 
       - name: Install pinned native toolchain
-        run: npm ci
+        run: |
+          npm ci
+          npm run native:push:install
 
       - name: Audit dependencies
         shell: bash
@@ -115,6 +120,7 @@ jobs:
           test -d android || npx cap add android
           npx cap sync android
           node scripts/configure-native-platforms.mjs
+          node scripts/configure-native-push.mjs
 
       - name: Generate approved Android branding
         run: |

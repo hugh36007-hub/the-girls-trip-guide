@@ -9,6 +9,8 @@ on:
       - 'package-lock.json'
       - 'deno.json'
       - 'capacitor.config.json'
+      - '.native-push-package/package.json'
+      - 'native-push.js'
       - 'native-app.js'
       - 'native-url.js'
       - 'native-app.css'
@@ -20,6 +22,7 @@ on:
       - 'delete-account.html'
       - 'scripts/build-mobile-web.mjs'
       - 'scripts/configure-native-platforms.mjs'
+      - 'scripts/configure-native-push.mjs'
       - 'tests/native/**'
       - 'ios/**'
       - 'android/**'
@@ -60,6 +63,7 @@ jobs:
           else
             npm install
           fi
+          npm run native:push:install
 
       - name: Build native web payload
         run: npm run mobile:prepare
@@ -71,7 +75,9 @@ jobs:
           npx cap sync
 
       - name: Apply native platform configuration
-        run: node scripts/configure-native-platforms.mjs
+        run: |
+          node scripts/configure-native-platforms.mjs
+          node scripts/configure-native-push.mjs
 
       - name: Generate approved native branding
         run: |
