@@ -45,10 +45,10 @@ jobs:
           java-version: '21'
       - name: Confirm Android signing and Firebase inputs
         env:
-          KEYSTORE: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
-          STORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
-          KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
-          KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
+          KEYSTORE: ${{ secrets.GTG_ANDROID_UPLOAD_KEYSTORE_BASE64 }}
+          STORE_PASSWORD: ${{ secrets.GTG_ANDROID_UPLOAD_KEYSTORE_PASSWORD }}
+          KEY_ALIAS: ${{ secrets.GTG_ANDROID_UPLOAD_KEY_ALIAS }}
+          KEY_PASSWORD: ${{ secrets.GTG_ANDROID_UPLOAD_KEY_PASSWORD }}
           FIREBASE_JSON: ${{ secrets.FIREBASE_GOOGLE_SERVICES_JSON_BASE64 }}
         run: |
           test -n "$KEYSTORE"
@@ -74,10 +74,10 @@ jobs:
           node -e "const j=require('./android/app/google-services.json');if(!(j.client||[]).some(c=>c?.client_info?.android_client_info?.package_name==='com.storystone.thegirlstripguide'))process.exit(1)"
       - name: Build signed AAB
         env:
-          KEYSTORE: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
-          STORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
-          KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
-          KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
+          KEYSTORE: ${{ secrets.GTG_ANDROID_UPLOAD_KEYSTORE_BASE64 }}
+          STORE_PASSWORD: ${{ secrets.GTG_ANDROID_UPLOAD_KEYSTORE_PASSWORD }}
+          KEY_ALIAS: ${{ secrets.GTG_ANDROID_UPLOAD_KEY_ALIAS }}
+          KEY_PASSWORD: ${{ secrets.GTG_ANDROID_UPLOAD_KEY_PASSWORD }}
         working-directory: android
         run: |
           umask 077
@@ -88,6 +88,7 @@ jobs:
             -Pandroid.injected.signing.key.alias="$KEY_ALIAS" \
             -Pandroid.injected.signing.key.password="$KEY_PASSWORD"
           test -s app/build/outputs/bundle/release/app-release.aab
+          jarsigner -verify app/build/outputs/bundle/release/app-release.aab
       - name: Verify generated push wiring
         run: |
           grep -Fq 'capacitor-push-notifications' android/capacitor.settings.gradle
