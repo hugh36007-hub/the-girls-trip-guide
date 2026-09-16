@@ -1,0 +1,69 @@
+name: Feature iOS signing diagnostic
+
+on:
+  push:
+    branches:
+      - feature/organiser-costs-default-push-2026-09-16-native
+    paths:
+      - '.github/workflows/feature-ios-signing-diagnostic.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  signing-diagnostic:
+    runs-on: macos-26
+    timeout-minutes: 10
+    steps:
+      - name: Validate and import Apple Distribution identity
+        env:
+          DISTRIBUTION_P12: ${{ secrets.APPLE_DISTRIBUTION_P12_BASE64 }}
+          DISTRIBUTION_P12_PASSWORD: ${{ secrets.APPLE_DISTRIBUTION_P12_PASSWORD }}
+        run: |
+          set -euo pipefail
+          test -n "$DISTRIBUTION_P12"
+          test -n "$DISTRIBUTION_P12_PASSWORD"
+          CERT_DIR="$RUNNER_TEMP/apple-signing"
+          KEYCHAIN_PATH="$RUNNER_TEMP/app-signing.keychain-db"
+          KEYCHAIN_PASSWORD="$(openssl rand -base64 32)"
+          mkdir -p "$CERT_DIR"
+          umask 077
+          python3 - <<'PY'
+          import os, base64, re
+          from pathlib import Path
+          d = Path(os.environ['RUNNER_TEMP']) / 'apple-signing'
+          raw = os.environ['DISTRIBUTION_P12'].strip()
+          prefix = 'APPLE_DISTRIBUTION_P12_BASE64='
+          if raw.startswith(prefix): raw = raw[len(prefix):]
+          raw = raw.strip().strip('"').strip("'")
+          if '\n' in raw: raw = raw.splitlines()[0].strip()
+          raw = re.sub(r'\s+', '', raw)
+          data = base64.b64decode(raw, validate=True)
+          if len(data) < 1000 or data[:1] != b'0': raise SystemExit('Decoded P12 is invalid')
+          (d / 'distribution.p12').write_bytes(data)
+          pw = os.environ['DISTRIBUTION_P12_PASSWORD'].strip()
+          prefix = 'APPLE_DISTRIBUTION_P12_PASSWORD='
+          if pw.startswith(prefix): pw = pw[len(prefix):]
+          pw = pw.strip().strip('"').strip("'")
+          if '\n' in pw: pw = pw.splitlines()[0].strip()
+          if not pw: raise SystemExit('P12 password is empty')
+          (d / 'password.txt').write_text(pw)
+          PY
+          if ! openssl pkcs12 -in "$CERT_DIR/distribution.p12" -passin file:"$CERT_DIR/password.txt" -noout; then
+            echo 'PKCS12_PASSWORD_CHECK_FAILED'
+            exit 21
+          fi
+          echo 'PKCS12_PASSWORD_CHECK_OK'
+          P12_PASSWORD="$(cat "$CERT_DIR/password.txt")"
+          security create-keychain -p "$KEYCHAIN_PASSWORD" "$KEYCHAIN_PATH"
+          security unlock-keychain -p "$KEYCHAIN_PASSWORD" "$KEYCHAIN_PATH"
+          security import "$CERT_DIR/distribution.p12" -k "$KEYCHAIN_PATH" -P "$P12_PASSWORD" -A
+          security set-key-partition-list -S apple-tool:,apple: -s -k "$KEYCHAIN_PASSWORD" "$KEYCHAIN_PATH"
+          security find-identity -v -p codesigning "$KEYCHAIN_PATH" | grep -Fq 'Apple Distribution: Storystone Ltd (25NJJVNZPZ)'
+          echo 'APPLE_DISTRIBUTION_IDENTITY_OK'
+      - name: Clean up
+        if: always()
+        run: |
+          rm -rf "$RUNNER_TEMP/apple-signing"
+          security delete-keychain "$RUNNER_TEMP/app-signing.keychain-db" >/dev/null 2>&1 || true
