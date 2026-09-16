@@ -1,0 +1,75 @@
+name: Feature native Firebase smoke
+
+on:
+  push:
+    branches:
+      - feature/organiser-costs-default-push-2026-09-16-native
+    paths:
+      - '.github/workflows/feature-native-firebase-smoke.yml'
+      - '.native-push-package/**'
+      - 'scripts/configure-native-push.mjs'
+      - 'scripts/configure-native-platforms.mjs'
+      - 'native-push.js'
+      - 'package.json'
+      - 'package-lock.json'
+      - 'android/**'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  firebase-smoke:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: '21'
+      - name: Install native toolchain
+        run: |
+          npm ci
+          npm run native:push:install
+      - name: Build native payload and sync Android
+        run: |
+          npm run mobile:prepare
+          npx cap sync android
+          node scripts/configure-native-platforms.mjs
+          node scripts/configure-native-push.mjs
+      - name: Run native contract tests before credentials are materialized
+        run: npm run test:native
+      - name: Materialize Firebase Android config
+        env:
+          FIREBASE_GOOGLE_SERVICES_JSON_BASE64: ${{ secrets.FIREBASE_GOOGLE_SERVICES_JSON_BASE64 }}
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          import base64, json, os
+          from pathlib import Path
+          raw=os.environ.get('FIREBASE_GOOGLE_SERVICES_JSON_BASE64','')
+          if not raw: raise SystemExit('Missing FIREBASE_GOOGLE_SERVICES_JSON_BASE64')
+          data=base64.b64decode(raw, validate=True)
+          payload=json.loads(data)
+          expected='com.storystone.thegirlstripguide'
+          packages=[c.get('client_info',{}).get('android_client_info',{}).get('package_name') for c in payload.get('client',[])]
+          if expected not in packages: raise SystemExit(f'Firebase config missing {expected}')
+          p=Path('android/app/google-services.json')
+          p.write_bytes(data)
+          p.chmod(0o600)
+          print('Firebase config validated for Girls package.')
+          PY
+      - name: Prove Google Services processing and Android build
+        working-directory: android
+        run: |
+          ./gradlew :app:processDebugGoogleServices
+          ./gradlew assembleDebug
+      - name: Ensure Firebase config never entered source control
+        if: always()
+        run: |
+          ! git ls-files | grep -F 'google-services.json'
+          rm -f android/app/google-services.json
