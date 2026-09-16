@@ -33,6 +33,16 @@
     document.head.appendChild(resendScript);
   }
 
+  // The organiser cost summary is core account functionality and must also be
+  // present in the Capacitor payload, so load it from a core script rather than a route bundle.
+  if (!document.querySelector('script[data-gtg-organiser-summary-loader]')) {
+    const summaryScript = document.createElement('script');
+    summaryScript.src = '/organiser-trip-summary.js?v=20260916-1';
+    summaryScript.async = false;
+    summaryScript.dataset.gtgOrganiserSummaryLoader = '1';
+    document.head.appendChild(summaryScript);
+  }
+
   const LABELS = {
     emailForm: 'Sending code…',
     otpForm: 'Signing in…',
