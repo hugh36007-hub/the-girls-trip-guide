@@ -30,35 +30,35 @@ jobs:
           mkdir -p "$CERT_DIR"
           umask 077
           python3 - <<'PY'
-          import os, base64, re
+          import os, base64, re, hashlib
           from pathlib import Path
           d = Path(os.environ['RUNNER_TEMP']) / 'apple-signing'
-          raw = os.environ['DISTRIBUTION_P12'].strip()
+          raw = os.environ['DISTRIBUTION_P12'].strip().lstrip('\ufeff')
           prefix = 'APPLE_DISTRIBUTION_P12_BASE64='
           if raw.startswith(prefix): raw = raw[len(prefix):]
-          raw = raw.strip().strip('"').strip("'")
-          if '\n' in raw: raw = raw.splitlines()[0].strip()
+          raw = raw.strip().strip('"').strip("'").strip('`')
           raw = re.sub(r'\s+', '', raw)
           data = base64.b64decode(raw, validate=True)
           if len(data) < 1000 or data[:1] != b'0': raise SystemExit('Decoded P12 is invalid')
+          if hashlib.sha256(data).hexdigest() != 'f3a053d3efe1794b88498ec1436813b037816744ae8e8f21767f3db15e136e1f':
+              raise SystemExit('P12_CONTENT_MISMATCH')
+          print('P12_CONTENT_MATCH')
           (d / 'distribution.p12').write_bytes(data)
-          pw = os.environ['DISTRIBUTION_P12_PASSWORD'].strip()
-          prefix = 'APPLE_DISTRIBUTION_P12_PASSWORD='
-          if pw.startswith(prefix): pw = pw[len(prefix):]
-          pw = pw.strip().strip('"').strip("'")
-          if '\n' in pw: pw = pw.splitlines()[0].strip()
+          pw = os.environ['DISTRIBUTION_P12_PASSWORD'].strip().lstrip('\ufeff')
+          if 'APPLE_DISTRIBUTION_P12_PASSWORD' in pw and '=' in pw:
+              pw = pw.split('=', 1)[1]
+          pw = pw.strip().strip('"').strip("'").strip('`')
           if not pw: raise SystemExit('P12 password is empty')
           (d / 'password.txt').write_text(pw)
           PY
-          if ! openssl pkcs12 -in "$CERT_DIR/distribution.p12" -passin file:"$CERT_DIR/password.txt" -noout; then
-            echo 'PKCS12_PASSWORD_CHECK_FAILED'
-            exit 21
-          fi
+          openssl pkcs12 -in "$CERT_DIR/distribution.p12" -passin file:"$CERT_DIR/password.txt" -noout
           echo 'PKCS12_PASSWORD_CHECK_OK'
-          P12_PASSWORD="$(cat "$CERT_DIR/password.txt")"
+          openssl pkcs12 -in "$CERT_DIR/distribution.p12" -passin file:"$CERT_DIR/password.txt" -clcerts -nokeys -out "$CERT_DIR/distribution-cert.pem"
+          openssl pkcs12 -in "$CERT_DIR/distribution.p12" -passin file:"$CERT_DIR/password.txt" -nocerts -nodes -out "$CERT_DIR/distribution-key.pem"
           security create-keychain -p "$KEYCHAIN_PASSWORD" "$KEYCHAIN_PATH"
           security unlock-keychain -p "$KEYCHAIN_PASSWORD" "$KEYCHAIN_PATH"
-          security import "$CERT_DIR/distribution.p12" -k "$KEYCHAIN_PATH" -P "$P12_PASSWORD" -A
+          security import "$CERT_DIR/distribution-cert.pem" -k "$KEYCHAIN_PATH" -A
+          security import "$CERT_DIR/distribution-key.pem" -k "$KEYCHAIN_PATH" -A
           security set-key-partition-list -S apple-tool:,apple: -s -k "$KEYCHAIN_PASSWORD" "$KEYCHAIN_PATH"
           security find-identity -v -p codesigning "$KEYCHAIN_PATH" | grep -Fq 'Apple Distribution: Storystone Ltd (25NJJVNZPZ)'
           echo 'APPLE_DISTRIBUTION_IDENTITY_OK'
