@@ -13,8 +13,12 @@ test('native push dependency is isolated from the locked app dependency graph', 
   assert.equal(pkg.dependencies['@capacitor/push-notifications'], undefined);
 });
 
-test('native push bridge is explicit opt-in and securely registers the signed-in device', async () => {
+test('native push defaults on, preserves explicit opt-out and securely registers the signed-in device', async () => {
   const source = await read('native-push.js');
+  assert.match(source, /localStorage\.getItem\(prefKey\) === null/);
+  assert.match(source, /localStorage\.setItem\(prefKey, '1'\)/);
+  assert.match(source, /localStorage\.setItem\(prefKey, '0'\)/);
+  assert.match(source, /ensureDefaultEnabled/);
   assert.match(source, /requestPermissions/);
   assert.match(source, /PushNotifications\.register/);
   assert.match(source, /functions\/v1\/push-register/);
@@ -26,9 +30,9 @@ test('native push bridge is explicit opt-in and securely registers the signed-in
   assert.match(source, /pushNotificationActionPerformed/);
 });
 
-test('native payload pins the current web release and replaces Web Push with the native bridge', async () => {
+test('native payload pins the organiser-cost web release and replaces Web Push with the native bridge', async () => {
   const build = await read('scripts/build-mobile-web.mjs');
-  assert.match(build, /67d54633576b06c8652292ee5f61b794f1cf3446/);
+  assert.match(build, /13337e72a9762700486c241af181e37170a3c991/);
   assert.match(build, /native-push\.js/);
   assert.match(build, /girls-push-notifications\.js/);
   assert.match(build, /Native payload must not contain/);
