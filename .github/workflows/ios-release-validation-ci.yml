@@ -17,7 +17,7 @@ jobs:
     env:
       GTG_WEB_SOURCE_SHA: 67d54633576b06c8652292ee5f61b794f1cf3446
       VERSION_NAME: 1.0.3
-      BUILD_NUMBER: '6'
+      BUILD_NUMBER: '7'
       BUNDLE_ID: com.storystone.thegirlstripguide
     steps:
       - uses: actions/checkout@v4
@@ -136,7 +136,7 @@ jobs:
           xcrun altool --validate-app -f "$IPA_PATH" -t ios --apiKey "$API_KEY_ID" --apiIssuer "$API_ISSUER_ID"
       - uses: actions/upload-artifact@v4
         with:
-          name: girls-trip-guide-ios-1.0.3-build-6-validation
+          name: girls-trip-guide-ios-1.0.3-build-7-validation
           path: |
             ios/build/GirlsTripGuide.xcarchive
             ios/build/export/*.ipa
