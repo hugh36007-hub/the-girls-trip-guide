@@ -34,10 +34,9 @@ async function submit(form){
 }
 document.addEventListener('click',event=>{
   const target=event.target.closest?.('[data-a="reportIssue"],[data-issue-close],[data-a="drawer"]');if(!target)return;
-  if(target.dataset.a==='drawer')setTimeout(injectMenu,0);
+  if(target.dataset.a==='drawer')requestAnimationFrame(injectMenu);
   if(target.dataset.a==='reportIssue'){event.preventDefault();event.stopImmediatePropagation();openReport();}
   if(target.hasAttribute('data-issue-close')){event.preventDefault();event.stopImmediatePropagation();close();}
 },true);
 document.addEventListener('submit',event=>{const form=event.target.closest?.('#gtgIssueReportForm');if(!form)return;event.preventDefault();event.stopImmediatePropagation();void submit(form)},true);
-new MutationObserver(injectMenu).observe(document.documentElement,{subtree:true,childList:true});setTimeout(injectMenu,0);
 })();
