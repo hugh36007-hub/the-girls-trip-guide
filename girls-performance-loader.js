@@ -20,6 +20,7 @@ const BUNDLES={
     '/girls-home-shell-parity.js?v=20260909-1',
     '/girls-hidden-gallery-intro.js?v=20260915-2'
   ],
+  dashboardTour:['/girls-dashboard-tour.js?v=1'],
   onboarding:['/girls-batch1-parity-safe-v2.js?v=20260914-1','/girls-convince-copy-v2.js?v=20260907-1'],
   parity:['/girls-product-parity.js?v=5','/girls-gals-selector-fix.js?v=1'],
   shell:['/girls-section-layout.js?v=1','/girls-inner-page-polish.js?v=2'],
@@ -137,6 +138,7 @@ function afterDashboard(callback,delay=0){
 }
 function scheduleInitial(){
  const route=action();
+ afterDashboard(()=>void loadBundle('dashboardTour'),100);
  if(route==='evidence')afterDashboard(()=>void openEvidence(),0);
  else if(route!=='overview')afterDashboard(()=>void loadRoute(route),0);
  if(['group','evidence','plan','money'].includes(route))afterDashboard(()=>idle(()=>void loadBundle('parity')),700);
