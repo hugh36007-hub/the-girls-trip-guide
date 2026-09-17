@@ -22,7 +22,7 @@ permissions:
   contents: read
 
 env:
-  GTG_WEB_SOURCE_SHA: 385566f3d05f62010284765d953c42ea7987e755
+  GTG_WEB_SOURCE_SHA: 59d31bb188cab249b08f6ea1b172e0a9b6e9a176
 
 jobs:
   signed-release:
@@ -96,12 +96,13 @@ jobs:
           ! grep -Fq 'theboystripguide.com' mobile-web/invite-auth.js
           ! grep -Fq 'theboystripguide.com' mobile-web/invite-return.js
 
-      - name: Verify fixed Girls Home startup payload
+      - name: Verify current Girls critical style startup payload
         run: |
           grep -Fq 'girls-critical-style-loader.js?v=20260914-1' mobile-web/create-trip.html
-          grep -Fq 'function coreReady()' mobile-web/girls-critical-style-loader.js
-          grep -Fq 'release(true)' mobile-web/girls-critical-style-loader.js
-          grep -Fq 'failsafeTimer=setTimeout(failsafeCheck,9000)' mobile-web/girls-critical-style-loader.js
+          grep -Fq 'window.__GTG_CRITICAL_STYLE_LOADER__=true' mobile-web/girls-critical-style-loader.js
+          grep -Fq 'gtg-route-paint-guard' mobile-web/girls-critical-style-loader.js
+          grep -Fq 'const BASE_STYLES=[' mobile-web/girls-critical-style-loader.js
+          grep -Fq 'girls-chat-bubble-refinement.css?v=20260915-2' mobile-web/girls-critical-style-loader.js
 
       - name: Run approved web release guards
         shell: bash
