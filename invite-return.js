@@ -27,17 +27,22 @@ async function run(){
     if(status)status.textContent='Verifying your secure invitation…';
     const {data:verified,error:verifyError}=await client.auth.verifyOtp({token_hash:tokenHash,type:'email'});
     if(verifyError||!verified?.session?.access_token)throw new Error('Secure sign-in did not complete. Reopen the invitation and try again.');
+
     const response=await fetch(FINALIZER,{method:'POST',headers:{'Content-Type':'application/json','apikey':PUBLISHABLE,'Authorization':`Bearer ${verified.session.access_token}`},body:JSON.stringify({state})});
     const result=await response.json().catch(()=>({}));
     if(!response.ok||result?.ok!==true)throw new Error(result?.error||'This invitation could not be verified.');
     if(result.productKey!==PRODUCT||!UUID.test(String(result.tripId||'')))throw new Error('The invitation returned an invalid trip.');
+
     if(window.GTG_NATIVE&&window.Capacitor?.Plugins?.Browser?.close){try{await window.Capacitor.Plugins.Browser.close()}catch{}}
     const target=new URL('/create-trip',location.origin);
     target.searchParams.set('trip_id',String(result.tripId));
     target.searchParams.set('action','plan');
     target.searchParams.set('invite','accepted');
     location.replace(target.toString());
-  }catch(error){console.error('[GTG invite return]',error);fail(error?.message||'This invitation could not be completed. Ask the organiser for a fresh link.');}
+  }catch(error){
+    console.error('[GTG invite return]',error);
+    fail(error?.message||'This invitation could not be completed. Ask the organiser for a fresh link.');
+  }
 }
 void run();
 })();
