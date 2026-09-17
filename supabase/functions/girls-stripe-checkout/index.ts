@@ -3,7 +3,7 @@ const cors={
   'Access-Control-Allow-Headers':'authorization, x-client-info, apikey, content-type',
   'Access-Control-Allow-Methods':'POST, OPTIONS'
 }
-const PRICE_ID='price_1U7JW9EUQ5rJLL4MdDH2x3qP'
+const PRICE_ID='price_1UGhRXI463g1GrNqcctVE8xK'
 const SITE='https://thegirlstripguide.com/create-trip'
 const PROJECT='vtcmvwixfqyxqghibsla'
 const WEBHOOK_URL=`https://${PROJECT}.supabase.co/functions/v1/stripe-webhook`
@@ -82,7 +82,7 @@ Deno.serve(async(req)=>{
       if(await currentEntitlement(tripId))return json({ok:true,paid:true,already_active:true,tripId})
       const pending=await reusablePending(tripId,user.id);if(pending?.alreadyActive)return json({ok:true,paid:true,already_active:true,tripId,reference:pending.reference});if(pending?.url)return json({ok:true,url:pending.url,id:pending.id,reused:true})
       const reservation=pending?.reservation||await reservePending(tripId,user.id);if(reservation?.provider_checkout_id){const reused=await reusablePending(tripId,user.id);if(reused?.url)return json({ok:true,url:reused.url,id:reused.id,reused:true});if(reused?.alreadyActive)return json({ok:true,paid:true,already_active:true,tripId,reference:reused.reference})}
-      await ensureWebhook();const p=new URLSearchParams();p.set('mode','payment');p.set('line_items[0][price]',PRICE_ID);p.set('line_items[0][quantity]','1');p.set('success_url',`${SITE}?stripe=success&session_id={CHECKOUT_SESSION_ID}`);p.set('cancel_url',`${SITE}?stripe=cancelled`)
+      await ensureWebhook();const p=new URLSearchParams();p.set('mode','payment');p.set('allow_promotion_codes','true');p.set('line_items[0][price]',PRICE_ID);p.set('line_items[0][quantity]','1');p.set('success_url',`${SITE}?stripe=success&session_id={CHECKOUT_SESSION_ID}`);p.set('cancel_url',`${SITE}?stripe=cancelled`)
       p.set('metadata[product]','the-full-trip');p.set('metadata[product_key]','girls');p.set('metadata[trip_name]',clean(trip.name,160)||'The Full Trip');p.set('metadata[trip_id]',tripId);p.set('metadata[purchaser_user_id]',user.id)
       const consentedAt=clean(reservation?.created_at,60)||new Date().toISOString();p.set('metadata[terms_accepted]','true');p.set('metadata[immediate_access_requested]','true');p.set('metadata[legal_version]',LEGAL_VERSION);p.set('metadata[refund_policy_version]',LEGAL_VERSION);p.set('metadata[consented_at]',consentedAt)
       p.set('payment_intent_data[metadata][product]','the-full-trip');p.set('payment_intent_data[metadata][product_key]','girls');p.set('payment_intent_data[metadata][trip_id]',tripId);p.set('payment_intent_data[metadata][terms_accepted]','true');p.set('payment_intent_data[metadata][immediate_access_requested]','true');p.set('payment_intent_data[metadata][legal_version]',LEGAL_VERSION);p.set('payment_intent_data[metadata][consented_at]',consentedAt)
