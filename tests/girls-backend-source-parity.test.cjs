@@ -40,7 +40,8 @@ assert(sender.includes('/assets/email-banners/'),'girls-email-send must remain t
 
 assert(stripe.includes('&product_key=eq.girls&select=id,name,plan'),'Girls checkout product isolation changed');
 assert(stripe.includes("session?.metadata?.product_key==='girls'"),'Girls Stripe verification product key changed');
-assert(stripe.includes("const PRICE_ID='price_1U7JW9EUQ5rJLL4MdDH2x3qP'"),'Girls £24.99 Stripe mapping changed');
+assert(stripe.includes("const PRICE_ID='price_1UGhRXI463g1GrNqcctVE8xK'"),'Girls live £24.99 Stripe mapping changed');
+assert(stripe.includes("p.set('allow_promotion_codes','true')"),'Girls checkout must allow customer promotion codes');
 
 assert(authOtp.includes("keyFromJson('SUPABASE_SECRET_KEYS')"),'Girls OTP must support the current Supabase secret-key bundle');
 assert(authOtp.includes("Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')"),'Girls OTP must retain legacy service-role key compatibility');
@@ -48,4 +49,4 @@ assert(authOtp.includes("if(!service)throw new Error('SUPABASE service key missi
 
 console.log('Girls backend source parity contract: PASS');
 console.log('Scheduled and invitation email paths use girls-email-send');
-console.log('Girls queue/product isolation, Free transactional routing, Full character routing, idempotency, entitlements, optional-message limiting and v3 banners preserved');
+console.log('Girls queue/product isolation, live £24.99 price, promotion-code entry, Free transactional routing, Full character routing, idempotency, entitlements, optional-message limiting and v3 banners preserved');
