@@ -155,3 +155,5 @@ window.addEventListener('pageshow',syncActiveForms);
 installStyles();
 setTimeout(syncActiveForms,0);
 })();
+
+(()=>{if(document.querySelector('script[data-girls-trip-issue-report]'))return;const s=document.createElement('script');s.src='/girls-trip-issue-report.js?v=1';s.async=false;s.dataset.girlsTripIssueReport='1';document.head.appendChild(s)})();
