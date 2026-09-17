@@ -39,12 +39,7 @@ body:has(.gtg-boot-shell),body:has(#gtg-first-paint-cover){background:radial-gra
 @media(max-width:600px){.gtg-boot-appbar{height:58px}.gtg-boot-appbar-inner,.gtg-boot-inner{width:calc(100% - 20px)}.gtg-boot-dashboard{padding-top:8px;padding-bottom:138px}.gtg-boot-hero{min-height:310px;padding:16px;border-radius:18px;gap:12px 11px;grid-template-columns:minmax(0,1.12fr) minmax(0,.88fr)}.gtg-boot-title{padding:6px 2px}.gtg-boot-title h1{font-size:40px;margin:15px 0 10px}.gtg-boot-title p{font-size:11px}.gtg-boot-date,.gtg-boot-message,.gtg-boot-photo{border-radius:14px;padding:12px 11px}.gtg-boot-stats{gap:8px}.gtg-boot-stat{min-height:98px;padding:13px}.gtg-boot-card{height:122px}}
 @media(prefers-reduced-motion:reduce){.gtg-boot-line{animation:none}}
 </style>
-<link rel="preload" as="style" href="/mobile-viewport-lock.css?v=2">
-<link rel="preload" as="style" href="/girls-action-feedback.css?v=1">
-<link rel="preload" as="style" href="/girls-drawer-fix.css?v=1">
-<link rel="preload" as="style" href="/girls-hero-vault-ux.css?v=1">
-<link rel="preload" as="style" href="/girls-final-refinement.css?v=1">
-<script defer src="/girls-critical-style-loader.js?v=20260913-1"></script>
+<script defer src="/girls-critical-style-loader.js?v=20260914-1"></script>
 </head>
 <body>
 <div id="app">
@@ -68,15 +63,19 @@ body:has(.gtg-boot-shell),body:has(#gtg-first-paint-cover){background:radial-gra
 <noscript><main class="auth-screen"><section class="auth-card"><h1>JavaScript required</h1><p>The private trip app needs JavaScript enabled.</p></section></main></noscript>
 <script defer src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.112.4" crossorigin="anonymous"></script>
 <script defer src="/girls-supabase-auth-bridge.js?v=2"></script>
-<script defer src="/girls-action-feedback.js?v=1"></script>
-<script defer src="/girls-app-v2.js?v=6"></script>
-<script defer src="/girls-session-guard.js?v=1"></script>
-<script defer src="/girls-date-flow.js?v=3"></script>
+<script defer src="/girls-action-feedback.js?v=2"></script>
+<script defer src="/girls-app-v2.js?v=7"></script>
+<script defer src="/girls-fx-expenses.js?v=4"></script>
+<script defer src="/girls-session-guard.js?v=2"></script>
+<script defer src="/girls-date-flow.js?v=6"></script>
 <script defer src="/girls-hero-vault-ux.js?v=4"></script>
 <script defer src="/girls-role-aware-dock.js?v=3"></script>
-<script defer src="/girls-performance-loader.js?v=10"></script>
+<script defer src="/girls-group-card-refinement.js?v=20260915-1"></script>
+<script defer src="/girls-home-social-hub-v3.js?v=20260914-1"></script>
+<script defer src="/girls-performance-loader.js?v=14"></script>
+<script defer src="/girls-gals-picker-refinement.js?v=20260915-1"></script>
 <script defer src="/girls-user-facing-wording.js?v=1"></script>
-<script defer src="/girls-pwa-register.js?v=4"></script>
+<script defer src="/girls-pwa-register.js?v=5"></script>
 <script>
 (()=>{const app=document.getElementById('app');if(!app)return;const refine=()=>{const card=app.querySelector('.auth-screen .auth-card');if(!card)return;const p=card.querySelector(':scope>p');if(p&&p.textContent.includes('One private place for the plan, money, group and the evidence.'))p.textContent='One private place for the plan, money, group and travel documents. Full Trip adds the GALS and shared media.';};new MutationObserver(refine).observe(app,{childList:true,subtree:true});refine();})();
 </script>
