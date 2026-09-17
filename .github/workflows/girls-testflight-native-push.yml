@@ -14,6 +14,7 @@ jobs:
     runs-on: macos-26
     timeout-minutes: 60
     env:
+      GTG_WEB_SOURCE_SHA: 385566f3d05f62010284765d953c42ea7987e755
       VERSION_NAME: 1.0.3
       BUILD_NUMBER: '8'
       BUNDLE_ID: com.storystone.thegirlstripguide
