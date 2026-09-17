@@ -1,0 +1,228 @@
+name: Android signed release
+# Final Google Play build: isolated native shell + exact approved Girls web release.
+
+on:
+  push:
+    branches:
+      - native-app-isolated
+    paths:
+      - '.github/workflows/android-signed-release.yml'
+      - '.native-push-package/package.json'
+      - 'scripts/configure-native-push.mjs'
+      - 'native-push.js'
+      - 'package.json'
+      - 'package-lock.json'
+      - 'capacitor.config.json'
+      - 'android/app/build.gradle'
+      - 'girls-critical-style-loader.js'
+      - 'create-trip.html'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+env:
+  GTG_WEB_SOURCE_SHA: c65b306996e5c4a92556862a52428a1d2aed2cc4
+
+jobs:
+  signed-release:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+
+    steps:
+      - name: Checkout isolated native shell
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 0
+
+      - name: Checkout approved Girls web release
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ env.GTG_WEB_SOURCE_SHA }}
+          path: web-source
+          fetch-depth: 1
+
+      - name: Verify exact approved web source
+        shell: bash
+        run: |
+          test "$(git -C web-source rev-parse HEAD)" = "$GTG_WEB_SOURCE_SHA"
+          printf 'webSourceCommit=%s\nnativeShellCommit=%s\n' "$GTG_WEB_SOURCE_SHA" "$GITHUB_SHA" > web-source-provenance.txt
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: '21'
+
+      - name: Install pinned native toolchain
+        run: |
+          npm ci
+          npm run native:push:install
+
+      - name: Audit dependencies
+        shell: bash
+        run: |
+          npm audit --json > dependency-audit.json || test "$?" -eq 1
+          node -e 'const a=require("./dependency-audit.json");if(a.error)throw Error(JSON.stringify(a.error));console.log(JSON.stringify(a,null,2));if(a.metadata.vulnerabilities.critical)throw Error("Critical build dependency vulnerability")'
+          npm audit --omit=dev --audit-level=high
+
+      - name: Build native web payload from approved release
+        env:
+          GTG_WEB_SOURCE_DIR: web-source
+        run: npm run mobile:prepare
+
+      - name: Verify hardened invitation payload
+        run: |
+          test -f mobile-web/invite-auth.html
+          test -f mobile-web/invite-auth.js
+          test -f mobile-web/invite-return.html
+          test -f mobile-web/invite-return.js
+          grep -Fq '/invite-auth.html' mobile-web/native-url.js
+          grep -Fq '/invite-return.html' mobile-web/native-url.js
+          grep -Fq '/invite-auth.js?v=4' mobile-web/invite-auth.html
+          grep -Fq '/invite-return.js?v=5' mobile-web/invite-return.html
+          grep -Fq "new URL('/invite-return.html',location.origin)" mobile-web/invite-auth.js
+          grep -Fq 'token_hash' mobile-web/invite-auth.js
+          grep -Fq 'validAuthToken' mobile-web/invite-auth.js
+          grep -Fq 'validAuthToken' mobile-web/invite-return.js
+          grep -Fq "verifyOtp({token_hash:tokenHash,type:'email'})" mobile-web/invite-return.js
+          grep -Fq 'girls-finalize-invite' mobile-web/invite-return.js
+          grep -Fq 'JSON.stringify({state})' mobile-web/invite-return.js
+          ! grep -Eq 'localStorage|sessionStorage|magic=|magic:actionLink|TOKEN_HASH' mobile-web/invite-auth.js mobile-web/invite-return.js
+          ! grep -Fq 'theboystripguide.com' mobile-web/invite-auth.js
+          ! grep -Fq 'theboystripguide.com' mobile-web/invite-return.js
+
+      - name: Verify fixed Girls Home startup payload
+        run: |
+          grep -Fq 'girls-critical-style-loader.js?v=20260913-1' mobile-web/create-trip.html
+          grep -Fq 'function coreReady()' mobile-web/girls-critical-style-loader.js
+          grep -Fq 'release(true)' mobile-web/girls-critical-style-loader.js
+          grep -Fq 'failsafeTimer=setTimeout(failsafeCheck,9000)' mobile-web/girls-critical-style-loader.js
+
+      - name: Run approved web release guards
+        shell: bash
+        run: |
+          cd web-source
+          node tests/release-contract.test.cjs
+          node tests/girls-feature-parity.test.cjs
+          node tests/girls-product-parity-ui.test.cjs
+          node tests/girls-pwa-security-contract.test.cjs
+          node tests/girls-home-startup-safety.test.cjs
+          node tests/girls-live-dashboard-hero.test.cjs
+          node tests/retest-100.cjs
+
+      - name: Sync Android project
+        run: |
+          test -d android || npx cap add android
+          npx cap sync android
+          node scripts/configure-native-platforms.mjs
+          node scripts/configure-native-push.mjs
+
+      - name: Generate approved Android branding
+        run: |
+          mkdir -p native-assets
+          cp web-source/assets/images/gtg-pwa-512.svg native-assets/icon.svg
+          cp web-source/assets/images/gtg-pwa-maskable.svg native-assets/icon-foreground.svg
+          cp web-source/assets/images/gtg-pwa-512.svg native-assets/splash.svg
+          npx capacitor-assets generate --android --assetPath native-assets --iconBackgroundColor '#070507' --splashBackgroundColor '#070507'
+
+      - name: Run native contract tests
+        run: npm run test:native
+
+      - name: Verify Android package identity and version
+        run: |
+          grep -Fq 'applicationId "com.storystone.thegirlstripguide"' android/app/build.gradle
+          grep -Fq '"appId": "com.storystone.thegirlstripguide"' capacitor.config.json
+          grep -Fq 'versionCode 6' android/app/build.gradle
+          grep -Fq 'versionName "1.0.3"' android/app/build.gradle
+
+      - name: Validate and materialize upload key
+        env:
+          ANDROID_UPLOAD_KEYSTORE_PATH: /tmp/gtg-upload-key.jks
+          ANDROID_UPLOAD_KEYSTORE_BASE64: ${{ secrets.GTG_ANDROID_UPLOAD_KEYSTORE_BASE64 }}
+          ANDROID_UPLOAD_KEYSTORE_PASSWORD: ${{ secrets.GTG_ANDROID_UPLOAD_KEYSTORE_PASSWORD }}
+          ANDROID_UPLOAD_KEY_ALIAS: ${{ secrets.GTG_ANDROID_UPLOAD_KEY_ALIAS }}
+          ANDROID_UPLOAD_KEY_PASSWORD: ${{ secrets.GTG_ANDROID_UPLOAD_KEY_PASSWORD }}
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          import base64
+          import os
+          from pathlib import Path
+          required=['ANDROID_UPLOAD_KEYSTORE_BASE64','ANDROID_UPLOAD_KEYSTORE_PASSWORD','ANDROID_UPLOAD_KEY_ALIAS','ANDROID_UPLOAD_KEY_PASSWORD']
+          missing=[name for name in required if not os.environ.get(name)]
+          if missing: raise SystemExit('Missing required GitHub signing secrets: '+', '.join(missing))
+          key_bytes=base64.b64decode(os.environ['ANDROID_UPLOAD_KEYSTORE_BASE64'], validate=True)
+          if not key_bytes: raise SystemExit('Decoded upload keystore is empty.')
+          key_path=Path(os.environ['ANDROID_UPLOAD_KEYSTORE_PATH'])
+          key_path.write_bytes(key_bytes)
+          key_path.chmod(0o600)
+          PY
+          keytool -list -keystore "$ANDROID_UPLOAD_KEYSTORE_PATH" -storepass "$ANDROID_UPLOAD_KEYSTORE_PASSWORD" -alias "$ANDROID_UPLOAD_KEY_ALIAS" >/dev/null
+
+      - name: Build signed release AAB
+        env:
+          ANDROID_UPLOAD_KEYSTORE_PATH: /tmp/gtg-upload-key.jks
+          ANDROID_UPLOAD_KEYSTORE_PASSWORD: ${{ secrets.GTG_ANDROID_UPLOAD_KEYSTORE_PASSWORD }}
+          ANDROID_UPLOAD_KEY_ALIAS: ${{ secrets.GTG_ANDROID_UPLOAD_KEY_ALIAS }}
+          ANDROID_UPLOAD_KEY_PASSWORD: ${{ secrets.GTG_ANDROID_UPLOAD_KEY_PASSWORD }}
+        working-directory: android
+        run: ./gradlew bundleRelease
+
+      - name: Verify AAB signature
+        env:
+          ANDROID_UPLOAD_KEYSTORE_PATH: /tmp/gtg-upload-key.jks
+          ANDROID_UPLOAD_KEYSTORE_PASSWORD: ${{ secrets.GTG_ANDROID_UPLOAD_KEYSTORE_PASSWORD }}
+          ANDROID_UPLOAD_KEY_ALIAS: ${{ secrets.GTG_ANDROID_UPLOAD_KEY_ALIAS }}
+          ANDROID_UPLOAD_KEY_PASSWORD: ${{ secrets.GTG_ANDROID_UPLOAD_KEY_PASSWORD }}
+        shell: bash
+        run: |
+          AAB='android/app/build/outputs/bundle/release/app-release.aab'
+          test -s "$AAB"
+          jarsigner -verify "$AAB"
+          EXPECTED_SHA256="$(keytool -list -v -keystore "$ANDROID_UPLOAD_KEYSTORE_PATH" -storepass "$ANDROID_UPLOAD_KEYSTORE_PASSWORD" -alias "$ANDROID_UPLOAD_KEY_ALIAS" | sed -n 's/^[[:space:]]*SHA256: //p' | head -n 1)"
+          ACTUAL_SHA256="$(keytool -printcert -jarfile "$AAB" | sed -n 's/^[[:space:]]*SHA256: //p' | head -n 1)"
+          test -n "$EXPECTED_SHA256"
+          test -n "$ACTUAL_SHA256"
+          test "$EXPECTED_SHA256" = "$ACTUAL_SHA256"
+          echo 'Signed Android App Bundle verified against the configured upload key.'
+
+      - name: Record exact release provenance
+        run: |
+          test "$(git rev-parse HEAD)" = "$GITHUB_SHA"
+          node scripts/release-provenance.mjs
+
+      - name: Verify no signing material entered the repository
+        run: |
+          test -z "$(git status --porcelain -- '*.jks' '*.keystore')"
+          ! git ls-files | grep -E '\.(jks|keystore)$'
+
+      - name: Upload signed Android release bundle
+        uses: actions/upload-artifact@v4
+        with:
+          name: girls-trip-guide-android-1.0.3-build-6-signed
+          path: |
+            android/app/build/outputs/bundle/release/app-release.aab
+            release-provenance.json
+            web-source-provenance.txt
+          if-no-files-found: error
+          retention-days: 14
+
+      - name: Upload dependency audit
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: dependency-audit
+          path: dependency-audit.json
+          if-no-files-found: warn
+          retention-days: 14
+
+      - name: Remove upload key
+        env:
+          ANDROID_UPLOAD_KEYSTORE_PATH: /tmp/gtg-upload-key.jks
+        if: always()
+        run: rm -f "$ANDROID_UPLOAD_KEYSTORE_PATH"

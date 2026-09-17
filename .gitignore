@@ -5,5 +5,15 @@ backend-ready/.env
 backend-ready/.env.*
 !backend-ready/.env.example
 node_modules/
+.native-push-package/node_modules/
 .DS_Store
 Thumbs.db
+mobile-web/
+native-assets/
+ios/build/
+android/.gradle/
+android/build/
+android/app/build/
+android/app/google-services.json
+*.jks
+*.keystore

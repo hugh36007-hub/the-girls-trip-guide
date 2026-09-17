@@ -1,0 +1,1 @@
+Fresh Android/native rebuild marker after 4 September 2026 production parity sync.

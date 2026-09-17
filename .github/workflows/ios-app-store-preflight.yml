@@ -1,0 +1,116 @@
+name: iOS App Store preflight
+
+on:
+  push:
+    branches:
+      - native-app-isolated
+    paths:
+      - '.github/workflows/ios-app-store-preflight.yml'
+      - 'scripts/build-mobile-web.mjs'
+      - 'scripts/configure-ios-app-store-version.mjs'
+      - 'scripts/configure-ios-privacy-manifest.mjs'
+      - 'scripts/configure-native-platforms.mjs'
+      - 'scripts/configure-native-push.mjs'
+      - '.native-push-package/package.json'
+      - 'native-push.js'
+      - 'native-app.js'
+      - 'native-app.css'
+      - 'native-url.js'
+      - 'girls-conversation-inbox.js'
+      - 'girls-media-social.js'
+      - 'girls-trip-social.js'
+      - 'package.json'
+      - 'package-lock.json'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+env:
+  GTG_WEB_SOURCE_SHA: c65b306996e5c4a92556862a52428a1d2aed2cc4
+  VERSION_NAME: 1.0.3
+  BUILD_NUMBER: '6'
+
+jobs:
+  preflight:
+    runs-on: macos-26
+    timeout-minutes: 45
+    steps:
+      - name: Checkout native shell
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 0
+
+      - name: Checkout approved Girls web release
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ env.GTG_WEB_SOURCE_SHA }}
+          path: approved-web
+          fetch-depth: 1
+
+      - name: Verify approved source and Xcode
+        run: |
+          test "$(git -C approved-web rev-parse HEAD)" = "$GTG_WEB_SOURCE_SHA"
+          xcodebuild -version
+          XCODE_MAJOR="$(xcodebuild -version | awk '/Xcode/{split($2,a,"."); print a[1]}')"
+          test "$XCODE_MAJOR" -ge 26
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Install pinned native toolchain
+        run: |
+          npm ci
+          npm run native:push:install
+
+      - name: Verify fixed approved Girls web release
+        run: |
+          cd approved-web
+          node tests/girls-home-startup-safety.test.cjs
+          node tests/girls-live-dashboard-hero.test.cjs
+
+      - name: Prepare native payload
+        run: |
+          npm run mobile:prepare
+          npx cap sync ios
+          node scripts/configure-native-platforms.mjs
+          node scripts/configure-native-push.mjs
+          node scripts/configure-ios-privacy-manifest.mjs
+          node scripts/configure-ios-app-store-version.mjs
+          npm run test:native
+
+      - name: Verify App Store contracts
+        run: |
+          plutil -lint ios/App/App/Info.plist ios/App/App/PrivacyInfo.xcprivacy ios/App/App/App.entitlements
+          grep -Fq 'PrivacyInfo.xcprivacy in Resources' ios/App/App.xcodeproj/project.pbxproj
+          grep -Fq '<key>aps-environment</key>' ios/App/App/App.entitlements
+          grep -Fq 'CapacitorPushNotifications' ios/App/CapApp-SPM/Package.swift
+          grep -Fq 'PRODUCT_BUNDLE_IDENTIFIER = com.storystone.thegirlstripguide;' ios/App/App.xcodeproj/project.pbxproj
+          grep -Fq 'MARKETING_VERSION = 1.0.3;' ios/App/App.xcodeproj/project.pbxproj
+          grep -Fq 'CURRENT_PROJECT_VERSION = 6;' ios/App/App.xcodeproj/project.pbxproj
+          grep -Fq 'data-native-delete-account' mobile-web/native-app.js
+          grep -Fq 'data-native-report' mobile-web/native-app.js
+          grep -Fq 'data-native-block' mobile-web/native-app.js
+          grep -Fq 'data-native-media-report' mobile-web/girls-media-social.js
+          grep -Fq 'data-native-media-block' mobile-web/girls-media-social.js
+          grep -Fq 'GTGNativeSafety' mobile-web/girls-conversation-inbox.js
+          grep -Fq 'girls-finalize-invite' mobile-web/invite-return.js
+          grep -Fq 'girls-critical-style-loader.js?v=20260913-1' mobile-web/create-trip.html
+          grep -Fq 'function coreReady()' mobile-web/girls-critical-style-loader.js
+          grep -Fq 'release(true)' mobile-web/girls-critical-style-loader.js
+          ! grep -Fq 'theboystripguide.com' mobile-web/invite-return.js
+
+      - name: Compile release without signing
+        run: |
+          xcodebuild \
+            -project ios/App/App.xcodeproj \
+            -scheme App \
+            -configuration Release \
+            -sdk iphonesimulator \
+            -destination 'generic/platform=iOS Simulator' \
+            CODE_SIGNING_ALLOWED=NO \
+            MARKETING_VERSION="$VERSION_NAME" \
+            CURRENT_PROJECT_VERSION="$BUILD_NUMBER" \
+            build
