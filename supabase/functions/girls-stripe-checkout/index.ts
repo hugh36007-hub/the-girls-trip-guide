@@ -31,9 +31,15 @@ async function service(path:string,init:RequestInit={}){
   const res=await fetch(`${env('SUPABASE_URL')}/rest/v1/${path}`,{...init,headers});const text=await res.text();let out:any=null;try{out=text?JSON.parse(text):null}catch{out=text}
   if(!res.ok)throw new Error(typeof out==='object'&&out?.message?out.message:`Supabase error ${res.status}`);return out
 }
+async function assertTripActive(tripId:string){
+  const rows=await service(`owner_trip_lifecycle?trip_id=eq.${encodeURIComponent(tripId)}&select=state&limit=1`)
+  if(Array.isArray(rows)&&rows[0]?.state==='archived')throw new Error('This trip has been archived and is not available.')
+}
 async function assertOwner(tripId:string,userId:string){
   const rows=await service(`trips?id=eq.${encodeURIComponent(tripId)}&owner_id=eq.${encodeURIComponent(userId)}&product_key=eq.girls&select=id,name,plan`)
-  if(!Array.isArray(rows)||!rows.length)throw new Error('This Girls Trip Guide trip is not available for purchase from this account.');return rows[0]
+  if(!Array.isArray(rows)||!rows.length)throw new Error('This Girls Trip Guide trip is not available for purchase from this account.')
+  await assertTripActive(tripId)
+  return rows[0]
 }
 async function upsertPurchase(input:{tripId:string,session:any,userId?:string|null,status?:string}){
   const status=input.status||'paid';const body={trip_id:input.tripId,provider:'stripe',provider_checkout_id:input.session.id,provider_payment_id:typeof input.session.payment_intent==='string'?input.session.payment_intent:null,status,amount_pence:Number(input.session.amount_total||2499),currency:String(input.session.currency||'gbp').toUpperCase(),purchased_by:input.userId||null,completed_at:status==='paid'?new Date().toISOString():null}
@@ -46,7 +52,7 @@ async function activateTrip(tripId:string,purchaseId:string){
 async function existingPurchase(checkoutId:string){const rows=await service(`purchases?provider=eq.stripe&provider_checkout_id=eq.${encodeURIComponent(checkoutId)}&select=id,trip_id,status,purchased_by&limit=1`);return Array.isArray(rows)?rows[0]||null:null}
 async function verifyAndActivate(session:any,expectedOwnerId?:string){
   const valid=session?.payment_status==='paid'&&session?.metadata?.product==='the-full-trip'&&session?.metadata?.product_key==='girls';if(!valid)return{paid:false,persisted:false}
-  const tripId=clean(session?.metadata?.trip_id,80),userId=clean(session?.metadata?.purchaser_user_id,80)||null;if(!UUID.test(tripId))return{paid:true,persisted:false,tripId:null}
+  const tripId=clean(session?.metadata?.trip_id,80),userId=clean(session?.metadata?.purchaser_user_id,80)||null;if(!UUID.test(tripId))return{paid:true,persisted:false,tripId:null};await assertTripActive(tripId)
   if(expectedOwnerId){await assertOwner(tripId,expectedOwnerId);if(userId&&userId!==expectedOwnerId)throw new Error('Checkout ownership does not match this account.')}
   const existing=await existingPurchase(session.id);if(existing?.status==='refunded')return{paid:false,persisted:true,tripId,refunded:true}
   const purchase=await upsertPurchase({tripId,session,userId:userId||expectedOwnerId||null,status:'paid'});if(purchase?.id){await activateTrip(tripId,purchase.id);return{paid:true,persisted:true,tripId}}return{paid:true,persisted:false,tripId}
