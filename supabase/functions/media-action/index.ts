@@ -1,5 +1,6 @@
 import "jsr:@supabase/functions-js/edge-runtime.d.ts";
 import { createClient } from "npm:@supabase/supabase-js@2";
+import { assertTripActive } from "../_shared/trip-lifecycle.ts";
 
 const cors = {
   "Access-Control-Allow-Origin": "*",
@@ -28,6 +29,7 @@ Deno.serve(async (req: Request) => {
     const { data: media, error: mediaError } = await admin.from("media").select("id,trip_id,album,storage_path,thumbnail_path,visibility_state").eq("id", mediaId).maybeSingle();
     if (mediaError) throw mediaError;
     if (!media) return json({ error: "Media not found" }, 404);
+    await assertTripActive(admin, media.trip_id, "This trip has been archived.");
     const [{ data: member }, { data: trip }] = await Promise.all([
       admin.from("trip_members").select("id").eq("trip_id", media.trip_id).eq("user_id", user.id).maybeSingle(),
       admin.from("trips").select("owner_id").eq("id", media.trip_id).maybeSingle(),

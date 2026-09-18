@@ -1,4 +1,5 @@
 import { createClient } from 'npm:@supabase/supabase-js@2.112.4'
+import { assertTripActive } from '../_shared/trip-lifecycle.ts'
 
 const UUID=/^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i
 function hex(bytes:ArrayBuffer){return [...new Uint8Array(bytes)].map(b=>b.toString(16).padStart(2,'0')).join('')}
@@ -50,6 +51,7 @@ Deno.serve(async(req)=>{
     const {data:trip,error:tripError}=await db.from('trips').select('id,product_key').eq('id',member.trip_id).maybeSingle()
     if(tripError)throw tripError
     if(!trip||trip.product_key!==product)return redirect(new URL('/create-trip?invite=invalid',site).toString())
+    await assertTripActive(db,member.trip_id,'This trip has been archived.')
 
     const callback='https://thegirlstripguide.com/invite-return.html'
     const {data:linkData,error:linkError}=await db.auth.admin.generateLink({type:'magiclink',email:member.email,options:{redirectTo:callback}})
