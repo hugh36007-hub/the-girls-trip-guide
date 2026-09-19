@@ -18,7 +18,7 @@ const BUNDLES={
     '/logged-in-stat-icons.js?v=20260907-2',
     '/girls-direct-login-route.js?v=20260907-2',
     '/girls-home-shell-parity.js?v=20260909-1',
-    '/girls-hidden-gallery-intro.js?v=20260919-1',
+    '/girls-hidden-gallery-intro.js?v=20260919-2',
     '/girls-vault-contract-fix.js?v=2',
     '/girls-home-thumbnail-prime.js?v=2'
   ],
@@ -62,7 +62,7 @@ const BUNDLES={
     '/home-social-platform-guard.js?v=20260908-2',
     '/girls-live-dashboard-hero.js?v=13',
     '/girls-live-chat-sync.js?v=3',
-    '/girls-home-refinements.js?v=2',
+    '/girls-home-refinements.js?v=3',
     '/girls-home-scoreboard-fit.js?v=20260908-3',
     '/girls-parity-refresh-20260904.js?v=4'
   ],

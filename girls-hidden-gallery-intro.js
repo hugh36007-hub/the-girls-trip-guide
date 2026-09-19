@@ -15,12 +15,9 @@ function stripDirectEntries(){
 function photoTarget(event){
  return event.target.closest?.('.dashboard[data-home-composition="full"] .live-snapshot-hero .live-photo-block');
 }
-function photoExpanded(photo){
- return Boolean(photo?.closest('.live-snapshot-hero')?.querySelector('.live-snapshot-bottom')?.classList.contains('is-photo-focused'));
-}
 function updatePhotoLabel(){
  document.querySelectorAll('.dashboard[data-home-composition="full"] .live-snapshot-hero .live-photo-open').forEach(open=>{
-   open.setAttribute('aria-label','Tap once to expand photo. Then press and hold the expanded photo for 4 seconds to open Hidden Gallery. Tap the expanded photo normally to open Evidence.');
+   open.setAttribute('aria-label','Tap once to expand photo. Then press and hold the expanded photo for 4 seconds and release to open Hidden Gallery. Tap the expanded photo normally to open Evidence.');
  });
 }
 
@@ -31,16 +28,6 @@ function install(){
 
 function schedule(){[0,80,240,650].forEach(ms=>setTimeout(install,ms))}
 
-// A hold on the collapsed Latest Photo must never open Hidden Gallery.
-// If the Home refinement hold timer has already started, cancel it with the same pointer id.
-window.addEventListener('pointerdown',event=>{
- if(event.pointerType==='mouse'&&event.button!==0)return;
- const photo=photoTarget(event);
- if(!photo||event.target.closest?.('.live-photo-add')||photoExpanded(photo))return;
- event.stopImmediatePropagation();
- try{window.dispatchEvent(new PointerEvent('pointercancel',{pointerId:event.pointerId,pointerType:event.pointerType,bubbles:false,cancelable:false}))}catch{}
- updatePhotoLabel();
-},{capture:true,passive:true});
 
 document.addEventListener('click',event=>{
  const direct=event.target.closest?.('[data-a="vault"]');
