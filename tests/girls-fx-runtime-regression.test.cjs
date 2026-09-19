@@ -21,7 +21,7 @@ const expenseSlice=app.slice(expenseStart,expenseStart+2200);
 assert(expenseSlice.includes('S.members.map'),'Core expense modal must use the already-loaded authoritative member state');
 assert(expenseSlice.includes('name="payer"')&&expenseSlice.includes('name="people"'),'Core expense modal must render payer and split members from the same state');
 
-const appPos=html.indexOf('/girls-app-v2.js?v=8');
+const appPos=html.indexOf('/girls-app-v2.js?v=9');
 const fxPos=html.indexOf('/girls-fx-expenses.js?v=4');
 const datePos=html.indexOf('/girls-date-flow.js?v=6');
 assert(appPos>=0&&fxPos>appPos&&datePos>fxPos,'FX runtime must load after app core and before secondary form enhancers');
