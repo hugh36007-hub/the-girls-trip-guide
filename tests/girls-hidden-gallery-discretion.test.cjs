@@ -38,13 +38,15 @@ assert(app.includes("rpc('set_vault_pin'")&&app.includes("rpc('unlock_vault'"),'
 assert(app.includes('S.vaultConfigured=true;S.vaultUnlocked=true'),'successful PIN setup must open Hidden Gallery without asking for the PIN twice');
 assert(app.includes('window.GTGVault={open:openVaultFromHome}'),'Home must call the core vault API directly');
 assert(home.includes('const opener=window.GTGVault?.open')&&!home.includes("b.dataset.a='vault'"),'Home hold must not synthesize a hidden vault click');
-assert(home.includes("document.addEventListener('touchstart'")&&home.includes("document.addEventListener('touchend'"),'mobile Hidden Gallery entry must use touch-native start/end handling');
-assert(home.includes("event.preventDefault();")&&home.includes("if(ready&&target?.isConnected)setTimeout(openHidden,0)"),'mobile long hold must suppress native long-press and open only after touchend');
-assert(home.includes("else if(target?.isConnected)setTimeout(openEvidence,0)"),'short expanded-photo taps must still open Evidence');
-assert(home.includes("if(event.pointerType==='touch'||touchGestureActive)return;"),'pointer layer must not duplicate touch handling');
+assert(home.includes("open.dataset.gtgHiddenHoldBound='1'"),'Hidden Gallery hold must bind once to the actual Latest Photo button');
+assert(home.includes("open.setPointerCapture?.(event.pointerId)"),'local hold must capture the pointer on the photo button itself');
+assert(home.includes("photoHold={kind:'local'"),'photo hold state must be local rather than document-wide');
+assert(home.includes("if(shouldOpen)setTimeout(openHidden,0)"),'four-second hold must open only after pointer release');
+assert(!home.includes("document.addEventListener('touchstart'")&&!home.includes("document.addEventListener('touchend'"),'Home must not install document-level touch interception');
+assert(home.includes('is-photo-focused .live-photo-open{touch-action:none}'),'only the expanded Latest Photo control may disable native touch gestures');
 assert(!intro.includes("dispatchEvent(new PointerEvent('pointercancel'"),'guide layer must not inject synthetic pointer cancellation');
 assert(!loader.match(/evidenceFull:\[[\s\S]*?girls-hidden-gallery-intro\.js/),'Hidden Gallery guide must not depend on opening Evidence');
-assert(html.includes('/girls-app-v2.js?v=10')&&html.includes('/girls-hero-vault-ux.js?v=4')&&html.includes('/girls-performance-loader.js?v=19'),'Updated scripts must be cache-busted');
-assert(sw.includes("gtg-pwa-v38-hidden-gallery-mobile-touch")&&sw.includes('/girls-performance-loader.js?v=18'),'PWA cache generation must include the updated loader');
+assert(html.includes('/girls-app-v2.js?v=10')&&html.includes('/girls-hero-vault-ux.js?v=4')&&html.includes('/girls-performance-loader.js?v=20'),'Updated scripts must be cache-busted');
+assert(sw.includes("gtg-pwa-v39-hidden-gallery-local-hold")&&sw.includes('/girls-performance-loader.js?v=18'),'PWA cache generation must include the updated loader');
 
 console.log('Girls Hidden Gallery discretion contract PASS');

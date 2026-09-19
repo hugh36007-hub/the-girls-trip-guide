@@ -14,8 +14,8 @@ const checks=[
  ['first-open PIN establishes the vault session', app.includes("rpc('set_vault_pin'")&&app.includes("rpc('unlock_vault'")&&app.includes('S.vaultConfigured=true;S.vaultUnlocked=true')],
  ['PIN guard is available from Home', loader.includes('/girls-vault-contract-fix.js?v=2')&&!loader.match(/evidenceFull:\[[\s\S]*?girls-vault-contract-fix\.js/)],
  ['Home uses direct vault API rather than a synthetic hidden button', home.includes('const opener=window.GTGVault?.open')&&!home.includes("b.dataset.a='vault'")],
- ['mobile hold uses touch-native four-second release', home.includes('PHOTO_HOLD_MS=4000')&&home.includes("document.addEventListener('touchstart'")&&home.includes("document.addEventListener('touchend'")&&home.includes('if(ready&&target?.isConnected)setTimeout(openHidden,0)')],
- ['collapsed photo never starts the hold timer', home.includes("&&photoExpanded(photo)){cancelPhotoHold()")],
+ ['mobile hold is isolated to the expanded photo control', home.includes('PHOTO_HOLD_MS=4000')&&home.includes("open.dataset.gtgHiddenHoldBound='1'")&&home.includes("photoHold={kind:'local'")&&home.includes('if(shouldOpen)setTimeout(openHidden,0)')&&!home.includes("document.addEventListener('touchstart'")],
+ ['collapsed photo never starts the hold timer', home.includes("const photo=currentPhoto();if(!photo||!photoExpanded(photo))return;")],
  ['core exports one safe vault opener', app.includes('window.GTGVault={open:openVaultFromHome}')&&app.includes('if(vaultOpening)return false')],
  ['synthetic pointer-cancel conflict removed', !intro.includes("dispatchEvent(new PointerEvent('pointercancel'")]
 ];
