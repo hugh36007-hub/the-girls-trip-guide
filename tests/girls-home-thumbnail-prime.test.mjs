@@ -7,6 +7,7 @@ const deferred=fs.readFileSync('girls-performance-loader.js','utf8');
 
 for(const token of ['BATCH_SIZE=9','MAX_MEDIA=250','CONCURRENT=2','requestIdleCallback',"visibilityState==='hidden'",'saveData','slow-2g','thumbnail_path','storage_path',"cache:'force-cache'","priority:'low'",'AbortController','GTGHomeThumbnailPrime','offset+=BATCH_SIZE','transform:{width:480,height:480,resize:\'cover\',quality:64}'])assert(prime.includes(token),`missing Girls background-thumbnail contract: ${token}`);
 assert(prime.includes(".eq('album','evidence').order('created_at',{ascending:false}).limit(MAX_MEDIA)"),'Girls primer must stay isolated to Evidence and work through the bounded media set');
+assert(prime.includes('.dashboard[data-home-composition="full"]'),'background Evidence preparation must never run for Free trips');
 assert(prime.includes("if(row.thumbnail_path)")&&prime.includes("storage.from('btg-evidence').createSignedUrl(row.thumbnail_path,SIGNED_SECONDS)"),'stored Girls thumbnails must be reused directly');
 assert(prime.includes("createSignedUrl(row.storage_path,SIGNED_SECONDS,{transform:"),'older Girls images without stored thumbnails must use a lightweight transformed preview');
 assert(prime.includes('if(token!==runToken||document.visibilityState===\'hidden\'||evidenceActive())'),'background work must yield when the app is hidden or Evidence takes foreground ownership');
