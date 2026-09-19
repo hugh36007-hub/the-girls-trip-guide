@@ -18,7 +18,7 @@ const BUNDLES={
     '/logged-in-stat-icons.js?v=20260907-2',
     '/girls-direct-login-route.js?v=20260907-2',
     '/girls-home-shell-parity.js?v=20260909-1',
-    '/girls-hidden-gallery-intro.js?v=20260915-2'
+    '/girls-hidden-gallery-intro.js?v=20260919-1'
   ],
   dashboardTour:['/girls-dashboard-tour.js?v=1'],
   onboarding:['/girls-batch1-parity-safe-v2.js?v=20260914-1','/girls-convince-copy-v2.js?v=20260907-1'],
@@ -34,12 +34,12 @@ const BUNDLES={
     '/conversation-header-align.js?v=2'
   ],
   groupPollExtras:['/girls-poll-nudge.js?v=2'],
-  evidenceShared:['/evidence-intro-dismiss.js?v=3'],
+  evidenceShared:['/evidence-intro-dismiss.js?v=4'],
   evidenceFull:[
     '/girls-vault-contract-fix.js?v=2',
     '/girls-hidden-upload-choice.js?v=1',
     '/girls-media-performance-max.js?v=2',
-    '/girls-media-ux-plus.js?v=3',
+    '/girls-media-ux-plus.js?v=4',
     '/girls-evidence-parity.js?v=2',
     '/girls-media-quality-fix.js?v=5',
     '/girls-media-readiness.js?v=3',

@@ -68,17 +68,14 @@ function optimistic(row,file,album){if(album!=='evidence')return;const gallery=d
 async function persist(file,album,onProgress){
   const isVid=video(file),limit=isVid?VIDEO_MAX:IMAGE_MAX;if(file.size>limit)throw Error(isVid?`${file.name} is over 500 MB.`:`${file.name} is over 50 MB.`);
   const prepared=isVid?file:await compressPhoto(file),bucket=album==='vault'?'btg-vault':'btg-evidence';const {data:{session}}=await db().auth.getSession();if(!session?.user)throw Error('Your secure session expired. Sign in again.');const path=await storageUpload(bucket,`${tripId()}/${session.user.id}/${uid()}-${safe(prepared.name||file.name)}`,prepared,onProgress);
-  let row;try{const {data,error}=await db().from('media').insert({trip_id:tripId(),album,storage_path:path,thumbnail_path:null,file_name:file.name,mime_type:file.type,size_bytes:prepared.size,created_by:session.user.id}).select('*').single();if(error)throw error;row=data}catch(e){await db().storage.from(bucket).remove([path]).catch(()=>{});throw e}
+  let thumbPath=null,thumbnailStatus='failed',thumbnailError='client_preview_unavailable';
+  try{
+    const blob=await makeThumb(prepared);
+    if(blob){const candidate=`${tripId()}/${session.user.id}/thumb-${uid()}.webp`;await storageUpload(bucket,candidate,new File([blob],'thumbnail.webp',{type:'image/webp'}));thumbPath=candidate;thumbnailStatus='ready';thumbnailError=null}
+  }catch(error){thumbnailError=String(error?.message||'client_preview_failed').slice(0,500)}
+  let row;try{const {data,error}=await db().from('media').insert({trip_id:tripId(),album,storage_path:path,thumbnail_path:thumbPath,file_name:file.name,mime_type:file.type,size_bytes:prepared.size,created_by:session.user.id,thumbnail_status:thumbnailStatus,thumbnail_attempts:1,thumbnail_error:thumbnailError}).select('*').single();if(error)throw error;row=data}catch(e){await db().storage.from(bucket).remove([path,...(thumbPath?[thumbPath]:[])]).catch(()=>{});throw e}
   optimistic(row,file,album);
-  if(album==='evidence'||!isVid)defer(async()=>{
-    const blob=await makeThumb(prepared);if(!blob)return;
-    const p=`${tripId()}/${session.user.id}/thumb-${uid()}.webp`;
-    try{
-      await storageUpload(bucket,p,new File([blob],'thumbnail.webp',{type:'image/webp'}));
-      const {error}=await db().rpc('set_girls_media_thumbnail',{p_media_id:row.id,p_thumbnail_path:p});if(error)throw error;
-      window.dispatchEvent(new CustomEvent('gtg:thumbnail-ready',{detail:{mediaId:row.id,album}}));
-    }catch(error){console.warn('Deferred preview skipped.',error);await db().storage.from(bucket).remove([p]).catch(()=>{})}
-  });
+  if(thumbPath)window.dispatchEvent(new CustomEvent('gtg:thumbnail-ready',{detail:{mediaId:row.id,album}}));
   return row
 }
 async function pool(items,limit,work){let i=0;async function next(){while(i<items.length){const n=i++;await work(items[n])}}await Promise.all(Array.from({length:Math.min(limit,items.length)},next))}
