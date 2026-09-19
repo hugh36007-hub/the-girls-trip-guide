@@ -30,8 +30,14 @@ assert(!guide.includes('max-width: 700px'),'Guide must behave consistently on mo
 assert(!vaultUx.includes('data-vault-privacy-note'),'Permanent duplicate privacy note must be removed');
 
 assert(loader.includes('/girls-hidden-gallery-intro.js?v=20260919-1'),'Hidden Gallery guide/guard must load app-wide');
+assert(loader.includes('/girls-vault-contract-fix.js?v=2'),'4-digit PIN contract must load app-wide for Home entry');
+assert(!loader.match(/evidenceFull:\[[\s\S]*?girls-vault-contract-fix\.js/),'PIN contract must not depend on Evidence loading');
+assert(app.includes('required pattern="[0-9]{4}" minlength="4" maxlength="4"'),'core Home PIN form must enforce exactly four digits');
+assert(!app.includes('Set a 4–8 digit PIN'),'obsolete 4–8 digit PIN copy must be removed');
+assert(app.includes("rpc('set_vault_pin'")&&app.includes("rpc('unlock_vault'"),'first PIN save must immediately establish the secure vault session');
+assert(app.includes('S.vaultConfigured=true;S.vaultUnlocked=true'),'successful PIN setup must open Hidden Gallery without asking for the PIN twice');
 assert(!loader.match(/evidenceFull:\[[\s\S]*?girls-hidden-gallery-intro\.js/),'Hidden Gallery guide must not depend on opening Evidence');
-assert(html.includes('/girls-app-v2.js?v=8')&&html.includes('/girls-hero-vault-ux.js?v=4')&&html.includes('/girls-performance-loader.js?v=16'),'Updated scripts must be cache-busted');
-assert(sw.includes("gtg-pwa-v35-girls-media-runtime")&&sw.includes('/girls-performance-loader.js?v=16'),'PWA cache generation must include the updated loader');
+assert(html.includes('/girls-app-v2.js?v=9')&&html.includes('/girls-hero-vault-ux.js?v=4')&&html.includes('/girls-performance-loader.js?v=17'),'Updated scripts must be cache-busted');
+assert(sw.includes("gtg-pwa-v36-evidence-smooth-pin")&&sw.includes('/girls-performance-loader.js?v=16'),'PWA cache generation must include the updated loader');
 
 console.log('Girls Hidden Gallery discretion contract PASS');
