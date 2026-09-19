@@ -15,7 +15,7 @@ const checks=[
  ['PIN guard is available from Home', loader.includes('/girls-vault-contract-fix.js?v=2')&&!loader.match(/evidenceFull:\[[\s\S]*?girls-vault-contract-fix\.js/)],
  ['Home uses direct vault API rather than a synthetic hidden button', home.includes('const opener=window.GTGVault?.open')&&!home.includes("b.dataset.a='vault'")],
  ['mobile hold is isolated to the expanded photo control', home.includes('PHOTO_HOLD_MS=4000')&&home.includes("open.dataset.gtgHiddenHoldBound='1'")&&home.includes("photoHold={kind:'local'")&&home.includes('if(shouldOpen)setTimeout(openHidden,0)')&&!home.includes("document.addEventListener('touchstart'")],
- ['collapsed photo never starts the hold timer', home.includes("&&photoExpanded(photo)){cancelPhotoHold()")],
+ ['collapsed photo never starts the hold timer', home.includes("const photo=currentPhoto();if(!photo||!photoExpanded(photo))return;")],
  ['core exports one safe vault opener', app.includes('window.GTGVault={open:openVaultFromHome}')&&app.includes('if(vaultOpening)return false')],
  ['synthetic pointer-cancel conflict removed', !intro.includes("dispatchEvent(new PointerEvent('pointercancel'")]
 ];
