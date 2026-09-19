@@ -11,7 +11,7 @@ const tripId=()=>new URL(location.href).searchParams.get('trip_id')||'';
 const connection=()=>navigator.connection||navigator.mozConnection||navigator.webkitConnection||null;
 const constrained=()=>{const c=connection();return Boolean(c?.saveData||/^(slow-2g|2g)$/i.test(String(c?.effectiveType||'')))};
 const evidenceActive=()=>Boolean(document.querySelector('.gtg-immersive-media-host,[data-panel="evidence"].active'));
-const appReady=()=>Boolean(tripId()&&document.querySelector('#app .appbar')&&!evidenceActive());
+const appReady=()=>Boolean(tripId()&&document.querySelector('#app .dashboard[data-home-composition="full"]')&&!evidenceActive());
 const sleep=ms=>new Promise(resolve=>setTimeout(resolve,ms));
 function markInput(){pauseUntil=Date.now()+PAUSE_AFTER_INPUT}
 function cancel(){runToken++;running=false;controller?.abort();controller=null}
