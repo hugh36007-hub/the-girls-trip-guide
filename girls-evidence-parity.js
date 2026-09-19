@@ -57,7 +57,8 @@ async function hydratePhoto(row,img){
   img.addEventListener('load',()=>{if(img.dataset.gtgPreviewToken===token)img.dataset.gtgPreviewReady='1'},{once:true});
   img.addEventListener('error',()=>void fallbackPhoto(img,row,token),{once:true});
   try{
-    const url=row.thumbnail_path?await signed(row,'thumbnail'):await signed(row,'preview');
+    const primed=window.GTGHomeThumbnailPrime?.peek?.(row.id)||'';
+    const url=primed||(row.thumbnail_path?await signed(row,'thumbnail'):await signed(row,'preview'));
     if(!url)throw Error('No preview URL');
     if(img.isConnected&&img.dataset.gtgPreviewToken===token)img.src=url;
   }catch{await fallbackPhoto(img,row,token)}
