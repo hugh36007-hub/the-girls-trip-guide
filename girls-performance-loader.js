@@ -62,7 +62,7 @@ const BUNDLES={
     '/home-social-platform-guard.js?v=20260908-2',
     '/girls-live-dashboard-hero.js?v=13',
     '/girls-live-chat-sync.js?v=3',
-    '/girls-home-refinements.js?v=3',
+    '/girls-home-refinements.js?v=4',
     '/girls-home-scoreboard-fit.js?v=20260908-3',
     '/girls-parity-refresh-20260904.js?v=4'
   ],

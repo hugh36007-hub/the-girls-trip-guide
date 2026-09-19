@@ -5,7 +5,7 @@ if(window.__GTG_HOME_REFINEMENTS__)return;window.__GTG_HOME_REFINEMENTS__=true;
 const SUPA='https://vtcmvwixfqyxqghibsla.supabase.co';
 const KEY='sb_publishable_qBQzJjFxSToEGxPJEcmskg_GNd4M4cP';
 const PHOTO_HOLD_MS=4000,AVATAR_HOLD_MS=3000;
-let client=null,photoHold=null,avatarHold=null,suppressPhotoClickUntil=0,suppressAvatarClickUntil=0,syncTimer=0;
+let client=null,photoHold=null,avatarHold=null,suppressPhotoClickUntil=0,suppressAvatarClickUntil=0,syncTimer=0,touchGestureActive=false;
 const clamp=(n,min,max)=>Math.max(min,Math.min(max,n));
 const db=()=>client||(client=window.supabase?.createClient?.(SUPA,KEY,{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true}}));
 const tripId=()=>new URL(location.href).searchParams.get('trip_id')||'';
@@ -134,15 +134,49 @@ window.addEventListener('click',event=>{
  const message=event.target.closest?.('.dashboard[data-home-composition="full"] .live-snapshot-hero .live-message-card');if(message&&h.querySelector('.live-snapshot-bottom')?.classList.contains('is-photo-focused')){event.preventDefault();event.stopPropagation();event.stopImmediatePropagation();focusMessage(h)}
 },true);
 window.addEventListener('contextmenu',event=>{if(event.target.closest?.('.dashboard[data-home-composition="full"] .live-snapshot-hero .live-photo-block,.dashboard[data-home-composition="full"] .live-snapshot-hero .live-message-avatar')){event.preventDefault();event.stopPropagation()}},true);
+document.addEventListener('touchstart',event=>{
+ if(event.touches.length!==1)return;
+ const photo=event.target.closest?.('.dashboard[data-home-composition="full"] .live-snapshot-hero .live-photo-block');
+ if(!photo||event.target.closest?.('.live-photo-add')||!photoExpanded(photo))return;
+ const touch=event.touches[0];
+ event.preventDefault();
+ touchGestureActive=true;
+ cancelPhotoHold();
+ photoHold={kind:'touch',id:touch.identifier,x:touch.clientX,y:touch.clientY,target:photo,ready:false,timer:setTimeout(()=>{
+   if(photoHold?.kind==='touch'&&photoHold.id===touch.identifier&&photo.isConnected){
+     photoHold.ready=true;photoHold.timer=0;suppressPhotoClickUntil=Date.now()+2500;navigator.vibrate?.(28);
+   }
+ },PHOTO_HOLD_MS)};
+},{capture:true,passive:false});
+document.addEventListener('touchmove',event=>{
+ if(photoHold?.kind!=='touch'||event.touches.length!==1)return;
+ const touch=event.touches[0];
+ event.preventDefault();
+ if(Math.hypot(touch.clientX-photoHold.x,touch.clientY-photoHold.y)>32){cancelPhotoHold();touchGestureActive=false}
+},{capture:true,passive:false});
+document.addEventListener('touchend',event=>{
+ if(photoHold?.kind!=='touch')return;
+ event.preventDefault();
+ const target=photoHold.target,ready=photoHold.ready;
+ cancelPhotoHold();touchGestureActive=false;
+ if(ready&&target?.isConnected)setTimeout(openHidden,0);
+ else if(target?.isConnected)setTimeout(openEvidence,0);
+},{capture:true,passive:false});
+document.addEventListener('touchcancel',event=>{
+ if(photoHold?.kind!=='touch')return;
+ event.preventDefault();cancelPhotoHold();touchGestureActive=false;
+},{capture:true,passive:false});
+
 window.addEventListener('pointerdown',event=>{
+ if(event.pointerType==='touch'||touchGestureActive)return;
  if(event.pointerType==='mouse'&&event.button!==0)return;
  const photo=event.target.closest?.('.dashboard[data-home-composition="full"] .live-snapshot-hero .live-photo-block'),avatar=event.target.closest?.('.dashboard[data-home-composition="full"] .live-snapshot-hero .live-message-avatar');
- if(photo&&!event.target.closest?.('.live-photo-add')&&photoExpanded(photo)){cancelPhotoHold();photoHold={id:event.pointerId,x:event.clientX,y:event.clientY,target:photo,ready:false,timer:setTimeout(()=>armPhotoHold(photo,event.pointerId),PHOTO_HOLD_MS)}}
+ if(photo&&!event.target.closest?.('.live-photo-add')&&photoExpanded(photo)){cancelPhotoHold();photoHold={kind:'pointer',id:event.pointerId,x:event.clientX,y:event.clientY,target:photo,ready:false,timer:setTimeout(()=>armPhotoHold(photo,event.pointerId),PHOTO_HOLD_MS)}}
  if(avatar){cancelAvatarHold();avatarHold={id:event.pointerId,x:event.clientX,y:event.clientY,target:avatar,timer:setTimeout(()=>{if(avatarHold?.id===event.pointerId&&avatar.isConnected)void triggerAvatarHold(avatar)},AVATAR_HOLD_MS)}}
 },{capture:true,passive:true});
-window.addEventListener('pointermove',event=>{if(photoHold?.id===event.pointerId&&Math.hypot(event.clientX-photoHold.x,event.clientY-photoHold.y)>32)cancelPhotoHold();if(avatarHold?.id===event.pointerId&&Math.hypot(event.clientX-avatarHold.x,event.clientY-avatarHold.y)>32)cancelAvatarHold()},{capture:true,passive:true});
+window.addEventListener('pointermove',event=>{if(photoHold?.kind==='pointer'&&photoHold.id===event.pointerId&&Math.hypot(event.clientX-photoHold.x,event.clientY-photoHold.y)>32)cancelPhotoHold();if(avatarHold?.id===event.pointerId&&Math.hypot(event.clientX-avatarHold.x,event.clientY-avatarHold.y)>32)cancelAvatarHold()},{capture:true,passive:true});
 const finishPointer=(event,cancelled=false)=>{
- if(photoHold?.id===event.pointerId){
+ if(photoHold?.kind==='pointer'&&photoHold.id===event.pointerId){
    const shouldOpen=!cancelled&&photoHold.ready&&photoHold.target?.isConnected;
    cancelPhotoHold();
    if(shouldOpen)setTimeout(openHidden,0);
