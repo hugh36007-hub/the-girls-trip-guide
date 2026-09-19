@@ -30,7 +30,7 @@ function reorderSmallFirst(input){
 }
 function tuneGallery(root=document){
   const images=[...root.querySelectorAll?.('[data-panel="evidence"] .gallery img')||[]];
-  images.forEach((img,index)=>{img.decoding='async';img.loading=index<12?'eager':'lazy';try{img.fetchPriority=index<6?'high':'auto'}catch{}});
+  images.forEach((img,index)=>{img.decoding='async';img.loading=index<9?'eager':'lazy';try{img.fetchPriority=index<3?'high':'auto'}catch{}});
   const videos=[...root.querySelectorAll?.('[data-panel="evidence"] .gallery video')||[]];videos.forEach(video=>{video.preload='none';});
 }
 function scheduleTune(){[0,80,350,1200].forEach(delay=>setTimeout(()=>tuneGallery(),delay));}
