@@ -5,7 +5,7 @@ if(window.__GTG_HOME_REFINEMENTS__)return;window.__GTG_HOME_REFINEMENTS__=true;
 const SUPA='https://vtcmvwixfqyxqghibsla.supabase.co';
 const KEY='sb_publishable_qBQzJjFxSToEGxPJEcmskg_GNd4M4cP';
 const PHOTO_HOLD_MS=4000,AVATAR_HOLD_MS=3000;
-let client=null,photoHold=null,avatarHold=null,suppressPhotoClickUntil=0,suppressAvatarClickUntil=0,syncTimer=0,touchGestureActive=false;
+let client=null,photoHold=null,avatarHold=null,suppressPhotoClickUntil=0,suppressAvatarClickUntil=0,syncTimer=0;
 const clamp=(n,min,max)=>Math.max(min,Math.min(max,n));
 const db=()=>client||(client=window.supabase?.createClient?.(SUPA,KEY,{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true}}));
 const tripId=()=>new URL(location.href).searchParams.get('trip_id')||'';
@@ -17,6 +17,7 @@ function installStyles(){
  const s=document.createElement('style');s.id='gtg-home-refinements-css';s.textContent=`
 .dashboard[data-home-composition="full"] .hero-card.live-snapshot-hero .live-photo-block,.dashboard[data-home-composition="full"] .hero-card.live-snapshot-hero .live-photo-block *{-webkit-touch-callout:none;-webkit-user-select:none;user-select:none}
 .dashboard[data-home-composition="full"] .hero-card.live-snapshot-hero .live-photo-block{touch-action:manipulation}
+.dashboard[data-home-composition="full"] .hero-card.live-snapshot-hero .live-snapshot-bottom.is-photo-focused .live-photo-open{touch-action:none}
 .dashboard[data-home-composition="full"] .hero-card.live-snapshot-hero .live-photo-open img{transform:none!important;-webkit-user-drag:none!important}
 .dashboard[data-home-composition="full"] .hero-card.live-snapshot-hero .live-message-avatar{overflow:hidden;position:relative;display:grid!important;place-items:center!important;text-align:center!important;line-height:1!important;padding:0!important;user-select:none;-webkit-user-select:none;-webkit-touch-callout:none;touch-action:manipulation!important}
 .dashboard[data-home-composition="full"] .hero-card.live-snapshot-hero .live-message-avatar img{display:block;width:100%;height:100%;object-fit:cover;border-radius:50%}
@@ -46,7 +47,33 @@ function cancelPhotoHold(){if(photoHold?.timer)clearTimeout(photoHold.timer);pho
 function cancelAvatarHold(){if(avatarHold?.timer)clearTimeout(avatarHold.timer);avatarHold=null}
 function armPhotoHold(target,pointerId){
  if(!target?.isConnected||!photoHold||photoHold.id!==pointerId)return;
- photoHold.ready=true;photoHold.timer=0;suppressPhotoClickUntil=Date.now()+2500;navigator.vibrate?.(28);
+ photoHold.ready=true;photoHold.timer=0;suppressPhotoClickUntil=Date.now()+2500;
+}
+function bindPhotoHold(open){
+ if(!open||open.dataset.gtgHiddenHoldBound==='1')return;
+ open.dataset.gtgHiddenHoldBound='1';
+ const currentPhoto=()=>open.closest('.live-photo-block');
+ open.addEventListener('pointerdown',event=>{
+   if(event.pointerType==='mouse'&&event.button!==0)return;
+   const photo=currentPhoto();if(!photo||!photoExpanded(photo))return;
+   cancelPhotoHold();
+   try{open.setPointerCapture?.(event.pointerId)}catch{}
+   photoHold={kind:'local',id:event.pointerId,x:event.clientX,y:event.clientY,target:photo,ready:false,timer:setTimeout(()=>armPhotoHold(photo,event.pointerId),PHOTO_HOLD_MS)};
+ });
+ open.addEventListener('pointermove',event=>{
+   if(photoHold?.kind!=='local'||photoHold.id!==event.pointerId)return;
+   if(Math.hypot(event.clientX-photoHold.x,event.clientY-photoHold.y)>32)cancelPhotoHold();
+ });
+ const finish=(event,cancelled=false)=>{
+   if(photoHold?.kind!=='local'||photoHold.id!==event.pointerId)return;
+   const shouldOpen=!cancelled&&photoHold.ready&&photoHold.target?.isConnected;
+   cancelPhotoHold();
+   if(shouldOpen)setTimeout(openHidden,0);
+ };
+ open.addEventListener('pointerup',event=>finish(event,false));
+ open.addEventListener('pointercancel',event=>finish(event,true));
+ open.addEventListener('lostpointercapture',event=>finish(event,true));
+ open.addEventListener('contextmenu',event=>{if(photoExpanded(currentPhoto()))event.preventDefault()});
 }
 
 async function senderMember(card){
@@ -73,7 +100,7 @@ async function syncAvatar(){
 function scheduleSync(){clearTimeout(syncTimer);syncTimer=setTimeout(()=>{ensure();void syncAvatar()},40)}
 function ensure(){
  const h=hero();if(!h)return;
- const open=h.querySelector('.live-photo-open');if(open){open.removeAttribute('data-a');open.dataset.gtgHomePhoto='1';open.setAttribute('aria-label','Tap to expand photo. Tap again for Evidence. Hold 4 seconds, then release for Hidden Gallery.')}
+ const open=h.querySelector('.live-photo-open');if(open){open.removeAttribute('data-a');open.dataset.gtgHomePhoto='1';open.setAttribute('aria-label','Tap to expand photo. Tap again for Evidence. Hold 4 seconds, then release for Hidden Gallery.');bindPhotoHold(open)}
  const card=h.querySelector('.live-message-card');if(card)card.setAttribute('aria-label','Tap to open group chat. Hold your own avatar for 3 seconds to change profile photo.');
  if(!h.dataset.gtgHomeFocus)focusMessage(h);
 }
@@ -133,59 +160,17 @@ window.addEventListener('click',event=>{
  const photo=event.target.closest?.('.dashboard[data-home-composition="full"] .live-snapshot-hero .live-photo-block');if(photo&&!event.target.closest?.('.live-photo-add')){event.preventDefault();event.stopPropagation();event.stopImmediatePropagation();if(now<suppressPhotoClickUntil)return;const box=h.querySelector('.live-snapshot-bottom');if(box?.classList.contains('is-photo-focused'))openEvidence();else focusPhoto(h);return}
  const message=event.target.closest?.('.dashboard[data-home-composition="full"] .live-snapshot-hero .live-message-card');if(message&&h.querySelector('.live-snapshot-bottom')?.classList.contains('is-photo-focused')){event.preventDefault();event.stopPropagation();event.stopImmediatePropagation();focusMessage(h)}
 },true);
-window.addEventListener('contextmenu',event=>{if(event.target.closest?.('.dashboard[data-home-composition="full"] .live-snapshot-hero .live-photo-block,.dashboard[data-home-composition="full"] .live-snapshot-hero .live-message-avatar')){event.preventDefault();event.stopPropagation()}},true);
-document.addEventListener('touchstart',event=>{
- if(event.touches.length!==1)return;
- const photo=event.target.closest?.('.dashboard[data-home-composition="full"] .live-snapshot-hero .live-photo-block');
- if(!photo||event.target.closest?.('.live-photo-add')||!photoExpanded(photo))return;
- const touch=event.touches[0];
- event.preventDefault();
- touchGestureActive=true;
- cancelPhotoHold();
- photoHold={kind:'touch',id:touch.identifier,x:touch.clientX,y:touch.clientY,target:photo,ready:false,timer:setTimeout(()=>{
-   if(photoHold?.kind==='touch'&&photoHold.id===touch.identifier&&photo.isConnected){
-     photoHold.ready=true;photoHold.timer=0;suppressPhotoClickUntil=Date.now()+2500;navigator.vibrate?.(28);
-   }
- },PHOTO_HOLD_MS)};
-},{capture:true,passive:false});
-document.addEventListener('touchmove',event=>{
- if(photoHold?.kind!=='touch'||event.touches.length!==1)return;
- const touch=event.touches[0];
- event.preventDefault();
- if(Math.hypot(touch.clientX-photoHold.x,touch.clientY-photoHold.y)>32){cancelPhotoHold();touchGestureActive=false}
-},{capture:true,passive:false});
-document.addEventListener('touchend',event=>{
- if(photoHold?.kind!=='touch')return;
- event.preventDefault();
- const target=photoHold.target,ready=photoHold.ready;
- cancelPhotoHold();touchGestureActive=false;
- if(ready&&target?.isConnected)setTimeout(openHidden,0);
- else if(target?.isConnected)setTimeout(openEvidence,0);
-},{capture:true,passive:false});
-document.addEventListener('touchcancel',event=>{
- if(photoHold?.kind!=='touch')return;
- event.preventDefault();cancelPhotoHold();touchGestureActive=false;
-},{capture:true,passive:false});
-
+window.addEventListener('contextmenu',event=>{if(event.target.closest?.('.dashboard[data-home-composition="full"] .live-snapshot-hero .live-message-avatar')){event.preventDefault();event.stopPropagation()}},true);
 window.addEventListener('pointerdown',event=>{
- if(event.pointerType==='touch'||touchGestureActive)return;
  if(event.pointerType==='mouse'&&event.button!==0)return;
- const photo=event.target.closest?.('.dashboard[data-home-composition="full"] .live-snapshot-hero .live-photo-block'),avatar=event.target.closest?.('.dashboard[data-home-composition="full"] .live-snapshot-hero .live-message-avatar');
- if(photo&&!event.target.closest?.('.live-photo-add')&&photoExpanded(photo)){cancelPhotoHold();photoHold={kind:'pointer',id:event.pointerId,x:event.clientX,y:event.clientY,target:photo,ready:false,timer:setTimeout(()=>armPhotoHold(photo,event.pointerId),PHOTO_HOLD_MS)}}
+ const avatar=event.target.closest?.('.dashboard[data-home-composition="full"] .live-snapshot-hero .live-message-avatar');
  if(avatar){cancelAvatarHold();avatarHold={id:event.pointerId,x:event.clientX,y:event.clientY,target:avatar,timer:setTimeout(()=>{if(avatarHold?.id===event.pointerId&&avatar.isConnected)void triggerAvatarHold(avatar)},AVATAR_HOLD_MS)}}
 },{capture:true,passive:true});
-window.addEventListener('pointermove',event=>{if(photoHold?.kind==='pointer'&&photoHold.id===event.pointerId&&Math.hypot(event.clientX-photoHold.x,event.clientY-photoHold.y)>32)cancelPhotoHold();if(avatarHold?.id===event.pointerId&&Math.hypot(event.clientX-avatarHold.x,event.clientY-avatarHold.y)>32)cancelAvatarHold()},{capture:true,passive:true});
-const finishPointer=(event,cancelled=false)=>{
- if(photoHold?.kind==='pointer'&&photoHold.id===event.pointerId){
-   const shouldOpen=!cancelled&&photoHold.ready&&photoHold.target?.isConnected;
-   cancelPhotoHold();
-   if(shouldOpen)setTimeout(openHidden,0);
- }
- if(avatarHold?.id===event.pointerId)cancelAvatarHold();
-};
-window.addEventListener('pointerup',event=>finishPointer(event,false),{capture:true,passive:true});
-window.addEventListener('pointercancel',event=>finishPointer(event,true),{capture:true,passive:true});
-window.addEventListener('lostpointercapture',event=>finishPointer(event,true),{capture:true,passive:true});
+window.addEventListener('pointermove',event=>{if(avatarHold?.id===event.pointerId&&Math.hypot(event.clientX-avatarHold.x,event.clientY-avatarHold.y)>32)cancelAvatarHold()},{capture:true,passive:true});
+const finishAvatarPointer=event=>{if(avatarHold?.id===event.pointerId)cancelAvatarHold()};
+window.addEventListener('pointerup',finishAvatarPointer,{capture:true,passive:true});
+window.addEventListener('pointercancel',finishAvatarPointer,{capture:true,passive:true});
+window.addEventListener('lostpointercapture',finishAvatarPointer,{capture:true,passive:true});
 
 const observer=new MutationObserver(scheduleSync);
 function boot(){installStyles();observer.observe(document.getElementById('app')||document.body,{childList:true,subtree:true,characterData:true});scheduleSync();window.addEventListener('pageshow',scheduleSync);document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible')scheduleSync()})}
