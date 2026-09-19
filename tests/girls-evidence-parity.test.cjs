@@ -3,8 +3,8 @@ const script=fs.readFileSync('girls-evidence-parity.js','utf8');
 const html=fs.readFileSync('create-trip.html','utf8');
 const loader=fs.readFileSync('girls-performance-loader.js','utf8');
 const checks=[
- ['parity layer excluded from Home startup',!html.includes('/girls-evidence-parity.js?v=2')],
- ['parity layer retained by Full Evidence route',loader.includes('/girls-evidence-parity.js?v=2')&&loader.includes("if(mode==='full')await loadBundle('evidenceFull')")],
+ ['parity layer excluded from Home startup',!html.includes('/girls-evidence-parity.js?v=3')],
+ ['parity layer retained by Full Evidence route',loader.includes('/girls-evidence-parity.js?v=3')&&loader.includes("if(mode==='full')await loadBundle('evidenceFull')")],
  ['unseen count persisted per trip',script.includes('gtg-evidence-seen-count:')&&script.includes('localStorage.setItem')],
  ['Evidence open clears badge',script.includes('if(evidenceOpen()){saveSeen(total);setBadge(0);return}')],
  ['badge only uses unseen delta',script.includes('setBadge(Math.max(0,total-seen))')],
