@@ -19,6 +19,7 @@ const BUNDLES={
     '/girls-direct-login-route.js?v=20260907-2',
     '/girls-home-shell-parity.js?v=20260909-1',
     '/girls-hidden-gallery-intro.js?v=20260919-1',
+    '/girls-vault-contract-fix.js?v=2',
     '/girls-home-thumbnail-prime.js?v=2'
   ],
   dashboardTour:['/girls-dashboard-tour.js?v=1'],
@@ -37,7 +38,6 @@ const BUNDLES={
   groupPollExtras:['/girls-poll-nudge.js?v=2'],
   evidenceShared:['/evidence-intro-dismiss.js?v=4'],
   evidenceFull:[
-    '/girls-vault-contract-fix.js?v=2',
     '/girls-hidden-upload-choice.js?v=1',
     '/girls-media-performance-max.js?v=3',
     '/girls-media-ux-plus.js?v=4',
