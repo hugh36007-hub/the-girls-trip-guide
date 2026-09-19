@@ -18,7 +18,9 @@ const BUNDLES={
     '/logged-in-stat-icons.js?v=20260907-2',
     '/girls-direct-login-route.js?v=20260907-2',
     '/girls-home-shell-parity.js?v=20260909-1',
-    '/girls-hidden-gallery-intro.js?v=20260919-1'
+    '/girls-hidden-gallery-intro.js?v=20260919-1',
+    '/girls-vault-contract-fix.js?v=2',
+    '/girls-home-thumbnail-prime.js?v=2'
   ],
   dashboardTour:['/girls-dashboard-tour.js?v=1'],
   onboarding:['/girls-batch1-parity-safe-v2.js?v=20260914-1','/girls-convince-copy-v2.js?v=20260907-1'],
@@ -36,14 +38,13 @@ const BUNDLES={
   groupPollExtras:['/girls-poll-nudge.js?v=2'],
   evidenceShared:['/evidence-intro-dismiss.js?v=4'],
   evidenceFull:[
-    '/girls-vault-contract-fix.js?v=2',
     '/girls-hidden-upload-choice.js?v=1',
-    '/girls-media-performance-max.js?v=2',
+    '/girls-media-performance-max.js?v=3',
     '/girls-media-ux-plus.js?v=4',
-    '/girls-evidence-parity.js?v=2',
-    '/girls-media-quality-fix.js?v=5',
-    '/girls-media-readiness.js?v=3',
-    '/girls-direct-photo-viewer.js?v=5',
+    '/girls-evidence-parity.js?v=3',
+    '/girls-media-quality-fix.js?v=6',
+    '/girls-media-readiness.js?v=4',
+    '/girls-direct-photo-viewer.js?v=6',
     '/girls-gallery-no-zoom.js?v=1',
     '/girls-media-flow-refinement.js?v=2',
     '/girls-media-social.js?v=1',
@@ -63,8 +64,7 @@ const BUNDLES={
     '/girls-live-chat-sync.js?v=3',
     '/girls-home-refinements.js?v=2',
     '/girls-home-scoreboard-fit.js?v=20260908-3',
-    '/girls-parity-refresh-20260904.js?v=4',
-    '/girls-home-thumbnail-prime.js?v=1'
+    '/girls-parity-refresh-20260904.js?v=4'
   ],
   upload:['https://cdn.jsdelivr.net/npm/tus-js-client@4.3.1/dist/tus.min.js']
 };

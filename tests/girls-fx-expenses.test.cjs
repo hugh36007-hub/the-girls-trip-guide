@@ -17,7 +17,7 @@ assert(fx.includes("form.id==='expenseForm'")&&fx.includes('stopImmediatePropaga
 assert(fx.includes('dedupePeople(form)'),'Expense participants must be de-duplicated');
 assert(!fx.includes("from('trip_members')"),'FX runtime must not create a second member-loading path');
 assert(html.includes('/girls-fx-expenses.js?v=4'),'Trip page must load the FX runtime directly');
-assert(html.indexOf('/girls-fx-expenses.js?v=4')>html.indexOf('/girls-app-v2.js?v=8'),'FX runtime must load after app core');
+assert(html.indexOf('/girls-fx-expenses.js?v=4')>html.indexOf('/girls-app-v2.js?v=9'),'FX runtime must load after app core');
 assert(migration.includes('original_amount numeric')&&migration.includes('original_currency text')&&migration.includes('gbp_rate numeric'),'FX storage columns missing');
 assert(migration.includes("t.product_key = 'girls'"),'FX save RPC must be Girls-only');
 assert(migration.includes('v_gbp_amount := round(p_local_amount * v_rate, 2)'),'GBP accounting amount must be computed server-side');
