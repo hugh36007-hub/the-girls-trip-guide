@@ -1,11 +1,15 @@
 const fs=require('fs');
 const app=fs.readFileSync('girls-app-v2.js','utf8');
 const ux=fs.readFileSync('girls-hero-vault-ux.js','utf8');
+const loader=fs.readFileSync('girls-performance-loader.js','utf8');
 const checks=[
  ['evidence loads only evidence album', app.includes(".eq('album','evidence')")],
  ['vault loads only vault album', app.includes(".eq('album','vault')")],
  ['vault signs from vault bucket', app.includes("signPath('btg-vault'")],
  ['vault upload targets vault album', app.includes("doUpload(d.getAll('files'),'vault')")],
- ['vault requires server session for sensitive actions', ux.includes("rpc('has_active_vault_session'")]
+ ['vault requires server session for sensitive actions', ux.includes("rpc('has_active_vault_session'")],
+ ['first-open PIN is exactly four digits', app.includes('required pattern="[0-9]{4}" minlength="4" maxlength="4"')],
+ ['first-open PIN establishes the vault session', app.includes("rpc('set_vault_pin'")&&app.includes("rpc('unlock_vault'")&&app.includes('S.vaultConfigured=true;S.vaultUnlocked=true')],
+ ['PIN guard is available from Home', loader.includes('/girls-vault-contract-fix.js?v=2')&&!loader.match(/evidenceFull:\[[\s\S]*?girls-vault-contract-fix\.js/)]
 ];
 for(const [name,ok] of checks){if(!ok){console.error('FAIL:',name);process.exit(1)}console.log('PASS:',name)}
