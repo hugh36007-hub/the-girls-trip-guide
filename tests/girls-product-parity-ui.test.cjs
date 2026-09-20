@@ -14,7 +14,9 @@ for(const code of ['F01','F02','F03','F04','F05','F06','F07']) must(js,code,`Fre
 must(js,'Trip reminders','Free reminders UI');
 must(js,'Seven practical reminders','Free reminder explanation');
 must(js,"!state.paid&&(a==='settings'||a==='tripAppearance')",'Free paid-feature action guard');
-must(js,"text.includes('gals settings')||text.includes('trip appearance')",'Free drawer entitlement guard');
+must(js,"text.includes('gals settings')",'Free drawer legacy GALS guard');
+must(js,"text.includes('gals communications')",'Free drawer current GALS guard');
+must(js,"text.includes('trip appearance')",'Free drawer appearance guard');
 
 // Overview and navigation parity.
 for(const token of ['Next on the plan','State of affairs','Getting started','Message the group','Message history','What I owe']) must(js,token,token);
