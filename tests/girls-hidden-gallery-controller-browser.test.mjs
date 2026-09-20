@@ -55,7 +55,7 @@ window.__client={
    if(name==='vault_is_configured')return {data:window.__configured,error:null};
    if(name==='has_active_vault_session')return {data:window.__active,error:null};
    if(name==='set_vault_pin'){
-     if(!/^\\d{4}$/.test(String(args?.p_pin||'')))return {data:false,error:{message:'invalid pin'}};
+     if(!/^\d{4}$/.test(String(args?.p_pin||'')))return {data:false,error:{message:'invalid pin'}};
      window.__configured=true;window.__active=false;return {data:true,error:null};
    }
    if(name==='unlock_vault'){
