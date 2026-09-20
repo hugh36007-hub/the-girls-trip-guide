@@ -16,6 +16,7 @@
   const prefKey = 'gtg-native-push-optin-v1';
   const tokenKey = 'gtg-native-push-token-v1';
   const errorKey = 'gtg-native-push-error-v1';
+  const firstPromptKey = 'gtg-native-push-first-arrival-prompt-v1';
   let client = null;
   let lastAccessToken = '';
   let listenersInstalled = false;
@@ -227,9 +228,75 @@
     });
   }
 
+  function firstPromptSeen() {
+    try { return localStorage.getItem(firstPromptKey) === '1'; }
+    catch { return false; }
+  }
+
+  function markFirstPromptSeen() {
+    try { localStorage.setItem(firstPromptKey, '1'); }
+    catch {}
+  }
+
+  function installFirstPromptStyle() {
+    if (document.getElementById('gtg-native-first-push-prompt-css')) return;
+    const style = document.createElement('style');
+    style.id = 'gtg-native-first-push-prompt-css';
+    style.textContent = `
+.gtg-native-first-push{position:fixed;inset:0;z-index:2147482999;display:grid;place-items:center;padding:20px;background:rgba(20,10,17,.52);backdrop-filter:blur(4px)}
+.gtg-native-first-push__card{width:min(420px,100%);border:1px solid rgba(255,79,163,.28);border-radius:20px;background:#fff;color:#191316;padding:22px;box-shadow:0 24px 70px rgba(36,17,28,.24);font-family:Inter,system-ui,sans-serif}
+.gtg-native-first-push__icon{width:48px;height:48px;border-radius:15px;display:grid;place-items:center;background:#fff0f7;color:#ed2f8b;font-size:24px;margin-bottom:14px}
+.gtg-native-first-push__card h2{margin:0 0 8px;font-size:22px;line-height:1.15;color:#191316}
+.gtg-native-first-push__card p{margin:0;color:#6c5962;font-size:13px;line-height:1.5}
+.gtg-native-first-push__actions{display:flex;justify-content:flex-end;gap:9px;margin-top:20px}
+.gtg-native-first-push button{border:0;border-radius:999px;padding:10px 14px;font:800 12px/1 Inter,system-ui,sans-serif;cursor:pointer}
+.gtg-native-first-push [data-native-first-push-later]{background:#f5edf1;color:#5d4853}
+.gtg-native-first-push [data-native-first-push-enable]{background:#ff4fa3;color:#fff}
+.gtg-native-first-push button:disabled{opacity:.55;cursor:wait}
+.gtg-native-first-push__status{display:block;min-height:18px;margin-top:10px;color:#a23a6f;font-size:11px}
+`;
+    document.head.appendChild(style);
+  }
+
+  async function showFirstArrivalPrompt() {
+    if (firstPromptSeen() || localStorage.getItem(prefKey) === '1' || !PushNotifications || !provider) return false;
+    markFirstPromptSeen();
+    installFirstPromptStyle();
+    const state = await permissionState();
+    const denied = state === 'denied';
+    const root = document.createElement('div');
+    root.className = 'gtg-native-first-push';
+    root.setAttribute('role', 'dialog');
+    root.setAttribute('aria-modal', 'true');
+    root.setAttribute('aria-label', 'Turn on trip notifications');
+    root.innerHTML = `<section class="gtg-native-first-push__card"><div class="gtg-native-first-push__icon" aria-hidden="true">🔔</div><h2>Turn on trip notifications?</h2><p>${denied ? 'Notifications are currently blocked in your phone settings. Turn them on there so you do not miss trip updates and reminders.' : 'Get trip updates, reminders and important changes on this device. You can turn notifications off later in My details.'}</p><small class="gtg-native-first-push__status" data-native-first-push-status></small><div class="gtg-native-first-push__actions"><button type="button" data-native-first-push-later>${denied ? 'Close' : 'Not now'}</button>${denied ? '' : '<button type="button" data-native-first-push-enable>Turn on notifications</button>'}</div></section>`;
+    document.body.appendChild(root);
+    root.querySelector('[data-native-first-push-later]')?.addEventListener('click', () => root.remove(), { once: true });
+    const button = root.querySelector('[data-native-first-push-enable]');
+    const status = root.querySelector('[data-native-first-push-status]');
+    if (button) {
+      button.addEventListener('click', () => {
+        button.disabled = true;
+        status.textContent = 'Turning notifications on…';
+        void enable().then(() => {
+          status.textContent = 'Notifications are on.';
+          window.setTimeout(() => root.remove(), 450);
+        }).catch((error) => {
+          status.textContent = error?.message || 'Notifications could not be enabled.';
+          button.disabled = false;
+        });
+      }, { once: true });
+    }
+    return true;
+  }
+
   function scheduleProfileCheck() {
     [0, 80, 240, 600].forEach((ms) => setTimeout(decorateProfile, ms));
   }
+
+  window.addEventListener('gtg:dashboard-tour-finished', (event) => {
+    if (event.detail?.kind === 'first') window.setTimeout(() => void showFirstArrivalPrompt(), 100);
+  });
 
   document.addEventListener('click', (event) => {
     const toggle = event.target.closest?.('[data-gtg-native-push-toggle]');

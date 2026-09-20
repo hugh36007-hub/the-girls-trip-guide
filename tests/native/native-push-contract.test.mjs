@@ -24,6 +24,9 @@ test('native push bridge is explicit opt-in and securely registers the signed-in
   assert.match(source, /SIGNED_OUT/);
   assert.match(source, /unregisterStored/);
   assert.match(source, /pushNotificationActionPerformed/);
+  assert.match(source, /gtg:dashboard-tour-finished/);
+  assert.match(source, /gtg-native-push-first-arrival-prompt-v1/);
+  assert.match(source, /data-native-first-push-enable/);
 });
 
 test('native payload pins the current web release and replaces Web Push with the native bridge', async () => {
