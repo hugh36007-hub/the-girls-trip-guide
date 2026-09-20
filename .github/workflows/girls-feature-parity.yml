@@ -69,6 +69,7 @@ jobs:
           node --check tests/girls-hidden-gallery-browser.test.mjs
           node --check tests/girls-hidden-gallery-controller-browser.test.mjs
           node --check tests/girls-media-ux-plus.test.cjs
+          node --check tests/girls-dashboard-tour.test.cjs
           node --check tests/girls-media-performance-max.test.cjs
           node --check tests/girls-evidence-parity.test.cjs
           node --check tests/girls-mobile-evidence-grid.test.mjs
@@ -148,6 +149,8 @@ jobs:
         run: node tests/girls-runtime-ownership.test.cjs
       - name: Premium media UX contract
         run: node tests/girls-media-ux-plus.test.cjs
+      - name: Dashboard tour persistence contract
+        run: node tests/girls-dashboard-tour.test.cjs
       - name: Media performance max contract
         run: node tests/girls-media-performance-max.test.cjs
       - name: Evidence parity contract
