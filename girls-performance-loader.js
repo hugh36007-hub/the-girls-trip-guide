@@ -21,7 +21,7 @@ const BUNDLES={
     '/girls-hidden-gallery-intro.js?v=20260920-1',
     '/girls-home-thumbnail-prime.js?v=2'
   ],
-  dashboardTour:['/girls-dashboard-tour.js?v=1'],
+  dashboardTour:['/girls-dashboard-tour.js?v=2'],
   onboarding:['/girls-batch1-parity-safe-v2.js?v=20260914-1','/girls-convince-copy-v2.js?v=20260907-1'],
   parity:['/girls-product-parity.js?v=5','/girls-gals-selector-fix.js?v=1'],
   shell:['/girls-section-layout.js?v=1','/girls-inner-page-polish.js?v=2'],
@@ -39,7 +39,7 @@ const BUNDLES={
   evidenceFull:[
     '/girls-hidden-upload-choice.js?v=1',
     '/girls-media-performance-max.js?v=3',
-    '/girls-media-ux-plus.js?v=4',
+    '/girls-media-ux-plus.js?v=5',
     '/girls-evidence-parity.js?v=3',
     '/girls-media-quality-fix.js?v=6',
     '/girls-media-readiness.js?v=4',
