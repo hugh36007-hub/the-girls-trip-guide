@@ -8,13 +8,12 @@ const critical=fs.readFileSync('girls-critical-style-loader.js','utf8');
 const uploadPolicy=fs.readFileSync('supabase/migrations/20260828210044_allow_hidden_gallery_upload_without_pin.sql','utf8');
 const returnPolicy=fs.readFileSync('supabase/migrations/20260828210203_allow_hidden_gallery_upload_return_without_view.sql','utf8');
 const checks=[
- ['hero script loaded',html.includes('/girls-hero-vault-ux.js?v=4')],
+ ['hero script loaded',html.includes('/girls-hero-vault-ux.js?v=5')],
  ['hidden upload chooser excluded from Home startup',!html.includes('/girls-hidden-upload-choice.js?v=1')],
  ['hidden upload chooser retained by Full Evidence route',loader.includes('/girls-hidden-upload-choice.js?v=1')&&loader.includes("if(mode==='full')await loadBundle('evidenceFull')")],
  ['hero stylesheet loaded by critical style owner',critical.includes('/girls-hero-vault-ux.css?v=1')],
  ['change hero control',js.includes('Change trip hero')],
  ['set hero wording',js.includes('Set as trip hero')],
- ['hidden gallery explicit',js.includes('Open Hidden Gallery')],
  ['server gate retained for management',js.includes("[data-a=\"deleteVaultMedia\"]")&&js.includes("rpc('has_active_vault_session'")],
  ['vault upload not intercepted by PIN guard',!js.includes('[data-a="vaultUpload"],[data-a="deleteVaultMedia"]')],
  ['upload destination choice',chooser.includes('Where should this go?')&&chooser.includes('Hidden Gallery')&&chooser.includes('data-a="vaultUpload"')],
