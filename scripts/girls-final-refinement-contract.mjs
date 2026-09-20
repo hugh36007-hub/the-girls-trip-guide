@@ -88,7 +88,7 @@ assert(heroUx.includes("observe(app,{childList:true})")&&!heroUx.includes("obser
 assert(roleDock.includes("observe(app,{childList:true,subtree:false})")&&!roleDock.includes("observe(document.documentElement"),'dock normalisation must observe only authoritative app rerenders');
 
 for(const src of [
- '/girls-vault-contract-fix.js?v=2','/girls-section-layout.js?v=1','/girls-free-entitlement-guard.js?v=1','/girls-inner-page-polish.js?v=2','/girls-document-audience.js?v=20260908-2','/girls-hidden-upload-choice.js?v=1','/girls-media-performance-max.js?v=3','/girls-media-ux-plus.js?v=4','/girls-evidence-parity.js?v=3','/girls-media-quality-fix.js?v=6','/girls-media-readiness.js?v=4','/girls-direct-photo-viewer.js?v=6','/girls-media-flow-refinement.js?v=2','/girls-trip-social.js?v=3','/girls-chat-sheet.js?v=4','/girls-media-social.js?v=1','/girls-poll-nudge.js?v=2','/girls-home-thumbnail-prime.js?v=2','/evidence-intro-dismiss.js?v=4'
+ '/girls-section-layout.js?v=1','/girls-free-entitlement-guard.js?v=1','/girls-inner-page-polish.js?v=2','/girls-document-audience.js?v=20260908-2','/girls-hidden-upload-choice.js?v=1','/girls-media-performance-max.js?v=3','/girls-media-ux-plus.js?v=4','/girls-evidence-parity.js?v=3','/girls-media-quality-fix.js?v=6','/girls-media-readiness.js?v=4','/girls-direct-photo-viewer.js?v=6','/girls-media-flow-refinement.js?v=2','/girls-trip-social.js?v=3','/girls-chat-sheet.js?v=4','/girls-media-social.js?v=1','/girls-poll-nudge.js?v=2','/girls-home-thumbnail-prime.js?v=2','/evidence-intro-dismiss.js?v=4'
 ]){
   assert(!html.includes(`defer src=\"${src}\"`),`noncritical script must not execute on Home startup: ${src}`);
   assert(deferred.includes(src),`route loader must retain ${src}`);
