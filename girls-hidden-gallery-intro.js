@@ -31,27 +31,7 @@ function install(){
 
 function schedule(){[0,80,240,650].forEach(ms=>setTimeout(install,ms))}
 
-// A hold on the collapsed Latest Photo must never open Hidden Gallery.
-// If the Home refinement hold timer has already started, cancel it with the same pointer id.
-window.addEventListener('pointerdown',event=>{
- if(event.pointerType==='mouse'&&event.button!==0)return;
- const photo=photoTarget(event);
- if(!photo||event.target.closest?.('.live-photo-add')||photoExpanded(photo))return;
- event.stopImmediatePropagation();
- try{window.dispatchEvent(new PointerEvent('pointercancel',{pointerId:event.pointerId,pointerType:event.pointerType,bubbles:false,cancelable:false}))}catch{}
- updatePhotoLabel();
-},{capture:true,passive:true});
-
 document.addEventListener('click',event=>{
- const direct=event.target.closest?.('[data-a="vault"]');
- if(direct&&!direct.hidden){
-   event.preventDefault();
-   event.stopImmediatePropagation();
-   stripDirectEntries();
-   toast('Hidden Gallery: on Home, tap Latest Photo once, then hold the expanded photo for 4 seconds.');
-   return;
- }
-
  if(photoTarget(event))queueMicrotask(updatePhotoLabel);
  if(event.target.closest?.('[data-a="drawer"],[data-tab]'))setTimeout(()=>{stripDirectEntries();install()},0);
 },true);
