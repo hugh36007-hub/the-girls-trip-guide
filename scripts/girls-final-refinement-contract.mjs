@@ -93,7 +93,7 @@ for(const src of [
   assert(!html.includes(`defer src=\"${src}\"`),`noncritical script must not execute on Home startup: ${src}`);
   assert(deferred.includes(src),`route loader must retain ${src}`);
 }
-for(const src of ['/girls-role-aware-dock.js?v=3','/girls-hero-vault-ux.js?v=4'])assert(html.includes(src),`Home-critical interaction must remain immediate: ${src}`);
+for(const src of ['/girls-role-aware-dock.js?v=4','/girls-hero-vault-ux.js?v=5'])assert(html.includes(src),`Home-critical interaction must remain immediate: ${src}`);
 for(const token of ['requestIdleCallback','document.visibilityState','MutationObserver','afterDashboard','loadRoute'])assert(deferred.includes(token),`performance loader missing ${token}`);
 
 const parsed=JSON.parse(manifest);
