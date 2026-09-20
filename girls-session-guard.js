@@ -91,17 +91,9 @@ document.addEventListener('click',async event=>{
   }catch(error){console.warn('Girls Evidence permission preflight failed.',error);reloadForIdentityChange();}
 },true);
 
-document.addEventListener('submit',async event=>{
-  const form=event.target;if(!(form instanceof HTMLFormElement)||!['heroForm','setPinForm'].includes(form.id))return;
-  if(form.dataset.gtgSessionGuardBypass==='1'){delete form.dataset.gtgSessionGuardBypass;return;}
-  event.preventDefault();event.stopImmediatePropagation();
-  const submitter=event.submitter;
-  try{
-    if(!await ownerPreflight()||reloading)return;
-    form.dataset.gtgSessionGuardBypass='1';
-    if(submitter instanceof HTMLElement&&submitter.isConnected)form.requestSubmit(submitter);else form.requestSubmit();
-  }catch(error){console.warn('Girls owner permission preflight failed.',error);reloadForIdentityChange();}
-},true);
+/* Do not cancel and replay heroForm or setPinForm submits.
+   Both core flows perform their own role checks and their authoritative writes are
+   server-enforced. Replaying here collided with the action-feedback busy state. */
 
 const c=db();
 if(c){
