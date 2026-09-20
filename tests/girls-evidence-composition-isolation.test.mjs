@@ -7,10 +7,14 @@ import {fileURLToPath} from 'node:url';
 
 const root=path.resolve(path.dirname(fileURLToPath(import.meta.url)),'..');
 const loader=fs.readFileSync(path.join(root,'girls-performance-loader.js'),'utf8');
+const app=fs.readFileSync(path.join(root,'girls-app-v2.js'),'utf8');
 const chrome=[process.env.CHROME_BIN,process.env.CHROME_PATH,'/usr/bin/google-chrome','/usr/bin/google-chrome-stable','/opt/google/chrome/chrome','/usr/bin/chromium','/usr/bin/chromium-browser'].filter(Boolean).find(fs.existsSync);
 assert(chrome,'Chrome/Chromium required');
 
 assert.match(loader,/evidenceFull:\[/,'Full Evidence bundle must be explicit');
+assert.match(app,/window\.GTGVault=Object\.freeze\(\{open:vaultModal\}\)/,'core must own the app-wide Hidden Gallery entry point');
+assert.match(app,/pattern="\[0-9\]\{4\}" minlength="4" maxlength="4"/,'exact four-digit PIN contract must live in the core app');
+assert.doesNotMatch(loader,/girls-vault-contract-fix/,'unsafe mutation-based PIN correction script must not load');
 assert.match(loader,/evidenceFree:\[/,'Free Evidence bundle must be explicit');
 assert.match(loader,/const composition=\(\)=>document\.querySelector\('\.dashboard'\)\?\.dataset\.homeComposition\|\|''/,'authoritative composition state must gate Evidence loading');
 assert.match(loader,/if\(mode==='full'\)await loadBundle\('evidenceFull'\)/,'Full bundle must require Full composition');
@@ -43,7 +47,7 @@ try{
  const pageTarget=await target(),client=await connect(pageTarget.webSocketDebuggerUrl);await client.call('Runtime.enable');await client.call('Page.enable');await client.call('Emulation.setDeviceMetricsOverride',{width:390,height:844,deviceScaleFactor:3,mobile:true,screenWidth:390,screenHeight:844});
  await setPage(client,'full');
  const full=await evaluate(client,'({requested:window.__requested.slice(),styles:window.__styleRequested.slice(),composition:document.querySelector(\'.dashboard\')?.dataset.homeComposition})');
- assert.equal(full.composition,'full');assert(full.requested.includes('/girls-vault-contract-fix.js?v=2'),'PIN contract must be available app-wide before Evidence opens');assert(full.requested.includes('/girls-home-thumbnail-prime.js?v=2'),'quiet thumbnail primer must be app-wide');for(const src of fullOnly)assert(full.requested.includes(src),`Full must load ${src}`);for(const src of freeOnly)assert(!full.requested.includes(src),`Full must not load Free-only ${src}`);assert(full.requested.includes('/evidence-intro-dismiss.js?v=4'),'Full must retain the shared dismissible Evidence guide');assert(full.styles.includes(fullStyle),'Full must load the core-owned mobile Evidence grid style');
+ assert.equal(full.composition,'full');assert(!full.requested.some(src=>String(src).includes('girls-vault-contract-fix')),'removed PIN correction runtime must never be requested');assert(full.requested.includes('/girls-home-thumbnail-prime.js?v=2'),'quiet thumbnail primer must be app-wide');for(const src of fullOnly)assert(full.requested.includes(src),`Full must load ${src}`);for(const src of freeOnly)assert(!full.requested.includes(src),`Full must not load Free-only ${src}`);assert(full.requested.includes('/evidence-intro-dismiss.js?v=4'),'Full must retain the shared dismissible Evidence guide');assert(full.styles.includes(fullStyle),'Full must load the core-owned mobile Evidence grid style');
  await evaluate(client,"document.querySelector('[data-a=picker]').click()");await wait(80);const fullExit=await evaluate(client,'({hard:window.__hardResetCalls,bubble:window.__pickerBubble})');assert.equal(fullExit.hard,1,'Full picker must invoke the hard reset boundary');assert.equal(fullExit.bubble,0,'Full picker must not continue into the SPA switch handler');
 
  await client.call('Page.navigate',{url:'about:blank'});await wait(200);const clean=await evaluate(client,"({loader:typeof window.__GTG_PERFORMANCE_LOADER__,fullClasses:document.querySelectorAll('.gtg-mobile-media-tile,.gtg-optimistic').length,fullStyles:document.querySelectorAll('[id^=gtg-media],[id^=gtg-mobile-evidence],[id^=gtg-evidence-parity]').length})");assert.equal(clean.loader,'undefined','hard navigation must clear the prior Full loader runtime');assert.equal(clean.fullClasses,0);assert.equal(clean.fullStyles,0);
