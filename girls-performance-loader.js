@@ -21,9 +21,9 @@ const BUNDLES={
     '/girls-hidden-gallery-intro.js?v=20260920-1',
     '/girls-home-thumbnail-prime.js?v=2'
   ],
-  dashboardTour:['/girls-dashboard-tour.js?v=2'],
+  dashboardTour:['/girls-dashboard-tour.js?v=3'],
   onboarding:['/girls-batch1-parity-safe-v2.js?v=20260914-1','/girls-convince-copy-v2.js?v=20260907-1'],
-  parity:['/girls-product-parity.js?v=5','/girls-gals-selector-fix.js?v=1'],
+  parity:['/girls-product-parity.js?v=6','/girls-gals-selector-fix.js?v=1'],
   shell:['/girls-section-layout.js?v=1','/girls-inner-page-polish.js?v=2'],
   planDocuments:[DOC_SRC,'/girls-booking-copy.js?v=1'],
   money:['/girls-payment-nudge.js?v=3'],
@@ -55,7 +55,7 @@ const BUNDLES={
     '/girls-convince-copy-v2.js?v=20260907-1'
   ],
   reminders:[REMINDER_SRC],
-  drawer:['/girls-free-entitlement-guard.js?v=1','/trip-export-menu-guard.js?v=1','/trip-export.js?v=1'],
+  drawer:['/girls-free-entitlement-guard.js?v=1','/trip-export-menu-guard.js?v=1','/trip-export.js?v=1','/girls-trip-issue-report.js?v=1'],
   home:[
     '/girls-home-poll-return-refresh.js?v=1',
     '/home-social-platform-guard.js?v=20260908-2',
