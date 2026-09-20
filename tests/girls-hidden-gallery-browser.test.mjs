@@ -39,7 +39,7 @@ function runBrowser(label,size){
   assert.equal(out.status,0,`${label} Chromium failed: ${out.stderr||out.stdout}`);
   assert.match(out.stdout,/data-test-result="PASS"/,`${label} browser interaction regression failed:\n${out.stdout}\n${out.stderr}`);
   assert.match(out.stdout,/data-vault-opens="2"/,`${label} should produce exactly two successful Hidden Gallery opens`);
-  assert.match(out.stdout,/data-evidence-clicks="1"/,`${label} should preserve normal Evidence navigation after hold suppression`);
+  assert.match(out.stdout,/data-evidence-clicks="4"/,`${label} should preserve normal and rapid Evidence navigation after hold suppression`);
 }
 
 test('Girls Hidden Gallery desktop Chromium interaction',()=>runBrowser('desktop','1280,800'));
