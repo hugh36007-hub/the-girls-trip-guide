@@ -11,4 +11,7 @@ assert(!safe.includes("delete b.dataset.tab;b.dataset.a='addExpense'"),'Money do
 assert(app.includes('data-tab="money"'),'Money dock navigation is missing');
 assert(app.includes('data-a="addExpense"'),'organiser Add Expense action is missing');
 assert(app.includes('data-a="addRequest"'),'organiser Request Payment action is missing');
+const dateFlow=fs.readFileSync('girls-date-flow.js','utf8');
+assert(dateFlow.includes("const payer=form.querySelector('select[name=\"payer\"]')"),'Plan booking payer close handler is missing');
+assert(dateFlow.includes("payer.addEventListener('change',()=>requestAnimationFrame(()=>payer.blur()))"),'Plan payer picker must close immediately after selection');
 console.log('Girls organiser Plan and Money entry contracts passed.');
