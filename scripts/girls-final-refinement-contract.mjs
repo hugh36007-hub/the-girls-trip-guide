@@ -59,7 +59,7 @@ assert(html.includes('/girls-critical-style-loader.js?v=20260914-1'),'critical s
 assert(html.includes('/girls-home-social-hub-v3.js?v=20260914-1'),'Free Home chat must be part of core startup');
 assert(!deferred.includes('/girls-home-social-hub-v3.js'),'Free Home chat must not have a second deferred owner');
 assert(!deferred.includes('/girls-home-hero-layout-match.js'),'legacy black Free hero override must remain retired');
-assert(html.includes('/girls-performance-loader.js?v=24'),'performance loader missing');
+assert(html.includes('/girls-performance-loader.js?v=25'),'performance loader missing');
 
 // Current critical-path safeguards: one light, geometry-stable boot shell until authenticated composition is ready.
 assert(html.includes('rel="stylesheet" href="/girls-app.css?v=20260909-1"'),'current private-app stylesheet must be explicitly versioned');
