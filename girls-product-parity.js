@@ -151,12 +151,15 @@ function dockBadges(){
 function drawerEntitlements(){
  const drawer=document.getElementById('drawerRoot');if(!drawer?.classList.contains('open'))return;
  const buttons=[...drawer.querySelectorAll('button')];
- for(const b of buttons){const text=(b.textContent||'').toLowerCase();if(!state.paid&&(text.includes('gals settings')||text.includes('trip appearance')))b.style.display='none'}
- if(drawer.querySelector('[data-parity-drawer]'))return;
+ for(const b of buttons){const text=(b.textContent||'').toLowerCase();if(!state.paid&&(text.includes('gals settings')||text.includes('gals communications')||text.includes('trip appearance')))b.style.display='none'}
+ const coreComms=drawer.querySelector('[data-a="settings"]');
+ const existing=drawer.querySelector('[data-parity-drawer]');
+ if(state.paid&&coreComms){existing?.remove();return}
+ if(existing)return;
  const list=drawer.querySelector('.drawer-list');if(!list)return;
- const btn=document.createElement('button');btn.dataset.parityDrawer='1';btn.innerHTML=state.paid?'<b>GALS communications</b><small>Characters, reminders and message controls</small>':'<b>Trip reminders</b><small>Seven standard reminders included with Free</small>';
- btn.addEventListener('click',()=>state.paid?openComms():openReminders());
- const switchBtn=[...list.querySelectorAll('button')].find(x=>(x.textContent||'').toLowerCase().includes('trip settings'));
+ const btn=document.createElement('button');btn.dataset.parityDrawer='1';btn.innerHTML='<b>Trip reminders</b><small>View the seven standard reminders included with Free</small>';
+ btn.addEventListener('click',openReminders);
+ const switchBtn=[...list.querySelectorAll('button')].find(x=>(x.textContent||'').toLowerCase().includes('trip details'));
  if(switchBtn)switchBtn.insertAdjacentElement('beforebegin',btn);else list.prepend(btn)
 }
 
