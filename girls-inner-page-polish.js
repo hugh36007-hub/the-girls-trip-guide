@@ -100,6 +100,7 @@ function installPlanMoneyAuthority(){
  html.gtg-app-light body:has(.panel[data-panel="money"].active) .dock button.active{color:#ed2f8b!important;background:#fff3f8!important}
 
  #bookingForm select[name="kind"][data-gtg-mobile-kind-source="1"]{display:none!important}
+ #bookingForm select[name="payer"][data-gtg-mobile-payer-source="1"]{display:none!important}
  #bookingForm .gtg-kind-chooser{position:relative;display:grid;gap:6px;width:100%}
  #bookingForm .gtg-kind-trigger{width:100%;min-height:48px;display:flex;align-items:center;justify-content:space-between;padding:11px 14px;border:1.5px solid rgba(255,79,163,.42);border-radius:12px;background:#fff;color:#191316;font:600 16px/1.2 Inter,Arial,sans-serif;text-align:left}
  #bookingForm .gtg-kind-trigger:after{content:'⌄';color:#75636c;font-size:18px}
@@ -188,6 +189,38 @@ function enhanceBookingType(){
  chooser.append(trigger,menu);select.insertAdjacentElement('afterend',chooser);sync();
 }
 
+function enhanceBookingPayer(){
+ if(!window.matchMedia('(max-width:700px)').matches)return;
+ const form=document.getElementById('bookingForm');
+ const select=form?.querySelector('select[name="payer"]');
+ if(!select||select.dataset.gtgMobilePayerSource==='1')return;
+ select.dataset.gtgMobilePayerSource='1';
+ select.tabIndex=-1;select.setAttribute('aria-hidden','true');
+ const chooser=document.createElement('div');chooser.className='gtg-kind-chooser gtg-payer-chooser';
+ const trigger=document.createElement('button');trigger.type='button';trigger.className='gtg-kind-trigger gtg-payer-trigger';trigger.setAttribute('aria-haspopup','listbox');trigger.setAttribute('aria-expanded','false');trigger.setAttribute('aria-label','Paid by');
+ const menu=document.createElement('div');menu.className='gtg-kind-menu gtg-payer-menu';menu.setAttribute('role','listbox');menu.hidden=true;
+ const buttons=[];
+ const sync=()=>{
+  const selected=select.options[select.selectedIndex]||select.options[0];
+  trigger.textContent=selected?.textContent||'Not set';
+  buttons.forEach(button=>button.setAttribute('aria-selected',button.dataset.value===select.value?'true':'false'));
+ };
+ const close=()=>{menu.hidden=true;trigger.setAttribute('aria-expanded','false')};
+ for(const option of select.options){
+  const button=document.createElement('button');button.type='button';button.className='gtg-kind-option gtg-payer-option';button.setAttribute('role','option');button.dataset.value=option.value;button.textContent=option.textContent||'Not set';
+  button.addEventListener('click',()=>{
+   select.value=option.value;
+   select.dispatchEvent(new Event('input',{bubbles:true}));
+   select.dispatchEvent(new Event('change',{bubbles:true}));
+   sync();close();requestAnimationFrame(()=>trigger.focus({preventScroll:true}));
+  });
+  buttons.push(button);menu.appendChild(button);
+ }
+ trigger.addEventListener('click',()=>{const open=menu.hidden;document.querySelectorAll('.gtg-kind-menu:not([hidden])').forEach(other=>{if(other!==menu){other.hidden=true;other.previousElementSibling?.setAttribute('aria-expanded','false')}});menu.hidden=!open;trigger.setAttribute('aria-expanded',open?'true':'false')});
+ select.addEventListener('change',sync);
+ chooser.append(trigger,menu);select.insertAdjacentElement('afterend',chooser);sync();
+}
+
 function drawerClose(){
  const wrap=document.getElementById('drawerRoot');
  const drawer=wrap?.querySelector('.drawer');
@@ -207,6 +240,7 @@ function polish(){
  placeSummary(activePanel());
  syncHeader();
  enhanceBookingType();
+ enhanceBookingPayer();
  drawerClose();
 }
 
