@@ -43,6 +43,7 @@ jobs:
           node --check girls-document-audience.js
           node --check girls-hero-vault-ux.js
           node --check girls-hidden-upload-choice.js
+          node --check girls-trip-issue-report.js
           node --check girls-role-aware-dock.js
           node --check girls-media-performance-max.js
           node --check girls-media-ux-plus.js
