@@ -7,7 +7,7 @@ const DOC_SRC='/girls-document-audience.js?v=20260908-2';
 const REMINDER_SRC='/girls-free-reminders-parity.js?v=20260908-7';
 const BUNDLES={
   appTheme:[
-    '/girls-push-notifications.js?v=1',
+    '/girls-push-notifications.js?v=2',
     '/girls-fx-expenses-bootstrap.js?v=1',
     '/girls-resend-invite-fix.js?v=20260914-2',
     '/girls-mobile-history-fix.js?v=1',
@@ -21,7 +21,7 @@ const BUNDLES={
     '/girls-hidden-gallery-intro.js?v=20260920-1',
     '/girls-home-thumbnail-prime.js?v=2'
   ],
-  dashboardTour:['/girls-dashboard-tour.js?v=3'],
+  dashboardTour:['/girls-dashboard-tour.js?v=4'],
   onboarding:['/girls-batch1-parity-safe-v2.js?v=20260914-1','/girls-convince-copy-v2.js?v=20260907-1'],
   parity:['/girls-product-parity.js?v=6','/girls-gals-selector-fix.js?v=2'],
   shell:['/girls-section-layout.js?v=1','/girls-inner-page-polish.js?v=3'],
