@@ -77,6 +77,7 @@ async function run(){
   await sleep(1600);
   clickOpen();clickOpen();clickOpen();await sleep(50);
   expect(window.__vaultOpens===2,'rapid normal taps triggered duplicate Hidden Gallery opens');
+  expect(evidenceClicks===4,'rapid normal taps did not remain ordinary Evidence navigation');
 
   document.body.dataset.testResult=failures.length?'FAIL':'PASS';
   document.body.dataset.vaultOpens=String(window.__vaultOpens);
