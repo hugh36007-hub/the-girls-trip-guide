@@ -72,6 +72,7 @@ jobs:
           node --check tests/girls-media-ux-plus.test.cjs
           node --check tests/girls-dashboard-tour.test.cjs
           node --check tests/girls-drawer-launch-tools.test.cjs
+          node --check tests/girls-booking-copy-safety.test.cjs
           node --check tests/girls-media-performance-max.test.cjs
           node --check tests/girls-evidence-parity.test.cjs
           node --check tests/girls-mobile-evidence-grid.test.mjs
@@ -155,6 +156,8 @@ jobs:
         run: node tests/girls-dashboard-tour.test.cjs
       - name: Launch drawer and issue-reporting contract
         run: node tests/girls-drawer-launch-tools.test.cjs
+      - name: Plan booking-copy mutation-loop contract
+        run: node tests/girls-booking-copy-safety.test.cjs
       - name: Media performance max contract
         run: node tests/girls-media-performance-max.test.cjs
       - name: Evidence parity contract
