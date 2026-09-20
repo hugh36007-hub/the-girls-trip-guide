@@ -41,7 +41,7 @@ assert(loader.includes('/girls-hidden-gallery-intro.js?v=20260920-1'),'Passive H
 assert(loader.includes('/girls-home-refinements.js?v=3'),'single Home gesture controller must be cache-busted');
 assert(!loader.includes('girls-vault-contract-fix.js'),'unsafe mutation observer PIN correction must not load');
 assert(!loader.match(/evidenceFull:\[[\s\S]*?girls-hidden-gallery-intro\.js/),'Hidden Gallery guide must not depend on opening Evidence');
-assert(html.includes('/girls-app-v2.js?v=12')&&html.includes('/girls-session-guard.js?v=3')&&html.includes('/girls-hero-vault-ux.js?v=5')&&html.includes('/girls-role-aware-dock.js?v=4')&&html.includes('/girls-performance-loader.js?v=22'),'Updated scripts must be cache-busted');
-assert(sw.includes("gtg-pwa-v41-hidden-gallery-controller")&&sw.includes('/girls-app-v2.js?v=12')&&sw.includes('/girls-session-guard.js?v=3')&&sw.includes('/girls-performance-loader.js?v=22'),'PWA cache generation must include the repaired runtime');
+assert(html.includes('/girls-app-v2.js?v=12')&&html.includes('/girls-session-guard.js?v=3')&&html.includes('/girls-hero-vault-ux.js?v=5')&&html.includes('/girls-role-aware-dock.js?v=4')&&html.includes('/girls-performance-loader.js?v=23'),'Updated scripts must be cache-busted');
+assert(sw.includes("gtg-pwa-v42-hidden-gallery-upload")&&sw.includes('/girls-app-v2.js?v=12')&&sw.includes('/girls-session-guard.js?v=3')&&sw.includes('/girls-performance-loader.js?v=23'),'PWA cache generation must include the repaired runtime');
 
 console.log('Girls Hidden Gallery discretion contract PASS');
