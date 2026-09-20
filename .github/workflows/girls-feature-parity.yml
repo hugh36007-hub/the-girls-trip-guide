@@ -30,6 +30,8 @@ jobs:
           node --check girls-app-v2.js
           node --check girls-action-feedback.js
           node --check girls-session-guard.js
+          node --check girls-home-refinements.js
+          node --check girls-hidden-gallery-intro.js
           node --check girls-date-flow.js
           node --check girls-payment-nudge.js
           node --check girls-trip-social.js
@@ -62,6 +64,9 @@ jobs:
           node --check sw.js
           node --check scripts/girls-final-refinement-contract.mjs
           node --check tests/girls-session-guard.test.cjs
+          node --check tests/girls-home-vault-pin.test.cjs
+          node --check tests/girls-hidden-gallery-discretion.test.cjs
+          node --check tests/girls-hidden-gallery-browser.test.mjs
           node --check tests/girls-media-ux-plus.test.cjs
           node --check tests/girls-media-performance-max.test.cjs
           node --check tests/girls-evidence-parity.test.cjs
@@ -120,6 +125,12 @@ jobs:
         run: node scripts/hero-vault-ux-contract.mjs
       - name: Hidden Gallery separation contract
         run: node tests/hidden-gallery-separation.test.cjs
+      - name: Hidden Gallery controller contract
+        run: |
+          node tests/girls-home-vault-pin.test.cjs
+          node tests/girls-hidden-gallery-discretion.test.cjs
+      - name: Hidden Gallery Chromium interaction
+        run: node --test tests/girls-hidden-gallery-browser.test.mjs
       - name: Hero control contract
         run: node tests/hero-control-contract.test.cjs
       - name: Role-aware dock contract
