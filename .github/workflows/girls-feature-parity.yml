@@ -69,6 +69,7 @@ jobs:
           node --check tests/girls-hidden-gallery-discretion.test.cjs
           node --check tests/girls-hidden-gallery-browser.test.mjs
           node --check tests/girls-hidden-gallery-controller-browser.test.mjs
+          node --check tests/girls-plan-payer-browser.test.mjs
           node --check tests/girls-media-ux-plus.test.cjs
           node --check tests/girls-dashboard-tour.test.cjs
           node --check tests/girls-drawer-launch-tools.test.cjs
@@ -138,6 +139,8 @@ jobs:
         run: |
           node --test tests/girls-hidden-gallery-browser.test.mjs
           node --test tests/girls-hidden-gallery-controller-browser.test.mjs
+      - name: Plan payer picker Chromium interaction
+        run: node --test tests/girls-plan-payer-browser.test.mjs
       - name: Hero control contract
         run: node tests/hero-control-contract.test.cjs
       - name: Role-aware dock contract
