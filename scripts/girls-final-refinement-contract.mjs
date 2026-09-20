@@ -59,7 +59,7 @@ assert(html.includes('/girls-critical-style-loader.js?v=20260914-1'),'critical s
 assert(html.includes('/girls-home-social-hub-v3.js?v=20260914-1'),'Free Home chat must be part of core startup');
 assert(!deferred.includes('/girls-home-social-hub-v3.js'),'Free Home chat must not have a second deferred owner');
 assert(!deferred.includes('/girls-home-hero-layout-match.js'),'legacy black Free hero override must remain retired');
-assert(html.includes('/girls-performance-loader.js?v=23'),'performance loader missing');
+assert(html.includes('/girls-performance-loader.js?v=24'),'performance loader missing');
 
 // Current critical-path safeguards: one light, geometry-stable boot shell until authenticated composition is ready.
 assert(html.includes('rel="stylesheet" href="/girls-app.css?v=20260909-1"'),'current private-app stylesheet must be explicitly versioned');
@@ -79,7 +79,7 @@ assert(authBridge.includes('functions/v1/girls-auth-otp'),'OTP bridge must prese
 assert(!html.includes('tus-js-client@4.3.1/dist/tus.min.js'),'resumable upload library must not execute on Home startup');
 assert(deferred.includes('tus-js-client@4.3.1/dist/tus.min.js'),'upload intent must retain resumable upload support');
 assert(!html.includes('defer src="/girls-product-parity.js?v=1"'),'supplementary parity data must not compete with initial dashboard load');
-assert(deferred.includes('/girls-product-parity.js?v=5'),'route loader must retain the parity layer');
+assert(deferred.includes('/girls-product-parity.js?v=6'),'route loader must retain the parity layer');
 assert(!deferred.includes("route==='overview'?1200:220"),'Home parity must not auto-refresh the authoritative dashboard after paint');
 assert(deferred.includes("if(route==='overview')afterDashboard(()=>void loadBundle('home'),0)"),'Home bundle must start once after the core dashboard');
 assert(!dateFlow.includes('data-payment-nudge-loader'),'date helper must not side-load payment scripts');
