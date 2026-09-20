@@ -46,16 +46,9 @@ function enhanceHeroControls(s){
  });
 }
 
-function hardenVaultButton(s){
- document.querySelectorAll('[data-a="vault"]').forEach(btn=>{
-  btn.textContent='Open Hidden Gallery';
-  btn.setAttribute('aria-label','Open PIN-protected Hidden Gallery');
- });
-}
-
 function enhanceFromDom(){
  const s=domState();if(!s)return;
- enhanceHeroControls(s);hardenVaultButton(s);
+ enhanceHeroControls(s);
 }
 function scheduleEnhance(){
  if(enhanceQueued)return;enhanceQueued=true;
