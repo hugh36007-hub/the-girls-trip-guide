@@ -3,6 +3,7 @@ const assert=require('assert');
 const js=fs.readFileSync('girls-product-parity.js','utf8');
 const css=fs.readFileSync('girls-product-parity.css','utf8');
 const polish=fs.readFileSync('girls-inner-page-polish.js','utf8');
+const galsSelector=fs.readFileSync('girls-gals-selector-fix.js','utf8');
 assert(js.includes('function addBookingForKind(kind)'),'empty plan categories must open the correctly typed booking form');
 assert(js.includes("!state.bookings.some(x=>x.kind===kind)"),'populated plan categories must remain filters');
 const html=fs.readFileSync('create-trip.html','utf8');
@@ -30,6 +31,12 @@ for(const token of ['gtg-plan-money-mobile-authority','panel[data-panel="money"]
 must(polish,"appbar.classList.toggle('gtg-inner-appbar'",'inner header route resync');
 must(polish,"select.dispatchEvent(new Event('change',{bubbles:true}))",'booking type value bridge');
 assert(polish.includes('background:#fff!important'),'Plan/Money mobile light surfaces must override legacy dark refinement');
+
+// GALS character cards must render as face-first portraits, not full-body/bottom-anchored crops.
+for(const token of ['object-fit:cover!important','object-position:center top!important','transform-origin:50% 0!important']) must(galsSelector,token,`GALS portrait crop: ${token}`);
+assert(!galsSelector.includes('object-fit:contain!important'),'GALS selector must not show whole-body contained portraits');
+assert(!galsSelector.includes('object-position:center bottom!important'),'GALS selector must not bottom-anchor character portraits');
+must(loader,"/girls-gals-selector-fix.js?v=2",'GALS portrait cache generation');
 
 // Full Trip communications and Evidence parity.
 for(const token of ['GALS communications','Who handles the messages?','Automatic routing','The Boss','The Organised One','The Chaos Agent','The Hammer','Payment reminders','Gallery nudges','Post-trip upload reminders']) must(js,token,token);
