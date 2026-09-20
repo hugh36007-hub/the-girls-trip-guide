@@ -1,0 +1,34 @@
+name: Girls Hidden Gallery WebKit gate
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - 'girls-app-v2.js'
+      - 'girls-home-refinements.js'
+      - 'girls-hidden-gallery-intro.js'
+      - 'girls-role-aware-dock.js'
+      - 'girls-session-guard.js'
+      - 'girls-action-feedback.js'
+      - 'tests/girls-hidden-gallery-browser.html'
+      - 'tests/girls-hidden-gallery-webkit.test.mjs'
+      - '.github/workflows/girls-hidden-gallery-webkit.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  webkit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Install Playwright WebKit
+        run: |
+          npm install --no-save --package-lock=false playwright@1.55.0
+          npx playwright install --with-deps webkit
+      - name: WebKit Hidden Gallery gesture gate
+        run: node --test tests/girls-hidden-gallery-webkit.test.mjs

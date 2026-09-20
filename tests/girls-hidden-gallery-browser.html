@@ -1,0 +1,91 @@
+<!doctype html>
+<html lang="en">
+<head><meta charset="utf-8"><title>Girls Hidden Gallery browser regression</title></head>
+<body>
+<div id="toast"></div>
+<div id="app">
+  <main class="dashboard" data-home-composition="full">
+    <section class="hero-card live-snapshot-hero">
+      <div class="live-snapshot-bottom is-message-focused" data-focus="message">
+        <button type="button" class="live-message-card"><span class="live-message-meta"><span class="live-message-avatar"></span><b>Tester</b><time></time></span><p>Message</p></button>
+        <div class="live-photo-block">
+          <button type="button" class="live-photo-open" aria-label="Latest photo"><span>Photo</span></button>
+          <button type="button" class="live-photo-add">Add</button>
+        </div>
+      </div>
+    </section>
+    <nav class="dock"><button type="button" data-tab="evidence" id="evidenceButton">Evidence</button></nav>
+  </main>
+</div>
+<pre id="result">RUNNING</pre>
+<script>
+window.__vaultOpens=0;
+window.GTGVault={open:()=>{window.__vaultOpens++;}};
+</script>
+<script src="../girls-home-refinements.js?v=3"></script>
+<script>
+(()=>{
+'use strict';
+const result=document.getElementById('result');
+const open=document.querySelector('.live-photo-open');
+const photo=document.querySelector('.live-photo-block');
+const bottom=document.querySelector('.live-snapshot-bottom');
+const evidence=document.getElementById('evidenceButton');
+let evidenceClicks=0;
+const failures=[];
+evidence.addEventListener('click',()=>{evidenceClicks++;});
+const sleep=ms=>new Promise(resolve=>setTimeout(resolve,ms));
+const expect=(condition,message)=>{if(!condition)failures.push(message);};
+function pointer(type,id,x=20,y=20){
+  photo.dispatchEvent(new PointerEvent(type,{bubbles:true,cancelable:true,pointerId:id,pointerType:'touch',isPrimary:true,clientX:x,clientY:y}));
+}
+function clickOpen(){
+  open.dispatchEvent(new MouseEvent('click',{bubbles:true,cancelable:true,button:0}));
+}
+async function run(){
+  await sleep(100);
+
+  pointer('pointerdown',1);await sleep(4100);pointer('pointerup',1);
+  expect(window.__vaultOpens===0,'collapsed hold opened Hidden Gallery');
+
+  clickOpen();await sleep(20);
+  expect(bottom.classList.contains('is-photo-focused'),'first tap did not expand Latest Photo');
+
+  pointer('pointerdown',2);await sleep(3500);pointer('pointerup',2);await sleep(50);
+  expect(window.__vaultOpens===0,'sub-four-second hold opened Hidden Gallery');
+
+  pointer('pointerdown',3);await sleep(100);pointer('pointermove',3,100,100);await sleep(4100);pointer('pointerup',3);
+  expect(window.__vaultOpens===0,'movement did not cancel hold');
+
+  pointer('pointerdown',4);await sleep(100);pointer('pointercancel',4);await sleep(4100);
+  expect(window.__vaultOpens===0,'pointercancel did not cancel hold');
+
+  pointer('pointerdown',5);await sleep(4100);
+  expect(window.__vaultOpens===1,'four-second hold did not open exactly once');
+  await sleep(900);
+  expect(window.__vaultOpens===1,'hold timer fired more than once');
+  pointer('pointerup',5);
+  clickOpen();await sleep(50);
+  expect(evidenceClicks===0,'trailing click after hold was not suppressed');
+  await sleep(1600);
+  clickOpen();await sleep(50);
+  expect(evidenceClicks===1,'normal expanded-photo tap did not open Evidence');
+
+  pointer('pointerdown',6);await sleep(4100);pointer('pointerup',6);
+  expect(window.__vaultOpens===2,'repeated Hidden Gallery hold did not remain usable');
+
+  await sleep(1600);
+  clickOpen();clickOpen();clickOpen();await sleep(50);
+  expect(window.__vaultOpens===2,'rapid normal taps triggered duplicate Hidden Gallery opens');
+  expect(evidenceClicks===4,'rapid normal taps did not remain ordinary Evidence navigation');
+
+  document.body.dataset.testResult=failures.length?'FAIL':'PASS';
+  document.body.dataset.vaultOpens=String(window.__vaultOpens);
+  document.body.dataset.evidenceClicks=String(evidenceClicks);
+  result.textContent=failures.length?failures.join('\n'):'PASS';
+}
+window.addEventListener('DOMContentLoaded',()=>void run(),{once:true});
+})();
+</script>
+</body>
+</html>

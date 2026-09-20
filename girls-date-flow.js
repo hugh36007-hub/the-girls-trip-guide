@@ -70,6 +70,11 @@ function enhanceBookingForm(form){
   kind.dataset.gtgCloseBound='1';
   kind.addEventListener('change',()=>requestAnimationFrame(()=>kind.blur()));
  }
+ const payer=form.querySelector('select[name="payer"]');
+ if(payer&&!payer.dataset.gtgCloseBound){
+  payer.dataset.gtgCloseBound='1';
+  payer.addEventListener('change',()=>requestAnimationFrame(()=>payer.blur()));
+ }
 }
 function dedupePeopleOptions(people){
  if(!people)return;

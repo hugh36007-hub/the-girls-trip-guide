@@ -25,8 +25,9 @@ assert.match(app,/function panelEvidence\(\)\{if\(!paid\(\)\)return `[\s\S]*Incl
   'Free Evidence must be locked and only the organiser may see the purchase CTA');
 assert.match(app,/\$\{paid\(\)\?` · \$\{c\.total\|\|0\} uploads`:''\}/,
   'Free Group cards must not show paid upload counts');
-assert.match(app,/\$\{paid\(\)\?'<button data-a="vault"><b>Hidden Gallery<\/b>/,
-  'Free drawer must not expose Hidden Gallery');
+const drawerSlice=app.slice(app.indexOf('function drawerOpen()'),app.indexOf('function bookingModal('));
+assert.doesNotMatch(drawerSlice,/data-a="vault"/,
+  'Hidden Gallery viewing must not have a direct drawer entry in either tier');
 
 // Full organiser + Full member: current paid media path remains intact.
 assert.match(app,/The official version of events\.'\,'<button class="btn primary" data-a="upload">Upload<\/button>'\)/,

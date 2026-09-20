@@ -84,6 +84,8 @@ html.gtg-app-light .dock button.active small,html.gtg-app-light .dock button.act
 html.gtg-app-light .drawer-wrap,html.gtg-app-light .modal-wrap{background:rgba(22,13,18,.48)!important;backdrop-filter:blur(3px)!important}
 html.gtg-app-light .drawer,html.gtg-app-light .modal{background:#fff!important;color:#191316!important;border-color:rgba(255,79,163,.32)!important;box-shadow:0 24px 60px rgba(36,18,27,.18)!important}
 html.gtg-app-light .drawer-list button{color:#191316!important;border-bottom-color:rgba(25,19,22,.09)!important}
+html.gtg-app-light .drawer-list button>b{display:block!important;color:#191316!important;font-weight:850!important;line-height:1.25!important}
+html.gtg-app-light .drawer-list button>small{display:block!important;margin-top:5px!important;color:#75636c!important;line-height:1.35!important}
 html.gtg-app-light .modal h2{color:#191316!important}
 html.gtg-app-light .field label{color:#ed2f8b!important}
 html.gtg-app-light .field input,html.gtg-app-light .field select,html.gtg-app-light .field textarea{background:#fff!important;color:#191316!important;border:1.25px solid rgba(255,79,163,.32)!important;box-shadow:inset 0 1px 2px rgba(50,20,35,.025)!important}

@@ -8,11 +8,11 @@ function relabel(root=document){
  const select=root.querySelector?.('#bookingForm select[name="kind"]')||document.querySelector('#bookingForm select[name="kind"]');
  if(select){
   const option=[...select.options].find(o=>o.value==='hotel'||o.textContent.trim().toLowerCase()==='hotel');
-  if(option){option.value='hotel';option.textContent='accommodation'}
+  if(option){if(option.value!=='hotel')option.value='hotel';if(option.textContent!=='Accommodation')option.textContent='Accommodation'}
  }
  const input=root.querySelector?.('#bookingForm input[name="hotel"]')||document.querySelector('#bookingForm input[name="hotel"]');
  const label=input?.closest('.field')?.querySelector('label');
- if(label)label.textContent='Accommodation';
+ if(label&&label.textContent!=='Accommodation')label.textContent='Accommodation';
 }
 
 relabel();

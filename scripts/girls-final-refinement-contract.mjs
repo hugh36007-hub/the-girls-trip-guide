@@ -53,13 +53,13 @@ for(const href of ['/girls-product-parity.css?v=1','/girls-inner-page-polish.css
   assert(!html.includes(`rel=\"preload\" as=\"style\" href=\"${href}\"`),`route CSS must not preload on Home: ${href}`);
   assert(deferred.includes(href),`route loader must retain ${href}`);
 }
-assert(!html.includes('/girls-inner-page-polish.js?v=2'),'inner-page DOM polish must not execute on Home startup');
-assert(deferred.includes('/girls-inner-page-polish.js?v=2'),'route loader must retain inner-page hierarchy polish');
+assert(!html.includes('/girls-inner-page-polish.js?v=3'),'inner-page DOM polish must not execute on Home startup');
+assert(deferred.includes('/girls-inner-page-polish.js?v=3'),'route loader must retain inner-page hierarchy polish');
 assert(html.includes('/girls-critical-style-loader.js?v=20260914-1'),'critical style loader missing');
 assert(html.includes('/girls-home-social-hub-v3.js?v=20260914-1'),'Free Home chat must be part of core startup');
 assert(!deferred.includes('/girls-home-social-hub-v3.js'),'Free Home chat must not have a second deferred owner');
 assert(!deferred.includes('/girls-home-hero-layout-match.js'),'legacy black Free hero override must remain retired');
-assert(html.includes('/girls-performance-loader.js?v=21'),'performance loader missing');
+assert(html.includes('/girls-performance-loader.js?v=26'),'performance loader missing');
 
 // Current critical-path safeguards: one light, geometry-stable boot shell until authenticated composition is ready.
 assert(html.includes('rel="stylesheet" href="/girls-app.css?v=20260909-1"'),'current private-app stylesheet must be explicitly versioned');
@@ -79,7 +79,7 @@ assert(authBridge.includes('functions/v1/girls-auth-otp'),'OTP bridge must prese
 assert(!html.includes('tus-js-client@4.3.1/dist/tus.min.js'),'resumable upload library must not execute on Home startup');
 assert(deferred.includes('tus-js-client@4.3.1/dist/tus.min.js'),'upload intent must retain resumable upload support');
 assert(!html.includes('defer src="/girls-product-parity.js?v=1"'),'supplementary parity data must not compete with initial dashboard load');
-assert(deferred.includes('/girls-product-parity.js?v=5'),'route loader must retain the parity layer');
+assert(deferred.includes('/girls-product-parity.js?v=6'),'route loader must retain the parity layer');
 assert(!deferred.includes("route==='overview'?1200:220"),'Home parity must not auto-refresh the authoritative dashboard after paint');
 assert(deferred.includes("if(route==='overview')afterDashboard(()=>void loadBundle('home'),0)"),'Home bundle must start once after the core dashboard');
 assert(!dateFlow.includes('data-payment-nudge-loader'),'date helper must not side-load payment scripts');
@@ -88,12 +88,12 @@ assert(heroUx.includes("observe(app,{childList:true})")&&!heroUx.includes("obser
 assert(roleDock.includes("observe(app,{childList:true,subtree:false})")&&!roleDock.includes("observe(document.documentElement"),'dock normalisation must observe only authoritative app rerenders');
 
 for(const src of [
- '/girls-vault-contract-fix.js?v=2','/girls-section-layout.js?v=1','/girls-free-entitlement-guard.js?v=1','/girls-inner-page-polish.js?v=2','/girls-document-audience.js?v=20260908-2','/girls-hidden-upload-choice.js?v=1','/girls-media-performance-max.js?v=3','/girls-media-ux-plus.js?v=4','/girls-evidence-parity.js?v=3','/girls-media-quality-fix.js?v=6','/girls-media-readiness.js?v=4','/girls-direct-photo-viewer.js?v=6','/girls-media-flow-refinement.js?v=2','/girls-trip-social.js?v=3','/girls-chat-sheet.js?v=4','/girls-media-social.js?v=1','/girls-poll-nudge.js?v=2','/girls-home-thumbnail-prime.js?v=2','/evidence-intro-dismiss.js?v=4'
+ '/girls-section-layout.js?v=1','/girls-free-entitlement-guard.js?v=1','/girls-inner-page-polish.js?v=3','/girls-document-audience.js?v=20260908-2','/girls-hidden-upload-choice.js?v=1','/girls-media-performance-max.js?v=3','/girls-media-ux-plus.js?v=5','/girls-evidence-parity.js?v=3','/girls-media-quality-fix.js?v=6','/girls-media-readiness.js?v=4','/girls-direct-photo-viewer.js?v=6','/girls-media-flow-refinement.js?v=2','/girls-trip-social.js?v=3','/girls-chat-sheet.js?v=4','/girls-media-social.js?v=1','/girls-poll-nudge.js?v=2','/girls-home-thumbnail-prime.js?v=2','/evidence-intro-dismiss.js?v=4'
 ]){
   assert(!html.includes(`defer src=\"${src}\"`),`noncritical script must not execute on Home startup: ${src}`);
   assert(deferred.includes(src),`route loader must retain ${src}`);
 }
-for(const src of ['/girls-role-aware-dock.js?v=3','/girls-hero-vault-ux.js?v=4'])assert(html.includes(src),`Home-critical interaction must remain immediate: ${src}`);
+for(const src of ['/girls-role-aware-dock.js?v=4','/girls-hero-vault-ux.js?v=5'])assert(html.includes(src),`Home-critical interaction must remain immediate: ${src}`);
 for(const token of ['requestIdleCallback','document.visibilityState','MutationObserver','afterDashboard','loadRoute'])assert(deferred.includes(token),`performance loader missing ${token}`);
 
 const parsed=JSON.parse(manifest);

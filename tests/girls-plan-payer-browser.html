@@ -1,0 +1,49 @@
+<!doctype html>
+<html>
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head>
+<body>
+<div id="app"></div>
+<div id="drawerRoot"></div>
+<div id="modalRoot">
+  <form id="bookingForm">
+    <div class="field">
+      <label>Type</label>
+      <select name="kind"><option value="flight" selected>flight</option><option value="hotel">hotel</option></select>
+    </div>
+    <div class="field">
+      <label>Paid by</label>
+      <select name="payer">
+        <option value="">Not set</option>
+        <option value="hugh">Hugh</option>
+        <option value="storystone">Hugh Storystone</option>
+        <option value="filiz">Filiz</option>
+      </select>
+    </div>
+  </form>
+</div>
+<script src="../girls-inner-page-polish.js"></script>
+<script>
+setTimeout(()=>{
+  try{
+    const select=document.querySelector('#bookingForm select[name="payer"]');
+    const trigger=document.querySelector('.gtg-payer-trigger');
+    const menu=document.querySelector('.gtg-payer-menu');
+    if(!select||!trigger||!menu)throw new Error('Controlled payer picker did not initialise');
+    trigger.click();
+    if(menu.hidden)throw new Error('Payer menu did not open');
+    const filiz=[...document.querySelectorAll('.gtg-payer-option')].find(b=>b.textContent.trim()==='Filiz');
+    if(!filiz)throw new Error('Filiz option missing');
+    filiz.click();
+    const pass=select.value==='filiz'&&trigger.textContent.trim()==='Filiz'&&menu.hidden===true&&trigger.getAttribute('aria-expanded')==='false';
+    document.body.dataset.testResult=pass?'PASS':'FAIL';
+    document.body.dataset.payerValue=select.value;
+    document.body.dataset.payerLabel=trigger.textContent.trim();
+    document.body.dataset.menuHidden=String(menu.hidden);
+  }catch(error){
+    document.body.dataset.testResult='FAIL';
+    document.body.dataset.error=String(error?.message||error);
+  }
+},300);
+</script>
+</body>
+</html>
