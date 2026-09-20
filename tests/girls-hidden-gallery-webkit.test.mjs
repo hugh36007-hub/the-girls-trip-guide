@@ -23,7 +23,7 @@ test('Girls Hidden Gallery real WebKit mobile gesture gate',async()=>{
    }));
    assert.equal(state.result,'PASS',state.detail);
    assert.equal(state.vaultOpens,'2','WebKit must trigger the 4-second Hidden Gallery hold exactly twice in the harness');
-   assert.equal(state.evidenceClicks,'1','WebKit must preserve the normal Evidence tap after hold suppression');
+   assert.equal(state.evidenceClicks,'4','WebKit must preserve normal and rapid Evidence taps after hold suppression');
    assert.deepEqual(errors,[],'WebKit page errors: '+errors.join('\n'));
  }finally{
    await browser.close();
