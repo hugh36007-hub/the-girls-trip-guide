@@ -73,9 +73,23 @@ async function persist(file,album,onProgress){
     const blob=await makeThumb(prepared);
     if(blob){const candidate=`${tripId()}/${session.user.id}/thumb-${uid()}.webp`;await storageUpload(bucket,candidate,new File([blob],'thumbnail.webp',{type:'image/webp'}));thumbPath=candidate;thumbnailStatus='ready';thumbnailError=null}
   }catch(error){thumbnailError=String(error?.message||'client_preview_failed').slice(0,500)}
-  let row;try{const {data,error}=await db().from('media').insert({trip_id:tripId(),album,storage_path:path,thumbnail_path:thumbPath,file_name:file.name,mime_type:file.type,size_bytes:prepared.size,created_by:session.user.id,thumbnail_status:thumbnailStatus,thumbnail_attempts:1,thumbnail_error:thumbnailError}).select('*').single();if(error)throw error;row=data}catch(e){await db().storage.from(bucket).remove([path,...(thumbPath?[thumbPath]:[])]).catch(()=>{});throw e}
-  optimistic(row,file,album);
-  if(thumbPath)window.dispatchEvent(new CustomEvent('gtg:thumbnail-ready',{detail:{mediaId:row.id,album}}));
+  const payload={trip_id:tripId(),album,storage_path:path,thumbnail_path:thumbPath,file_name:file.name,mime_type:file.type,size_bytes:prepared.size,created_by:session.user.id,thumbnail_status:thumbnailStatus,thumbnail_attempts:1,thumbnail_error:thumbnailError};
+  let row=null;
+  try{
+    if(album==='vault'){
+      const {error}=await db().from('media').insert(payload);
+      if(error)throw error;
+    }else{
+      const {data,error}=await db().from('media').insert(payload).select('*').single();
+      if(error)throw error;
+      row=data;
+    }
+  }catch(e){
+    await db().storage.from(bucket).remove([path,...(thumbPath?[thumbPath]:[])]).catch(()=>{});
+    throw e;
+  }
+  if(album==='evidence')optimistic(row,file,album);
+  if(thumbPath&&row?.id)window.dispatchEvent(new CustomEvent('gtg:thumbnail-ready',{detail:{mediaId:row.id,album}}));
   return row
 }
 async function pool(items,limit,work){let i=0;async function next(){while(i<items.length){const n=i++;await work(items[n])}}await Promise.all(Array.from({length:Math.min(limit,items.length)},next))}
@@ -85,13 +99,13 @@ async function quotaRemaining(){const {data,error}=await db().rpc('trip_storage_
 async function run(files,album){
   const queue=files.slice(0,25);if(!queue.length)return;const remaining=await quotaRemaining(),total=queue.reduce((n,f)=>n+f.size,0);if(total>remaining)throw Error('This trip does not have enough storage left for this selection.');
   try{localStorage.setItem(`gtg-upload-intent:${tripId()}`,JSON.stringify({album,files:queue.map(f=>({name:f.name,size:f.size,type:f.type,lastModified:f.lastModified})),at:Date.now()}))}catch{}
-  const root=modalRoot();root.innerHTML=`<div class="modal gtg-media-ux"><h2>Saving your evidence</h2><p data-gtg-upload-summary>0 of ${queue.length} saved</p><div class="progress"><i data-gtg-upload-bar style="width:0%"></i></div><div class="gtg-media-ux-list">${queue.map((f,i)=>`<div class="gtg-media-ux-row" data-gtg-upload-row="${i}"><span>${esc(f.name)}</span><b>Queued</b></div>`).join('')}</div><p class="gtg-media-ux-note">Once an item says Saved, it is safely in the trip. Large files resume from the last completed chunk if the same file is selected again.</p></div>`;root.classList.add('open');
+  const root=modalRoot();root.innerHTML=`<div class="modal gtg-media-ux"><h2>${album==='vault'?'Saving to Hidden Gallery':'Saving your evidence'}</h2><p data-gtg-upload-summary>0 of ${queue.length} saved</p><div class="progress"><i data-gtg-upload-bar style="width:0%"></i></div><div class="gtg-media-ux-list">${queue.map((f,i)=>`<div class="gtg-media-ux-row" data-gtg-upload-row="${i}"><span>${esc(f.name)}</span><b>Queued</b></div>`).join('')}</div><p class="gtg-media-ux-note">Once an item says Saved, it is safely in the trip. Large files resume from the last completed chunk if the same file is selected again.</p></div>`;root.classList.add('open');
   let saved=0,failed=0;const update=()=>{const s=document.querySelector('[data-gtg-upload-summary]'),bar=document.querySelector('[data-gtg-upload-bar]');if(s)s.textContent=`${saved} of ${queue.length} saved${failed?` · ${failed} failed`:''}`;if(bar)bar.style.width=`${Math.round(((saved+failed)/queue.length)*100)}%`};const indexed=queue.map((file,index)=>({file,index})),photos=indexed.filter(x=>!video(x.file)),videos=indexed.filter(x=>video(x.file));
   const work=async x=>{rowStatus(x.index,image(x.file)&&x.file.size>1600000?'Optimising…':'Starting…');try{await persist(x.file,album,(r,s,t)=>rowStatus(x.index,r>=1?'Saving…':`Uploading ${Math.round(r*100)}% · ${human(s)}/${human(t)}`));saved++;rowStatus(x.index,'Saved','ok')}catch(e){failed++;rowStatus(x.index,'Failed','fail');console.error(e)}update()};
   await pool(photos,concurrency(),work);await pool(videos,1,work);try{localStorage.removeItem(`gtg-upload-intent:${tripId()}`)}catch{};await wait(500);root.classList.remove('open');root.innerHTML='';
   window.dispatchEvent(new CustomEvent('gtg:media-uploaded',{detail:{album,saved,failed}}));
-  const toast=document.getElementById('toast');if(toast){toast.textContent=failed?`${saved} uploaded · ${failed} failed. Re-select failed files to resume.`:`${saved} uploaded.`;toast.classList.add('show');setTimeout(()=>toast.classList.remove('show'),4200)}
-  if(album==='vault')setTimeout(()=>document.querySelector('[data-a="vault"]')?.click(),80)
+  const toast=document.getElementById('toast');if(toast){toast.textContent=failed?`${saved} uploaded · ${failed} failed. Re-select failed files to resume.`:album==='vault'?`${saved} hidden item${saved===1?'':'s'} saved.`:`${saved} uploaded.`;toast.classList.add('show');setTimeout(()=>toast.classList.remove('show'),4200)}
+  if(album==='vault'&&saved){try{const {data}=await db().rpc('has_active_vault_session',{target_trip_id:tripId()});if(data===true)setTimeout(()=>void window.GTGVault?.open?.(),80)}catch{}}
 }
 
 style();
