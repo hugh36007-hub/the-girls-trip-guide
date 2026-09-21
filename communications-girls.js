@@ -1,12 +1,12 @@
 /* The Girls Trip Guide — canonical communications specification.
-   Converted from the proven Boys Trip Guide T01–T39 journey, but rewritten for Grace, Ava, Lila and Seb.
+   Converted from the proven Boys Trip Guide T01–T39 journey, but rewritten for Grace, Ava, Lola and Seb.
    This file is implementation-ready reference data. It is not yet wired into the static Girls front end. */
 
 const GTG_GALS=[
-  {id:'grace-auto',name:'Leave it to Grace',role:'Recommended',img:'./assets/images/grace.png',desc:'Grace watches the trip and brings in Ava, Lila or Seb when the moment calls for them.',example:'Everything is where it should be. Let’s not get creative now.'},
+  {id:'grace-auto',name:'Leave it to Grace',role:'Recommended',img:'./assets/images/grace.png',desc:'Grace watches the trip and brings in Ava, Lola or Seb when the moment calls for them.',example:'Everything is where it should be. Let’s not get creative now.'},
   {id:'grace',name:'Grace',role:'The Boss',img:'./assets/images/grace.png',desc:'Important organisation, final instructions and the moments that need one clear answer.',example:'Quick one. Something needs your attention. Then we can all move on.'},
   {id:'ava',name:'Ava',role:'The Organised One',img:'./assets/images/ava.png',desc:'Missing information, bookings, checklists and loose ends.',example:'Tiny admin thing. By tiny, I mean the hotel still needs your arrival time.'},
-  {id:'lola',name:'Lila',role:'The Chaos Agent',img:'./assets/images/lola.png',desc:'Countdowns, lighter nudges, photo prompts and the energy around the trip.',example:'Three days. If you haven’t packed, perfect. We remain statistically on schedule.'},
+  {id:'lola',name:'Lola',role:'The Chaos Agent',img:'./assets/images/lola.png',desc:'Countdowns, lighter nudges, photo prompts and the energy around the trip.',example:'Three days. If you haven’t packed, perfect. We remain statistically on schedule.'},
   {id:'seb',name:'Seb',role:'The Hammer',img:'./assets/images/seb.png',desc:'Payments, ignored reminders, overdue tasks and excuses entering their third season.',example:'Lovely story. Still unpaid. I admire the confidence, though.'}
 ];
 
@@ -87,7 +87,7 @@ const GTG_EMAIL_IDENTITIES={
   system:{name:'The Girls Trip Guide',localPart:'trips',portrait:null},
   grace:{name:'Grace',localPart:'grace',portrait:'https://thegirlstripguide.com/assets/images/grace.png'},
   ava:{name:'Ava',localPart:'ava',portrait:'https://thegirlstripguide.com/assets/images/ava.png'},
-  lola:{name:'Lila',localPart:'lola',portrait:'https://thegirlstripguide.com/assets/images/lola.png'},
+  lola:{name:'Lola',localPart:'lola',portrait:'https://thegirlstripguide.com/assets/images/lola.png'},
   seb:{name:'Seb',localPart:'seb',portrait:'https://thegirlstripguide.com/assets/images/seb.png'}
 };
 
