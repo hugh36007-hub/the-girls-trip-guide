@@ -22,7 +22,7 @@ permissions:
   contents: read
 
 env:
-  GTG_WEB_SOURCE_SHA: 0d6dfc9dfd9cf2e56d4a753c7a116a38dc41ecc7
+  GTG_WEB_SOURCE_SHA: 70b3ba236d39cf6a68a49ed98b87d49db580146f
 
 jobs:
   signed-release:
