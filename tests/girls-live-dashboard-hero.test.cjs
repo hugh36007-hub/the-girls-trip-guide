@@ -39,7 +39,7 @@ assert.doesNotMatch(dateFlow,/girls-live-dashboard-hero\.js/,'the legacy date fl
 assert.match(html,/girls-critical-style-loader\.js\?v=20260914-1/,'the private shell must cache-bust the critical style loader');
 assert.match(html,/girls-app-v2\.js\?v=12/,'the private shell must cache-bust the core renderer');
 assert.match(html,/girls-hero-vault-ux\.js\?v=5/,'the private shell must cache-bust the retired legacy hero control path');
-assert.match(html,/girls-performance-loader\\.js\\?v=28/,'the private shell must cache-bust the unified runtime loader');
+assert.match(html,/girls-performance-loader\.js\?v=28/,'the private shell must cache-bust the unified runtime loader');
 assert.match(html,/girls-pwa-register\.js\?v=5/,'the private shell must refresh PWA registration code');
 assert.match(html,/class="gtg-boot-shell"/,'the private shell must use the isolated light startup skeleton');
 assert.doesNotMatch(html,/gtg-boot-shell[\s\S]*girls-trip-guide-logo\.webp/,'the startup skeleton must not render the old square logo');
