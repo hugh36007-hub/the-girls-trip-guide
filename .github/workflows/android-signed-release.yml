@@ -22,7 +22,7 @@ permissions:
   contents: read
 
 env:
-  GTG_WEB_SOURCE_SHA: 59d31bb188cab249b08f6ea1b172e0a9b6e9a176
+  GTG_WEB_SOURCE_SHA: 0d6dfc9dfd9cf2e56d4a753c7a116a38dc41ecc7
 
 jobs:
   signed-release:
@@ -138,7 +138,7 @@ jobs:
         run: |
           grep -Fq 'applicationId "com.storystone.thegirlstripguide"' android/app/build.gradle
           grep -Fq '"appId": "com.storystone.thegirlstripguide"' capacitor.config.json
-          grep -Fq 'versionCode 7' android/app/build.gradle
+          grep -Fq 'versionCode 8' android/app/build.gradle
           grep -Fq 'versionName "1.0.3"' android/app/build.gradle
 
       - name: Validate and materialize upload key
@@ -205,7 +205,7 @@ jobs:
       - name: Upload signed Android release bundle
         uses: actions/upload-artifact@v4
         with:
-          name: girls-trip-guide-android-1.0.3-build-7-signed
+          name: girls-trip-guide-android-1.0.3-build-8-signed
           path: |
             android/app/build/outputs/bundle/release/app-release.aab
             release-provenance.json
