@@ -4,7 +4,7 @@ const file = 'ios/App/App.xcodeproj/project.pbxproj';
 const buildNumber = process.env.BUILD_NUMBER || '1';
 const versionName = process.env.VERSION_NAME || '1.0.3';
 let source = await readFile(file, 'utf8');
-source = source.replaceAll(/CURRENT_PROJECT_VERSION = \d+;/g, 'CURRENT_PROJECT_VERSION = 8;');
+source = source.replaceAll(/CURRENT_PROJECT_VERSION = \\d+;/g, `CURRENT_PROJECT_VERSION = ${buildNumber};`);
 source = source.replaceAll(/MARKETING_VERSION = [^;]+;/g, `MARKETING_VERSION = ${versionName};`);
 source = source.replaceAll(/^\s*CODE_SIGN_IDENTITY = "iPhone Developer";\s*$/gm, '');
 
