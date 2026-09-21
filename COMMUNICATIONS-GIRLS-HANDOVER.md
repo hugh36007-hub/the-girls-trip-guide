@@ -25,7 +25,7 @@ The Girls version should keep the operational logic because it is sound, while c
 |---|---|---|
 | Coach | **Grace — The Boss** | Important organisation, authoritative updates, final briefing, departure, closure |
 | Freddy | **Ava — The Organised One** | Missing details, bookings, passport checks, expense completeness, checklists |
-| Charlie | **Lola — The Chaos Agent** | Countdowns, lighter nudges, gallery/media prompts, energy and post-trip uploads |
+| Charlie | **Lila — The Chaos Agent** | Countdowns, lighter nudges, gallery/media prompts, energy and post-trip uploads |
 | Mickey | **Seb — The Hammer** | Payment escalation, ignored reminders, overdue tasks, outstanding balances |
 | Leave it to Coach | **Leave it to Grace** | Recommended automatic routing to the right GALS character |
 
@@ -45,7 +45,7 @@ Specific, practical and lightly exasperated. She notices the missing field, the 
 
 Useful recurring traits: “I checked”, lists, exactness, dislike of unnecessary voice notes.
 
-### Lola
+### Lila
 Playful and socially observant. Best for anticipation, photos, memories and lighter prompts. She makes the trip feel alive without making the product childish.
 
 Avoid: random chaos for its own sake.
@@ -82,7 +82,7 @@ Adds the character-led communication layer plus the richer media experience. The
 Recommended sender identities:
 - **Grace <grace@thegirlstripguide.com>**
 - **Ava <ava@thegirlstripguide.com>**
-- **Lola <lola@thegirlstripguide.com>**
+- **Lila <lola@thegirlstripguide.com>**
 - **Seb <seb@thegirlstripguide.com>**
 
 These aliases require domain/Resend configuration before they can send.
@@ -108,25 +108,25 @@ These aliases require domain/Resend configuration before they can send.
 - T15 Grace — Booking published
 - T16 Grace — Itinerary changed
 - T17 **Ava** — Partial-group booking
-- T18 Lola — 30-day countdown
-- T19 Lola — 14-day countdown
+- T18 Lila — 30-day countdown
+- T19 Lila — 14-day countdown
 - T20 Grace — Seven-day readiness
-- T21 Lola — 72-hour countdown
+- T21 Lila — 72-hour countdown
 - T22 Grace — Final briefing
 - T23 Grace — Departure day
-- T24 Lola — Arrival
-- T25 Lola — First evening
-- T26 Lola — Quiet gallery
-- T27 Lola — Morning-after prompt
-- T28 Lola — Upload milestone
-- T29 Lola — New destination
+- T24 Lila — Arrival
+- T25 Lila — First evening
+- T26 Lila — Quiet gallery
+- T27 Lila — Morning-after prompt
+- T28 Lila — Upload milestone
+- T29 Lila — New destination
 - T30 Ava — Incomplete expense
-- T31 Lola — Final night
+- T31 Lila — Final night
 - T32 Grace — Return home
-- T33 Lola — Final uploads
+- T33 Lila — Final uploads
 - T34 **Seb** — Outstanding expenses
-- T35 Lola — Three-day upload reminder
-- T36 Lola — Seven-day final call
+- T35 Lila — Three-day upload reminder
+- T36 Lila — Seven-day final call
 - T37 Grace — Completion summary
 - T38 Grace — Ready to close
 - T39 Grace — Formal closure
@@ -266,7 +266,7 @@ portrait = EMAIL_IDENTITIES[actualCharacter].portrait
 
 Never resolve sender and copy independently.
 
-This is why `communications-girls-voices.js` contains a full T01–T39 voice matrix for Grace, Ava, Lola and Seb.
+This is why `communications-girls-voices.js` contains a full T01–T39 voice matrix for Grace, Ava, Lila and Seb.
 
 ---
 
@@ -276,7 +276,7 @@ This is why `communications-girls-voices.js` contains a full T01–T39 voice mat
 Canonical character profiles, automatic trigger routing, baseline Girls copy, Free messages, sender identities, essential/optional policy and timing reference.
 
 ### `communications-girls-voices.js`
-Complete 39-trigger message set for **each** of Grace, Ava, Lola and Seb. This supports both automatic routing and a future fixed-character preference without voice mismatch.
+Complete 39-trigger message set for **each** of Grace, Ava, Lila and Seb. This supports both automatic routing and a future fixed-character preference without voice mismatch.
 
 ---
 
@@ -305,7 +305,7 @@ Do not point the current public static site at the Boys backend by accident. Bac
 **Recommended option:** Leave it to Grace
 
 **Hero:**
-Pick your favourite, or leave it to Grace. She’ll bring in Ava, Lola or Seb when the situation calls for it — without turning the trip into another admin job.
+Pick your favourite, or leave it to Grace. She’ll bring in Ava, Lila or Seb when the situation calls for it — without turning the trip into another admin job.
 
 **Heading:**
 The right person. At the right moment.

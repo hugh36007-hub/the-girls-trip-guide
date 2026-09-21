@@ -9,7 +9,7 @@ function env(n:string){const v=Deno.env.get(n)||'';if(!v)throw new Error(`${n} m
 function token(){const b=crypto.getRandomValues(new Uint8Array(32));return btoa(String.fromCharCode(...b)).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'')}
 async function sha(v:string){return [...new Uint8Array(await crypto.subtle.digest('SHA-256',new TextEncoder().encode(v)))].map(x=>x.toString(16).padStart(2,'0')).join('')}
 function titleName(v:any){return String(v||'').trim().split(/\s+/).filter(Boolean).map(x=>x[0].toUpperCase()+x.slice(1).toLowerCase()).join(' ')}
-function characterName(v:string){return v==='seb'?'Seb':v==='ava'?'Ava':v==='lola'?'Lola':'Grace'}
+function characterName(v:string){return v==='seb'?'Seb':v==='ava'?'Ava':v==='lola'?'Lila':'Grace'}
 async function deliver(payload:any){
   const r=await fetch(`${env('SUPABASE_URL')}/functions/v1/girls-email-send`,{method:'POST',headers:{'Content-Type':'application/json','x-btg-cron-secret':env('BTG_CRON_SECRET')},body:JSON.stringify(payload)})
   const out=await r.json().catch(()=>({}))

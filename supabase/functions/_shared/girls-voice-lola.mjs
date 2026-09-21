@@ -1,4 +1,4 @@
-/* Approved Lola T01-T39 email content. */
+/* Approved Lila T01-T39 email content. */
 export const LOLA_SUBJECTS = [
   "Oh, we're actually doing it.",
   "Minor issue: no girls.",
