@@ -20,7 +20,7 @@ for(const token of [
 assert(!html.includes('/girls-document-audience.js?v=1'),'document audience runtime must not execute on Home startup');
 assert(!html.includes('/girls-document-audience.css?v=1'),'document audience styles must not load on Home startup');
 assert(loader.includes("const DOC_SRC='/girls-document-audience.js?v=20260908-2'"),'Plan route must retain the current document audience runtime');
-assert(loader.includes('/girls-document-audience.css?v=20260908-2'),'Plan route must retain the current document audience styles');
+assert(loader.includes('/girls-document-audience.css?v=20260921-1'),'Plan route must retain the current document audience styles');
 assert(loader.includes("if(route==='plan')await loadBundle('planDocuments')"),'document audience must load with Plan route');
 
 for(const token of [
@@ -40,3 +40,4 @@ assert(sql.includes('is_trip_organiser(trip_id)'),'organiser write guard missing
 assert(js.includes("let documentId=crypto.randomUUID()"),'document inserts must pre-generate their id');
 assert(!js.includes(".insert({trip_id:ctx.trip.id,name:String(data.get('name')||'').trim(),note:String(data.get('note')||'').trim()||null,storage_path:path,file_name:file.name,mime_type:file.type||'application/octet-stream',size_bytes:file.size,created_by:ctx.user.id,visibility}).select('id').single()"),'document inserts must not request a protected returning row');
 console.log('Girls document audience contract PASS');
+
