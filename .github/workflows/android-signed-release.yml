@@ -20,6 +20,7 @@ on:
 
 permissions:
   contents: read
+  id-token: write
 
 env:
   GTG_WEB_SOURCE_SHA: 70b3ba236d39cf6a68a49ed98b87d49db580146f
@@ -213,30 +214,18 @@ jobs:
           if-no-files-found: error
           retention-days: 14
 
-      - name: Confirm Google Play publishing access
-        env:
-          GOOGLE_PLAY_SERVICE_ACCOUNT_JSON: ${{ secrets.GOOGLE_PLAY_SERVICE_ACCOUNT_JSON }}
-        shell: bash
-        run: |
-          test -n "$GOOGLE_PLAY_SERVICE_ACCOUNT_JSON" || {
-            echo 'Missing GOOGLE_PLAY_SERVICE_ACCOUNT_JSON GitHub secret.'
-            echo 'Add the Google Play service-account JSON to this repository before automatic upload can run.'
-            exit 1
-          }
-          python3 - <<'PY'
-          import json, os
-          payload=json.loads(os.environ['GOOGLE_PLAY_SERVICE_ACCOUNT_JSON'])
-          required=['client_email','private_key','project_id']
-          missing=[key for key in required if not payload.get(key)]
-          if missing:
-              raise SystemExit('Google Play service-account JSON is missing: '+', '.join(missing))
-          print('Google Play service-account credentials are present and structurally valid.')
-          PY
+      - name: Authenticate to Google Cloud for Google Play
+        id: google-auth
+        uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: projects/625633049890/locations/global/workloadIdentityPools/github-actions/providers/github
+          service_account: storystone-google-play-publish@storystone-app-publishing.iam.gserviceaccount.com
+          create_credentials_file: true
 
       - name: Upload to Google Play internal track
         uses: r0adkll/upload-google-play@v1
         with:
-          serviceAccountJsonPlainText: ${{ secrets.GOOGLE_PLAY_SERVICE_ACCOUNT_JSON }}
+          serviceAccountJson: ${{ steps.google-auth.outputs.credentials_file_path }}
           packageName: com.storystone.thegirlstripguide
           releaseFiles: android/app/build/outputs/bundle/release/app-release.aab
           tracks: internal
