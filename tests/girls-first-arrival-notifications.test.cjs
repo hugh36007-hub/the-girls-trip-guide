@@ -36,8 +36,8 @@ for(const token of [
 
 assert(loader.includes("'/girls-push-notifications.js?v=2'"),'web push onboarding cache generation must be current');
 assert(loader.includes("dashboardTour:['/girls-dashboard-tour.js?v=4']"),'tour cache generation must be current');
-assert(html.includes('/girls-performance-loader.js?v=27'),'create-trip must load the current performance loader generation');
-assert(sw.includes("gtg-pwa-v47-first-arrival-notifications"),'PWA cache generation must advance with onboarding behavior');
-assert(sw.includes("'/girls-performance-loader.js?v=27'"),'PWA app shell must cache the current performance loader');
+assert(html.includes('/girls-performance-loader.js?v=28'),'create-trip must load the current performance loader generation');
+assert(sw.includes("gtg-pwa-v48-travel-documents-light"),'PWA cache generation must advance with onboarding behavior');
+assert(sw.includes("'/girls-performance-loader.js?v=28'"),'PWA app shell must cache the current performance loader');
 
 console.log('Girls first-arrival notifications contract OK');

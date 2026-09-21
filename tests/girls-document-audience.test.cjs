@@ -1,6 +1,7 @@
 const fs=require('fs');
 const assert=require('assert');
 const js=fs.readFileSync('girls-document-audience.js','utf8');
+const css=fs.readFileSync('girls-document-audience.css','utf8');
 const html=fs.readFileSync('create-trip.html','utf8');
 const loader=fs.readFileSync('girls-performance-loader.js','utf8');
 const sql=fs.readFileSync('supabase/migrations/20260828193759_girls_document_audience.sql','utf8');
@@ -20,8 +21,13 @@ for(const token of [
 assert(!html.includes('/girls-document-audience.js?v=1'),'document audience runtime must not execute on Home startup');
 assert(!html.includes('/girls-document-audience.css?v=1'),'document audience styles must not load on Home startup');
 assert(loader.includes("const DOC_SRC='/girls-document-audience.js?v=20260908-2'"),'Plan route must retain the current document audience runtime');
-assert(loader.includes('/girls-document-audience.css?v=20260908-2'),'Plan route must retain the current document audience styles');
+assert(loader.includes('/girls-document-audience.css?v=20260921-1'),'Plan route must retain the current document audience styles');
 assert(loader.includes("if(route==='plan')await loadBundle('planDocuments')"),'document audience must load with Plan route');
+assert(!css.includes('background:#090609'),'document audience options must not retain the old dark surface');
+assert(css.includes('background:#fff0f6'),'selected audience option must use the Girls light pink treatment');
+assert(css.includes('.money-row:has([data-a="openDocument"])'),'travel document rows must receive a document-specific light override');
+assert(css.includes('grid-template-columns:repeat(3,minmax(0,1fr))'),'mobile document actions must fit in one compact row');
+assert(css.includes('::file-selector-button'),'document file picker must use the Girls modal styling');
 
 for(const token of [
   'documents_visibility_check',
@@ -40,3 +46,4 @@ assert(sql.includes('is_trip_organiser(trip_id)'),'organiser write guard missing
 assert(js.includes("let documentId=crypto.randomUUID()"),'document inserts must pre-generate their id');
 assert(!js.includes(".insert({trip_id:ctx.trip.id,name:String(data.get('name')||'').trim(),note:String(data.get('note')||'').trim()||null,storage_path:path,file_name:file.name,mime_type:file.type||'application/octet-stream',size_bytes:file.size,created_by:ctx.user.id,visibility}).select('id').single()"),'document inserts must not request a protected returning row');
 console.log('Girls document audience contract PASS');
+
