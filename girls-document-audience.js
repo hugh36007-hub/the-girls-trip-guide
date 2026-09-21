@@ -67,10 +67,10 @@ async function createDocument(form){
  if(file.size>MAX_DOCUMENT)throw new Error('Documents are limited to 25 MB.');
  if(file.type&&!ALLOWED_TYPES.has(file.type))throw new Error('Use a PDF, JPEG, PNG, WebP or HEIC file.');
  const {visibility,recipients}=selection(form),q=db(),path=`${ctx.trip.id}/documents/${crypto.randomUUID()}-${safeFile(file.name)}`;
- let documentId='';
+ let documentId=crypto.randomUUID();
  try{
-  const inserted=await q.from('documents').insert({trip_id:ctx.trip.id,name:String(data.get('name')||'').trim(),note:String(data.get('note')||'').trim()||null,storage_path:path,file_name:file.name,mime_type:file.type||'application/octet-stream',size_bytes:file.size,created_by:ctx.user.id,visibility}).select('id').single();
-  if(inserted.error)throw inserted.error;documentId=inserted.data.id;
+  const inserted=await q.from('documents').insert({id:documentId,trip_id:ctx.trip.id,name:String(data.get('name')||'').trim(),note:String(data.get('note')||'').trim()||null,storage_path:path,file_name:file.name,mime_type:file.type||'application/octet-stream',size_bytes:file.size,created_by:ctx.user.id,visibility});
+  if(inserted.error)throw inserted.error;
   if(visibility==='selected'){
    const links=recipients.map(member_id=>({document_id:documentId,trip_id:ctx.trip.id,member_id}));
    const linked=await q.from('document_recipients').insert(links);if(linked.error)throw linked.error;
