@@ -213,6 +213,38 @@ jobs:
           if-no-files-found: error
           retention-days: 14
 
+      - name: Confirm Google Play publishing access
+        env:
+          GOOGLE_PLAY_SERVICE_ACCOUNT_JSON: ${{ secrets.GOOGLE_PLAY_SERVICE_ACCOUNT_JSON }}
+        shell: bash
+        run: |
+          test -n "$GOOGLE_PLAY_SERVICE_ACCOUNT_JSON" || {
+            echo 'Missing GOOGLE_PLAY_SERVICE_ACCOUNT_JSON GitHub secret.'
+            echo 'Add the Google Play service-account JSON to this repository before automatic upload can run.'
+            exit 1
+          }
+          python3 - <<'PY'
+          import json, os
+          payload=json.loads(os.environ['GOOGLE_PLAY_SERVICE_ACCOUNT_JSON'])
+          required=['client_email','private_key','project_id']
+          missing=[key for key in required if not payload.get(key)]
+          if missing:
+              raise SystemExit('Google Play service-account JSON is missing: '+', '.join(missing))
+          print('Google Play service-account credentials are present and structurally valid.')
+          PY
+
+      - name: Upload to Google Play internal track
+        uses: r0adkll/upload-google-play@v1
+        with:
+          serviceAccountJsonPlainText: ${{ secrets.GOOGLE_PLAY_SERVICE_ACCOUNT_JSON }}
+          packageName: com.storystone.thegirlstripguide
+          releaseFiles: android/app/build/outputs/bundle/release/app-release.aab
+          tracks: internal
+          status: draft
+          releaseName: 'Girls Trip Guide 1.0.3 (8)'
+          changesNotSentForReview: true
+
+
       - name: Upload dependency audit
         if: always()
         uses: actions/upload-artifact@v4
