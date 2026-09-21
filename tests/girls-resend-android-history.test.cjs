@@ -22,8 +22,8 @@ assert(history.includes('gtgModal:true'),'Open modals must receive an in-app his
 assert(history.includes("window.addEventListener('popstate'"),'Android/browser Back must be handled');
 assert(history.includes("modal.classList.remove('open')"),'Back must close the open modal before leaving the app');
 
-const resendIndex=loader.indexOf('/girls-resend-invite-fix.js?v=20260914-2');
-const themeIndex=loader.indexOf('/logged-in-light-theme.js?v=20260909-1');
+const resendIndex=loader.search(/\/girls-resend-invite-fix\.js\?v=[^'\"]+/);
+const themeIndex=loader.search(/\/logged-in-light-theme\.js\?v=[^'\"]+/);
 assert(resendIndex>-1&&resendIndex<themeIndex,'Deferred fallback must still load resend before non-critical theme scripts');
 assert(loader.includes('/girls-mobile-history-fix.js?v=1'),'Mobile history repair must be loaded');
 

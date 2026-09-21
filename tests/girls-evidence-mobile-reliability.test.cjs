@@ -11,12 +11,7 @@ assert(evidence.includes("gallery.querySelector('[data-media-id]')"),'Evidence r
 assert(evidence.includes("row.thumbnail_path?await signed(row,'thumbnail'):await signed(row,'preview')"),'Evidence should prefer the thumbnail and fall back to a signed preview');
 assert(evidence.includes("await fallbackPhoto(img,row,token)"),'Evidence must fall back to the original photo if preview generation is unavailable');
 
-assert(dock.includes('const HIDDEN_GALLERY_HOLD_MS=4000'),'Hidden Gallery hold must remain exactly four seconds');
-assert(dock.includes("button[data-tab=\"evidence\"]"),'Hidden Gallery hold must attach only to the Evidence dock control');
-assert(dock.includes("proxy.dataset.a='vault'"),'Long hold must use the existing PIN-gated vault action');
-assert(dock.includes("document.addEventListener('touchstart'"),'Android touch hold must be handled explicitly');
-assert(dock.includes("document.addEventListener('touchcancel'"),'Cancelled mobile gestures must not open Hidden Gallery');
-assert(dock.includes("document.addEventListener('contextmenu'"),'Browser long-press menus must not steal the Evidence hold');
-assert(dock.includes("dataset.homeComposition==='full'"),'Hidden Gallery hold must remain Full Trip only');
+assert(!dock.includes('HIDDEN_GALLERY_HOLD_MS'),'Evidence dock must not compete with the Home Hidden Gallery controller');
+assert(!dock.includes("proxy.dataset.a='vault'"),'Evidence dock must not synthesize a vault action');
 
 console.log('Girls Evidence mobile reliability contract PASS');

@@ -72,6 +72,7 @@ jobs:
           node --check tests/girls-plan-payer-browser.test.mjs
           node --check tests/girls-media-ux-plus.test.cjs
           node --check tests/girls-dashboard-tour.test.cjs
+          node --check tests/girls-first-arrival-notifications.test.cjs
           node --check tests/girls-drawer-launch-tools.test.cjs
           node --check tests/girls-booking-copy-safety.test.cjs
           node --check tests/girls-media-performance-max.test.cjs
@@ -157,6 +158,8 @@ jobs:
         run: node tests/girls-media-ux-plus.test.cjs
       - name: Dashboard tour persistence contract
         run: node tests/girls-dashboard-tour.test.cjs
+      - name: First-arrival notification onboarding contract
+        run: node tests/girls-first-arrival-notifications.test.cjs
       - name: Launch drawer and issue-reporting contract
         run: node tests/girls-drawer-launch-tools.test.cjs
       - name: Plan booking-copy mutation-loop contract

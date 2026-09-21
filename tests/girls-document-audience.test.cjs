@@ -37,4 +37,6 @@ for(const token of [
 
 assert(sql.includes('revoke all on function private.can_access_trip_document(uuid) from public, anon'),'private helper execute is not contained');
 assert(sql.includes('is_trip_organiser(trip_id)'),'organiser write guard missing');
+assert(js.includes("let documentId=crypto.randomUUID()"),'document inserts must pre-generate their id');
+assert(!js.includes(".insert({trip_id:ctx.trip.id,name:String(data.get('name')||'').trim(),note:String(data.get('note')||'').trim()||null,storage_path:path,file_name:file.name,mime_type:file.type||'application/octet-stream',size_bytes:file.size,created_by:ctx.user.id,visibility}).select('id').single()"),'document inserts must not request a protected returning row');
 console.log('Girls document audience contract PASS');
