@@ -49,7 +49,7 @@ assert(!fs.readFileSync('girls-date-flow.js','utf8').includes('girls-live-dashbo
 assert(!critical.includes('gtg-first-paint-cover')&&!critical.includes('MutationObserver'),'critical styles must not block startup or own runtime readiness');
 assert(!deferred.includes('installHomePaintGuard'),'unified loader must not add a second Home paint handoff');
 assert.equal((deferred.match(/girls-live-dashboard-hero/g)||[]).length,1,'unified loader must register the Home hydrator exactly once');
-for(const href of ['/girls-product-parity.css?v=1','/girls-inner-page-polish.css?v=1','/girls-document-audience.css?v=20260908-2']){
+for(const href of ['/girls-product-parity.css?v=1','/girls-inner-page-polish.css?v=1','/girls-document-audience.css?v=20260921-1']){
   assert(!html.includes(`rel=\"preload\" as=\"style\" href=\"${href}\"`),`route CSS must not preload on Home: ${href}`);
   assert(deferred.includes(href),`route loader must retain ${href}`);
 }
@@ -59,7 +59,7 @@ assert(html.includes('/girls-critical-style-loader.js?v=20260914-1'),'critical s
 assert(html.includes('/girls-home-social-hub-v3.js?v=20260914-1'),'Free Home chat must be part of core startup');
 assert(!deferred.includes('/girls-home-social-hub-v3.js'),'Free Home chat must not have a second deferred owner');
 assert(!deferred.includes('/girls-home-hero-layout-match.js'),'legacy black Free hero override must remain retired');
-assert(html.includes('/girls-performance-loader.js?v=27'),'performance loader missing');
+assert(html.includes('/girls-performance-loader.js?v=28'),'performance loader missing');
 
 // Current critical-path safeguards: one light, geometry-stable boot shell until authenticated composition is ready.
 assert(html.includes('rel="stylesheet" href="/girls-app.css?v=20260909-1"'),'current private-app stylesheet must be explicitly versioned');
