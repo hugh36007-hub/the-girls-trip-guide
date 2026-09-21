@@ -231,7 +231,6 @@ jobs:
           tracks: internal
           status: draft
           releaseName: 'Girls Trip Guide 1.0.3 (8)'
-          changesNotSentForReview: true
 
 
       - name: Upload dependency audit
