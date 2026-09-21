@@ -19,7 +19,7 @@ function esc(value: unknown) {
 const PEOPLE = {
   grace: { name: 'Grace', mailbox: 'grace', banner: 'grace-email-banner-v3.webp' },
   ava: { name: 'Ava', mailbox: 'ava', banner: 'ava-email-banner-v3.webp' },
-  lola: { name: 'Lola', mailbox: 'lola', banner: 'lola-email-banner-v3.webp' },
+  lola: { name: 'Lila', mailbox: 'lola', banner: 'lola-email-banner-v3.webp' },
   seb: { name: 'Seb', mailbox: 'seb', banner: 'seb-email-banner-v3.webp' },
   system: { name: 'The Girls Trip Guide', mailbox: 'trips', banner: 'system-email-banner-v3.webp' },
 } as const

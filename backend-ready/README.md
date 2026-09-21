@@ -50,7 +50,7 @@ See `route-contract.json` for machine-readable route intent.
 - Supabase: EU-region project, authentication, Postgres and storage/R2 architecture as finally selected.
 - Stripe: £24.99 one-off Full Trip purchase.
 - Full Trip media promise: up to 20 GB for 12 months.
-- Resend/email: sender identities for Grace, Ava, Lola, Seb and the system identity.
+- Resend/email: sender identities for Grace, Ava, Lila, Seb and the system identity.
 - Analytics: confirm provider before enabling optional tracking or updating cookie consent.
 
 ## Communications

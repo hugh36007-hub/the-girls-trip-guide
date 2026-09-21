@@ -12,7 +12,7 @@ Baseline for rollback: `ground-zero-20260827` at commit `155f9a1482c3653e0acf8b1
 **Materially prepared.** Added `.env.example`, `supabase-client.example.ts`, `database.types.example.ts` and `supabase-schema-contract.md`. No real project credentials or executable migrations have been added before the Supabase project/schema is confirmed.
 
 ## 4. Communications are reference-only
-**Resolved for handoff.** `communications-loader.cjs` makes the canonical communication libraries importable from Node and validates 39 lifecycle messages for Grace, Ava, Lola and Seb. The original canonical files remain unchanged.
+**Resolved for handoff.** `communications-loader.cjs` makes the canonical communication libraries importable from Node and validates 39 lifecycle messages for Grace, Ava, Lila and Seb. The original canonical files remain unchanged.
 
 ## 5. Legal pages missing operator/data-controller identity
 **Resolved.** Terms, Privacy and Cookie Policy now identify Storystone Ltd, company number 16922351, registered office 101 Cuffley Hill, Goffs Oak, Waltham Cross, EN7 5HB, England. Privacy identifies Storystone Ltd as data controller.

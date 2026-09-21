@@ -156,7 +156,7 @@ function enhanceList(modal){
    const h3=upgrade.querySelector('h3');
    if(h3)h3.textContent='Bring in the GALS.';
    const p=upgrade.querySelector('p');
-   if(p)p.textContent='Full Trip adds 39 trip messages, Grace, Ava, Lola and Seb, richer prompts, Evidence and Hidden Gallery.';
+   if(p)p.textContent='Full Trip adds 39 trip messages, Grace, Ava, Lila and Seb, richer prompts, Evidence and Hidden Gallery.';
    const button=upgrade.querySelector('[data-parity-existing="upgrade"]');
    if(button)button.textContent='Compare Free vs Full →';
  }
