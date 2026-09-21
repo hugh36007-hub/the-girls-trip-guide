@@ -14,5 +14,5 @@ const must=(s,label)=>assert(app.includes(s),`Missing: ${label||s}`);
  ['trip_storage_usage','quota check'],['set_vault_pin','vault'],['girls-stripe-checkout','Girls Stripe endpoint'],['girls-trip-email','Girls invite endpoint']
 ].forEach(([s,l])=>must(s,l));
 for(const boys of ['Leave it to Coach','Freddy','Mickey','Charlie']) assert(!app.includes(boys),`Boys UI leaked into Girls: ${boys}`);
-assert(app.includes('Grace')&&app.includes('Ava')&&app.includes('Lila')&&app.includes('Seb'),'GALS identity missing');
+assert(app.includes('Grace')&&app.includes('Ava')&&app.includes('Lola')&&app.includes('Seb'),'GALS identity missing');
 console.log('Girls feature parity static audit PASS');
