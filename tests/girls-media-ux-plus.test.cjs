@@ -29,6 +29,7 @@ if(!src.includes("const isVid=video(file),isImg=image(file);if(!isVid&&!isImg)re
 if(!src.includes("if(album==='vault'){")||!src.includes("const {error}=await db().from('media').insert(payload);"))throw new Error('Vault uploads must use write-only media insert without a protected readback.');
 if(!src.includes("db().from('media').insert(payload).select('*').single()"))throw new Error('Evidence uploads must retain their returning-row path.');
 if(!src.includes("album==='vault'?'Saving to Hidden Gallery':'Saving your evidence'"))throw new Error('Vault upload progress must identify the Hidden Gallery.');
+if(!src.includes("file.size<=6*1024*1024&&bucket!=='btg-vault'"))throw new Error('Vault files must use resumable upload so write-only gallery uploads do not require ordinary object readback.');
 if(!src.includes("rpc('has_active_vault_session'")||!src.includes("window.GTGVault?.open?.()"))throw new Error('Vault upload may reopen the gallery only when an active vault session exists.');
 if(src.includes("document.querySelector('[data-a=\"vault\"]')?.click()"))throw new Error('Retired direct vault-button reopen path must not return.');
 console.log('Girls media UX+ contract OK');

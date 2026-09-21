@@ -28,6 +28,10 @@ assert.match(app,/\$\{paid\(\)\?` · \$\{c\.total\|\|0\} uploads`:''\}/,
 const drawerSlice=app.slice(app.indexOf('function drawerOpen()'),app.indexOf('function bookingModal('));
 assert.doesNotMatch(drawerSlice,/data-a="vault"/,
   'Hidden Gallery viewing must not have a direct drawer entry in either tier');
+assert.match(drawerSlice,/commsPaid\(\)&&isOwner\(\)\?'<button data-a="settings"/,
+  'Only the Full organiser may see the GALS settings entry');
+assert.match(app,/function settingsModal\(\)\{if\(!isOwner\(\)\)throw Error\('Only the organiser can change GALS settings\.'\)/,
+  'Member routes must not open editable GALS settings');
 
 // Full organiser + Full member: current paid media path remains intact.
 assert.match(app,/The official version of events\.'\,'<button class="btn primary" data-a="upload">Upload<\/button>'\)/,

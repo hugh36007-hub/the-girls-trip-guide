@@ -25,7 +25,7 @@ async function compressPhoto(file){
 
 async function storageUpload(bucket,path,file,onProgress=()=>{}){
   onProgress(0,0,file.size);
-  if(file.size<=6*1024*1024){const {error}=await db().storage.from(bucket).upload(path,file,{upsert:false,contentType:file.type||undefined,cacheControl:'3600'});if(error)throw error;onProgress(1,file.size,file.size);return path}
+  if(file.size<=6*1024*1024&&bucket!=='btg-vault'){const {error}=await db().storage.from(bucket).upload(path,file,{upsert:false,contentType:file.type||undefined,cacheControl:'3600'});if(error)throw error;onProgress(1,file.size,file.size);return path}
   if(!window.tus?.Upload)throw Error('The resumable upload service did not load. Refresh and try again.');
   const {data:{session}}=await db().auth.getSession();if(!session?.access_token)throw Error('Your secure session expired. Sign in again.');
   const prefix=`${tripId()}/${session.user.id}/`;let finalPath=path;
