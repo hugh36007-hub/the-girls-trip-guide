@@ -298,9 +298,19 @@
     window.location.href = url;
   }
 
+  const nativePurchaseSelector = [
+    '[data-action="stripe"]',
+    '[data-action="upgrade"]',
+    '[data-a="upgrade"]',
+    'a[href*="/full-trip"]',
+    'a[href*="full-trip.html"]',
+    'a[href*="/free-vs-full"]',
+    'a[href*="free-vs-full.html"]'
+  ].join(', ');
+
   function installExternalLinkBoundary() {
     document.addEventListener('click', (event) => {
-      const purchaseButton = event.target.closest('[data-action="stripe"], [data-action="upgrade"], [data-a="upgrade"], a[href*="full-trip"]');
+      const purchaseButton = event.target.closest(nativePurchaseSelector);
       if (purchaseButton) {
         event.preventDefault();
         event.stopImmediatePropagation();
@@ -323,19 +333,40 @@
   }
 
   function installNativeCommerceBoundary() {
+    const entitlementCopy = 'Existing Full Trip access is recognised automatically when you sign in.';
     const apply = (root = document) => {
-      root.querySelectorAll?.('[data-action="stripe"], [data-action="upgrade"], [data-a="upgrade"], a[href*="full-trip"]').forEach((control) => {
+      root.querySelectorAll?.(nativePurchaseSelector).forEach((control) => {
         if (control.dataset.nativeCommerceHandled === '1') return;
         const note = document.createElement('p');
         note.className = 'native-entitlement-note';
         note.dataset.nativeCommerceHandled = '1';
-        note.textContent = 'Existing Full Trip access is recognised automatically when you sign in.';
+        note.textContent = entitlementCopy;
         control.replaceWith(note);
       });
+
+      root.querySelectorAll?.('.card.upgrade').forEach((card) => {
+        if (card.dataset.nativeCommerceHandled === '1') return;
+        card.dataset.nativeCommerceHandled = '1';
+        card.innerHTML = '<div class="eyebrow">Full Trip</div><h3>Already have Full Trip?</h3><p>Existing Full Trip access is recognised automatically when you sign in.</p>';
+      });
+
+      root.querySelectorAll?.('.trip-stamp span, .stat small').forEach((element) => {
+        const value = element.textContent || '';
+        if (/upgrade for full media/i.test(value)) element.textContent = value.replace(/upgrade for full media/ig, 'Existing Full Trip access recognised');
+        if (/^full trip feature$/i.test(value.trim())) element.textContent = 'Available with existing Full Trip access';
+      });
+
       root.querySelectorAll?.('.upgrade-price, .upgrade-final-copy, .compare-row, .price, .amount').forEach((element) => {
         if (/£24\.99|one-off upgrade|one payment/i.test(element.textContent || '')) element.hidden = true;
       });
     };
+
+    document.addEventListener('submit', (event) => {
+      if (!event.target?.matches?.('#legalCheckoutForm')) return;
+      event.preventDefault();
+      event.stopImmediatePropagation();
+      showToast(entitlementCopy);
+    }, true);
 
     apply();
     const observer = new MutationObserver((records) => {
@@ -346,6 +377,35 @@
       }
     });
     observer.observe(document.body, { childList: true, subtree: true });
+  }
+
+  function installNativePurchaseFetchGuard() {
+    const originalFetch = window.fetch.bind(window);
+    window.fetch = async (input, init = {}) => {
+      const url = typeof input === 'string' ? input : input?.url || '';
+      if (url.includes('/functions/v1/girls-stripe-checkout')) {
+        let action = '';
+        try {
+          const payload = typeof init.body === 'string' ? JSON.parse(init.body) : null;
+          action = String(payload?.action || '');
+        } catch {}
+        if (action === 'create') {
+          showToast('Purchases are not available in the app. Existing Full Trip access is recognised automatically.');
+          return new Response(JSON.stringify({ error: 'Native checkout disabled.' }), {
+            status: 403,
+            headers: { 'Content-Type': 'application/json' }
+          });
+        }
+      }
+      return originalFetch(input, init);
+    };
+  }
+
+  function redirectNativeMarketingRoutes() {
+    const path = window.location.pathname.replace(/\/+$/, '') || '/';
+    if (!['/', '/index.html', '/free-vs-full', '/free-vs-full.html', '/full-trip', '/full-trip.html'].includes(path)) return false;
+    window.location.replace('/create-trip.html');
+    return true;
   }
 
   function installNetworkBanner() {
@@ -384,6 +444,8 @@
   }
 
   async function initialiseNativeShell() {
+    if (redirectNativeMarketingRoutes()) return;
+    installNativePurchaseFetchGuard();
     installExternalLinkBoundary();
     installNativeCommerceBoundary();
     installSafetyAndDeletionControls();
