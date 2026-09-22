@@ -13,12 +13,12 @@ function installStyles(){
 .gtg-gals-selector label.active{border-color:#ff4fa3!important;background:#fff3f8!important;box-shadow:0 0 0 2px rgba(255,79,163,.11)!important}
 .gtg-gals-selector label.active:after{content:'✓';position:absolute;top:8px;right:9px;width:22px;height:22px;border-radius:50%;display:grid;place-items:center;background:#ff4fa3;color:#fff;font-weight:900;font-size:12px}
 .gtg-gals-selector .gtg-gals-image-frame{width:86px;height:86px;margin:0 auto 2px;display:grid;place-items:center;overflow:hidden;border-radius:16px;background:linear-gradient(180deg,#fff 0%,#f8eef3 100%)}
-.gtg-gals-selector .gtg-gals-image-frame img{display:block;width:100%!important;height:100%!important;border-radius:0!important;object-fit:contain!important;object-position:center bottom!important;transform-origin:center bottom}
+.gtg-gals-selector .gtg-gals-image-frame img{display:block;width:100%!important;height:100%!important;border-radius:0!important;object-fit:cover!important;object-position:center top!important;transform:scale(1.52)!important;transform-origin:50% 0!important}
 .gtg-gals-selector label[data-gals-mode="grace-auto"] .gtg-gals-image-frame img,
-.gtg-gals-selector label[data-gals-mode="grace"] .gtg-gals-image-frame img{transform:scale(1.38)}
-.gtg-gals-selector label[data-gals-mode="lola"] .gtg-gals-image-frame img{transform:scale(1.42)}
-.gtg-gals-selector label[data-gals-mode="ava"] .gtg-gals-image-frame img{transform:scale(1.08)}
-.gtg-gals-selector label[data-gals-mode="seb"] .gtg-gals-image-frame img{transform:scale(1.10)}
+.gtg-gals-selector label[data-gals-mode="grace"] .gtg-gals-image-frame img{transform:scale(1.60)!important}
+.gtg-gals-selector label[data-gals-mode="ava"] .gtg-gals-image-frame img{transform:scale(1.45)!important}
+.gtg-gals-selector label[data-gals-mode="lola"] .gtg-gals-image-frame img{transform:scale(1.55)!important}
+.gtg-gals-selector label[data-gals-mode="seb"] .gtg-gals-image-frame img{transform:scale(1.50)!important}
 @media(max-width:650px){.gtg-gals-selector .gtg-gals-image-frame{width:92px;height:92px}.gtg-gals-selector label{min-height:156px;display:flex;flex-direction:column;align-items:center;justify-content:flex-start}.gtg-gals-selector label:first-child{min-height:148px}}
 `;
  document.head.appendChild(style);

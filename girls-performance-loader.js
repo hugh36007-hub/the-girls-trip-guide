@@ -23,7 +23,7 @@ const BUNDLES={
   ],
   dashboardTour:['/girls-dashboard-tour.js?v=4'],
   onboarding:['/girls-batch1-parity-safe-v2.js?v=20260914-1','/girls-convince-copy-v2.js?v=20260907-1'],
-  parity:['/girls-product-parity.js?v=6','/girls-gals-selector-fix.js?v=1'],
+  parity:['/girls-product-parity.js?v=6','/girls-gals-selector-fix.js?v=2'],
   shell:['/girls-section-layout.js?v=1','/girls-inner-page-polish.js?v=3'],
   planDocuments:[DOC_SRC,'/girls-booking-copy.js?v=2'],
   money:['/girls-payment-nudge.js?v=3'],
