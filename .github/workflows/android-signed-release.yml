@@ -1,5 +1,5 @@
 name: Android signed release
-# Final Google Play build: isolated native shell + exact approved Girls web release.
+# Final Google Play build 8: isolated native shell + exact approved Girls web release.
 
 on:
   push:
