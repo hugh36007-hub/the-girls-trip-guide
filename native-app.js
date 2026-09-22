@@ -404,7 +404,7 @@
   function redirectNativeMarketingRoutes() {
     const path = window.location.pathname.replace(/\/+$/, '') || '/';
     if (!['/', '/index.html', '/free-vs-full', '/free-vs-full.html', '/full-trip', '/full-trip.html'].includes(path)) return false;
-    window.location.replace('/create-trip');
+    window.location.replace('/create-trip.html');
     return true;
   }
 
