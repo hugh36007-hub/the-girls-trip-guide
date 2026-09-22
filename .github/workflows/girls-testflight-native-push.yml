@@ -16,7 +16,7 @@ jobs:
     env:
       GTG_WEB_SOURCE_SHA: 0fba53a5e845fc50f61ced7f2c4e8191f6a26199
       VERSION_NAME: 1.0.3
-      BUILD_NUMBER: '10'
+      BUILD_NUMBER: '11'
       BUNDLE_ID: com.storystone.thegirlstripguide
     steps:
       - uses: actions/checkout@v4
@@ -55,7 +55,7 @@ jobs:
           grep -Fq 'CapacitorPushNotifications' ios/App/CapApp-SPM/Package.swift
           grep -Fq 'PrivacyInfo.xcprivacy in Resources' ios/App/App.xcodeproj/project.pbxproj
           grep -Fq "PRODUCT_BUNDLE_IDENTIFIER = $BUNDLE_ID;" ios/App/App.xcodeproj/project.pbxproj
-          grep -Fq 'CURRENT_PROJECT_VERSION = 10;' ios/App/App.xcodeproj/project.pbxproj
+          grep -Fq 'CURRENT_PROJECT_VERSION = 11;' ios/App/App.xcodeproj/project.pbxproj
           grep -Fq 'girls-finalize-invite' mobile-web/invite-return.js
       - name: Prepare App Store Connect API key
         env:
@@ -118,7 +118,7 @@ jobs:
           xcrun altool --upload-app -f "$IPA_PATH" -t ios --apiKey "$API_KEY_ID" --apiIssuer "$API_ISSUER_ID"
       - uses: actions/upload-artifact@v4
         with:
-          name: girls-trip-guide-ios-1.0.3-build-10-testflight
+          name: girls-trip-guide-ios-1.0.3-build-11-testflight
           path: |
             ios/build/GirlsTripGuide.xcarchive
             ios/build/export/*.ipa
