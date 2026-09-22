@@ -10,7 +10,7 @@ test('native App Store shell blocks purchase controls and marketing routes', asy
   assert.match(source, /free-vs-full/);
   assert.match(source, /full-trip/);
   assert.match(source, /redirectNativeMarketingRoutes/);
-  assert.match(source, /window\.location\.replace\('\/create-trip'\)/);
+  assert.match(source, /window\.location\.replace\('\/create-trip\.html'\)/);
 });
 
 test('native App Store shell fails closed for Stripe checkout creation', async () => {
