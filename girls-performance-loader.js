@@ -4,6 +4,8 @@
 if(window.__GTG_PERFORMANCE_LOADER__)return;window.__GTG_PERFORMANCE_LOADER__=true;
 
 const DOC_SRC='/girls-document-audience.js?v=20260908-2';
+const TUS_SRC='https://cdn.jsdelivr.net/npm/tus-js-client@4.3.1/dist/tus.min.js';
+const TUS_SRI='sha384-UlHjK3F7TCQCEUpnoa1ohMbP2oaWB3Aypv4gMo511vaZ86uUZ0Zv7UzZ0J1zRUT1';
 const REMINDER_SRC='/girls-free-reminders-parity.js?v=20260908-7';
 const BUNDLES={
   appTheme:[
@@ -65,7 +67,7 @@ const BUNDLES={
     '/girls-home-scoreboard-fit.js?v=20260908-3',
     '/girls-parity-refresh-20260904.js?v=4'
   ],
-  upload:['https://cdn.jsdelivr.net/npm/tus-js-client@4.3.1/dist/tus.min.js']
+  upload:[TUS_SRC]
 };
 const STYLES={
   shell:['/girls-section-layout.css?v=1','/girls-product-parity.css?v=1','/girls-inner-page-polish.css?v=1'],
@@ -90,7 +92,7 @@ function loadStyle(href){
 function loadScript(src){
  if(loaded.has(src)||document.querySelector(`script[src="${src}"]`)){loaded.add(src);return Promise.resolve()}
  if(pending.has(src))return pending.get(src);
- const job=new Promise(resolve=>{const s=document.createElement('script');s.src=src;s.async=false;s.dataset.gtgDeferred='1';s.onload=()=>{loaded.add(src);pending.delete(src);resolve()};s.onerror=()=>{pending.delete(src);resolve()};document.body.appendChild(s)});
+ const job=new Promise(resolve=>{const s=document.createElement('script');if(src===TUS_SRC){s.integrity=TUS_SRI;s.crossOrigin='anonymous'}s.src=src;s.async=false;s.dataset.gtgDeferred='1';s.onload=()=>{loaded.add(src);pending.delete(src);resolve()};s.onerror=()=>{pending.delete(src);resolve()};document.body.appendChild(s)});
  pending.set(src,job);return job;
 }
 async function loadBundle(name){

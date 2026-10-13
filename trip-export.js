@@ -104,7 +104,7 @@ function partition(pack){
  if(current.files.length||!parts.some(p=>p.kind==='zip'))parts.push(current);
  return parts;
 }
-async function ensureZip(){if(window.JSZip)return window.JSZip;await new Promise((resolve,reject)=>{const s=document.createElement('script');s.src='https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js';s.onload=resolve;s.onerror=()=>reject(Error('The ZIP service could not load.'));document.head.appendChild(s)});return window.JSZip}
+async function ensureZip(){if(window.JSZip)return window.JSZip;await new Promise((resolve,reject)=>{const s=document.createElement('script');s.integrity='sha384-+mbV2IY1Zk/X1p/nWllGySJSUN8uMs+gUAN10Or95UBH0fpj6GfKgPmgC5EXieXG';s.crossOrigin='anonymous';s.src='https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js';s.onload=resolve;s.onerror=()=>reject(Error('The ZIP service could not load.'));document.head.appendChild(s)});return window.JSZip}
 async function signed(file,download=false){const opts=download?{download:file.name}:undefined;const r=await db().storage.from(file.bucket).createSignedUrl(file.path,3600,opts);if(r.error||!r.data?.signedUrl)throw r.error||Error(`Could not prepare ${file.name}`);return r.data.signedUrl}
 function triggerBlob(blob,name){const url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download=name;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),30000)}
 function archiveName(pack,index,total){const base=safe(pack.access.trip.name||'trip').replace(/\s+/g,'-').toLowerCase();return total>1?`${base}-part-${index+1}-of-${total}.zip`:`${base}-full-trip.zip`}

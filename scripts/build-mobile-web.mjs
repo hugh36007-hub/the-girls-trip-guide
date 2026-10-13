@@ -1,4 +1,5 @@
 import { cp, mkdir, readdir, readFile, rm, writeFile } from 'node:fs/promises';
+import { createHash } from 'node:crypto';
 import { execFileSync } from 'node:child_process';
 import os from 'node:os';
 import path from 'node:path';
@@ -56,6 +57,16 @@ try {
     path.join(vendorDir, 'tus.min.js')
   );
 
+  // Point the Supabase tags at the bundled copy and drop integrity/crossorigin, which
+  // only apply to the CDN. Matches web releases from before and after the CDN integrity change.
+  const supabaseScriptTag = /<script\b[^>]*\bsrc="https:\/\/cdn\.jsdelivr\.net\/npm\/@supabase\/supabase-js@2\.112\.4[^"]*"[^>]*><\/script>/g;
+  const supabasePreloadTag = /<link\b[^>]*\bhref="https:\/\/cdn\.jsdelivr\.net\/npm\/@supabase\/supabase-js@2\.112\.4[^"]*"[^>]*>/g;
+  const vendoredSupabase = 'sha384-' + createHash('sha384').update(await readFile(path.join(vendorDir, 'supabase.js'))).digest('base64');
+  const bundled = attribute => tag => tag
+    .replace(new RegExp(`\\b${attribute}="[^"]*"`), `${attribute}="/vendor/supabase.js"`)
+    .replace(/\s+integrity="[^"]*"/, '')
+    .replace(/\s+crossorigin(?:="[^"]*")?/, '');
+
   const nativeHead = [
     '<script>window.GTG_NATIVE=true;document.documentElement.classList.add("gtg-native");</script>',
     '<link rel="stylesheet" href="/native-app.css">'
@@ -65,8 +76,13 @@ try {
     if (!entry.isFile() || path.extname(entry.name) !== '.html') continue;
     const htmlPath = path.join(out, entry.name);
     let html = await readFile(htmlPath, 'utf8');
+    for (const [tag] of html.matchAll(supabaseScriptTag)) {
+      const pinned = tag.match(/\bintegrity="([^"]+)"/)?.[1];
+      if (pinned && pinned !== vendoredSupabase) throw new Error(`Vendored supabase.js is not the file ${entry.name} pins.`);
+    }
     html = html
-      .replaceAll('https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.112.4', '/vendor/supabase.js')
+      .replace(supabaseScriptTag, bundled('src'))
+      .replace(supabasePreloadTag, bundled('href'))
       .replaceAll('https://cdn.jsdelivr.net/npm/tus-js-client@4.3.1/dist/tus.min.js', '/vendor/tus.min.js')
       .replace(/\s*<script[^>]+src=["'][^"']*girls-pwa-register\.js[^"']*["'][^>]*><\/script>/gi, '')
       .replace(/\s*<script[^>]+src=["'][^"']*girls-push-notifications\.js[^"']*["'][^>]*><\/script>/gi, '');
@@ -80,6 +96,9 @@ try {
       );
     } else if (!html.includes('src="/native-push.js"')) {
       html = html.replace('</body>', '  <script defer src="/native-push.js"></script>\n</body>');
+    }
+    if (/<(?:script|link)\b[^>]*\b(?:src|href)="https:\/\/cdn\.jsdelivr\.net/.test(html)) {
+      throw new Error(`Native ${entry.name} must not load scripts from the CDN.`);
     }
     await writeFile(htmlPath, html, 'utf8');
   }
