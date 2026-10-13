@@ -182,6 +182,8 @@ jobs:
         run: node tests/girls-media-social-contract.test.cjs
       - name: Media flow refinement contract
         run: node tests/girls-media-flow-refinement.test.mjs
+      - name: www visitors reach the apex origin
+        run: node tests/girls-canonical-host.test.cjs
       - name: Poll nudge contract
         run: node tests/girls-poll-nudge.test.mjs
       - name: Home poll state ownership contract
