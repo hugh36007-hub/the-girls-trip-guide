@@ -11,16 +11,18 @@ const SUPABASE_URL='https://vtcmvwixfqyxqghibsla.supabase.co';
 const KEY='sb_publishable_qBQzJjFxSToEGxPJEcmskg_GNd4M4cP';
 let client=null,rotateTimer=0,hydrateBusy=false,hydrateQueued=false,hydrateScheduled=false;
 function db(){if(!client&&window.supabase?.createClient)client=window.supabase.createClient(SUPABASE_URL,KEY,{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true}});return client}
+/* Blocked uploaders: the native shell's list in the app, the same browser-stored list on the website. */
+function blockedUploader(id){if(!id)return false;if(window.GTGNativeSafety?.isBlocked)return window.GTGNativeSafety.isBlocked(id);try{return JSON.parse(localStorage.getItem('gtg-native-blocked-users-v1')||'[]').map(String).includes(String(id))}catch{return false}}
 function coreHero(){return document.querySelector('.dashboard[data-home-composition="full"] .hero-card.live-snapshot-hero[data-live-snapshot="1"][data-full-hero-owner="girls-app-v2"]')}
 
 async function photoUrls(tripId){
   const q=db();if(!q||!tripId)return[];
   const {data,error}=await q.from('media')
-    .select('id,storage_path,thumbnail_path,mime_type,created_at')
+    .select('id,storage_path,thumbnail_path,mime_type,created_at,created_by')
     .eq('trip_id',tripId).eq('album','evidence').like('mime_type','image/%')
-    .order('created_at',{ascending:false}).limit(5);
+    .order('created_at',{ascending:false}).limit(20);
   if(error)throw error;
-  return (await Promise.all((data||[]).map(async row=>{
+  return (await Promise.all((data||[]).filter(row=>!blockedUploader(row.created_by)).slice(0,5).map(async row=>{
     const path=row.thumbnail_path||row.storage_path;if(!path)return'';
     const {data:signed}=await q.storage.from('btg-evidence').createSignedUrl(path,1800);
     return signed?.signedUrl||'';
@@ -63,6 +65,7 @@ async function hydrate(){
 const observer=new MutationObserver(requestHydrate);
 observer.observe(document.getElementById('app')||document.body,{childList:true,subtree:true});
 window.addEventListener('pageshow',requestHydrate);
+window.addEventListener('gtg:native-block-list-changed',()=>{const hero=coreHero();if(!hero)return;delete hero.dataset.livePhotoHydrated;requestHydrate()});
 window.addEventListener('popstate',requestHydrate);
 requestHydrate();
 })();
