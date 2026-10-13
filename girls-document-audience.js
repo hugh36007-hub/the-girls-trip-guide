@@ -79,7 +79,7 @@ async function createDocument(form){
   close();toast(visibility==='everyone'?'Document added for everyone.':visibility==='organiser'?'Private organiser document added.':'Document added for selected people.');
   setTimeout(()=>location.reload(),350);
  }catch(error){
-  if(documentId)await q.from('documents').delete().eq('id',documentId).eq('trip_id',ctx.trip.id).catch(()=>{});
+  if(documentId){try{const {error:cleanupError}=await q.from('documents').delete().eq('id',documentId).eq('trip_id',ctx.trip.id);if(cleanupError)console.warn('Document rollback failed.',{table:'documents',id:documentId,code:cleanupError.code||null})}catch{}}
   await q.storage.from('btg-documents').remove([path]).catch(()=>{});
   throw error;
  }
