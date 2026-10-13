@@ -14,6 +14,9 @@ on:
       - 'supabase/functions/girls-finalize-invite/**'
       - 'supabase/migrations/2026090921*.sql'
       - 'tests/invitation-security-contract.test.cjs'
+      - 'tests/girls-invite-step-b-routing.test.mjs'
+      - 'tests/girls-invite-sign-in-route-browser.test.mjs'
+      - 'girls-app-v2.js'
       - 'tests/girls-invitation-voice-contract.test.cjs'
   workflow_dispatch:
 
@@ -30,5 +33,9 @@ jobs:
           node-version: '22'
       - name: Run invitation security contract
         run: node tests/invitation-security-contract.test.cjs
+      - name: Invite Step B routing (existing accounts must sign in)
+        run: node tests/girls-invite-step-b-routing.test.mjs
+      - name: Invite sign-in route in the app (Chromium)
+        run: node tests/girls-invite-sign-in-route-browser.test.mjs
       - name: Preserve Girls T03/T06 invitation voice contract
         run: node tests/girls-invitation-voice-contract.test.cjs

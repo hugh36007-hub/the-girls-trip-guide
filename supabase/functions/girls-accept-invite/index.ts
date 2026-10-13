@@ -47,11 +47,25 @@ Deno.serve(async(req)=>{
     if(!member||!member.invite_token_hash||supplied!==member.invite_token_hash)return redirect(new URL('/create-trip?invite=invalid',site).toString())
     if(!member.invite_token_expires_at||new Date(member.invite_token_expires_at).getTime()<=Date.now())return redirect(new URL('/create-trip?invite=expired',site).toString())
     if(!member.email)return redirect(new URL('/create-trip?invite=invalid',site).toString())
+    if(!['invited','opened','confirmed'].includes(String(member.status)))return redirect(new URL('/create-trip?invite=invalid',site).toString())
 
-    const {data:trip,error:tripError}=await db.from('trips').select('id,product_key').eq('id',member.trip_id).maybeSingle()
+    const {data:trip,error:tripError}=await db.from('trips').select('id,product_key,invite_code').eq('id',member.trip_id).maybeSingle()
     if(tripError)throw tripError
     if(!trip||trip.product_key!==product)return redirect(new URL('/create-trip?invite=invalid',site).toString())
     await assertTripActive(db,member.trip_id,'This trip has been archived.')
+
+    // An invitation link must never sign anyone in to an account that already exists. Only a brand-new
+    // invitee keeps the one-click flow below. Everyone else is sent to the join screen, where a normal
+    // sign-in proves they control the invited mailbox before join_girls_trip_by_code attaches the trip.
+    const {data:accountState,error:accountError}=await db.rpc('invitation_account_state',{p_email:member.email})
+    if(accountError)throw accountError
+    const oneClick=(accountState==='none'||accountState==='unverified')&&(member.status==='invited'||member.status==='opened')&&!member.user_id
+    if(!oneClick){
+      // The trip code is not a credential and the invited address is deliberately left out.
+      const signIn=new URL('/create-trip',site)
+      signIn.searchParams.set('join','1');signIn.searchParams.set('code',String(trip.invite_code||''));signIn.searchParams.set('person',String(member.name||''));signIn.searchParams.set('invite','signin')
+      return redirect(signIn.toString())
+    }
 
     const callback='https://thegirlstripguide.com/invite-return.html'
     const {data:linkData,error:linkError}=await db.auth.admin.generateLink({type:'magiclink',email:member.email,options:{redirectTo:callback}})

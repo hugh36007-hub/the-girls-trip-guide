@@ -122,6 +122,12 @@ jobs:
         run: node tests/release-contract.test.cjs
       - name: Girls feature parity contract
         run: node tests/girls-feature-parity.test.cjs
+      - name: Invitation security contract and Step B routing
+        run: |
+          node tests/invitation-security-contract.test.cjs
+          node tests/girls-invite-step-b-routing.test.mjs
+      - name: Invite sign-in route in the app (Chromium)
+        run: node tests/girls-invite-sign-in-route-browser.test.mjs
       - name: Girls product parity UI contract
         run: node tests/girls-product-parity-ui.test.cjs
       - name: Full overview panel ownership regression

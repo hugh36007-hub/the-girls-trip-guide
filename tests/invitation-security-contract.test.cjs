@@ -26,6 +26,23 @@ assert.doesNotMatch(accept,/from\('trip_members'\)\.update/,'acceptance must not
 assert.doesNotMatch(accept,/confirmed_at/,'acceptance must not set confirmation timestamps');
 assert.match(accept,/return redirect\(new URL\('\/create-trip\?invite=server',site\)\.toString\(\)\)/,'server errors must return to the product origin');
 
+// Step B: an invitation link must never sign anyone in to an account that already exists.
+const accountCheck=accept.indexOf("db.rpc('invitation_account_state'"),signInReturn=accept.indexOf('return redirect(signIn.toString())'),linkGeneration=accept.indexOf('db.auth.admin.generateLink('),stateCreation=accept.indexOf("db.rpc('create_invitation_auth_state'");
+assert.ok(accountCheck>0&&signInReturn>accountCheck,'existing accounts must be routed by the account check');
+assert.ok(signInReturn<linkGeneration&&signInReturn<stateCreation,'the sign-in route must return before any sign-in link or invitation state is created');
+assert.ok(accept.indexOf('supplied!==member.invite_token_hash')<accountCheck&&accept.indexOf('assertTripActive(db')<accountCheck,'the account check must run only after the token and archive checks');
+assert.match(accept,/if\(accountError\)throw accountError/,'an account check failure must fail closed');
+assert.match(accept,/const oneClick=\(accountState==='none'\|\|accountState==='unverified'\)&&\(member\.status==='invited'\|\|member\.status==='opened'\)&&!member\.user_id/,'only a brand-new, pending, unlinked invitee keeps the one-click flow');
+const signInBlock=accept.slice(accept.indexOf('if(!oneClick){'),signInReturn);
+assert.doesNotMatch(signInBlock,/email|state|token/i,'the sign-in redirect must not carry the invited email, a state or a token');
+assert.match(signInBlock,/new URL\('\/create-trip',site\)/,'the sign-in route must stay on the Girls app');
+assert.match(signInBlock,/searchParams\.set\('join','1'\)/);assert.match(signInBlock,/searchParams\.set\('code',String\(trip\.invite_code\|\|''\)\)/);
+// The Girls app must use the code the sign-in route carries; it is not shown anywhere else.
+const app=read('girls-app-v2.js');
+assert.match(app,/field\('Invite code','code','text',invite\.code,/,'the join form must be filled from the sign-in route');
+assert.match(app,/You already have an account\./,'an existing account must be told to sign in');
+assert.match(app,/for\(const key of \['join','code','person','invite'\]\)u\.searchParams\.delete\(key\)/,'a completed join must clear the invitation route from the address bar');
+
 assert.match(finalizer,/auth\.getUser\(\)/,'finalizer must verify bearer identity');
 assert.match(finalizer,/if\(!STATE\.test\(state\)\)/,'missing or modified state must be rejected');
 assert.match(finalizer,/p_state_hash:await sha256\(state\)/,'exact supplied state must be finalised');
