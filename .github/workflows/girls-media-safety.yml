@@ -1,0 +1,45 @@
+name: Girls media Report and Block
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - '.github/workflows/girls-media-safety.yml'
+      - 'girls-media-safety.js'
+      - 'girls-media-social.js'
+      - 'girls-live-dashboard-hero.js'
+      - 'girls-direct-photo-viewer.js'
+      - 'girls-performance-loader.js'
+      - 'girls-app-v2.js'
+      - 'tests/girls-media-safety-browser.test.mjs'
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/girls-media-safety.yml'
+      - 'girls-media-safety.js'
+      - 'girls-media-social.js'
+      - 'girls-live-dashboard-hero.js'
+      - 'girls-direct-photo-viewer.js'
+      - 'girls-performance-loader.js'
+      - 'girls-app-v2.js'
+      - 'tests/girls-media-safety-browser.test.mjs'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  media-safety:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Runtime syntax
+        run: |
+          node --check girls-media-safety.js
+          node --check girls-media-social.js
+          node --check girls-live-dashboard-hero.js
+      - name: Web Report and Block Chromium interaction
+        run: node tests/girls-media-safety-browser.test.mjs

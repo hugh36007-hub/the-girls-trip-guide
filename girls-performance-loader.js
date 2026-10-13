@@ -46,6 +46,7 @@ const BUNDLES={
     '/girls-direct-photo-viewer.js?v=6',
     '/girls-gallery-no-zoom.js?v=1',
     '/girls-media-flow-refinement.js?v=2',
+    '/girls-media-safety.js?v=1',
     '/girls-media-social.js?v=1',
     '/video-thumbnail-fix.js?v=1'
   ],
