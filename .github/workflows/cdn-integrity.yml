@@ -1,0 +1,22 @@
+name: CDN integrity contract
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  cdn-integrity:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Every CDN script is pinned and the CSP allows only those files
+        run: node scripts/cdn-integrity-check.mjs
