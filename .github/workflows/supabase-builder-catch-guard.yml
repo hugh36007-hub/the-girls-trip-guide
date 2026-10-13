@@ -1,0 +1,22 @@
+name: Supabase builder catch guard
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  builder-catch-guard:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: No .catch chained onto a supabase-js query builder
+        run: node scripts/supabase-builder-catch-guard-test.mjs
