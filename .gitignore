@@ -9,6 +9,8 @@ node_modules/
 .DS_Store
 Thumbs.db
 mobile-web/
+dist/
+.site-build-test-*/
 native-assets/
 ios/build/
 android/.gradle/
