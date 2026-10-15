@@ -73,13 +73,31 @@ function ownCalls(chain) {
   return out;
 }
 
+// A receiver that is one parenthesised expression, `(expr)`, is that expression: look inside it.
+// Without this, emptying groups would hide `(db.from(t).delete()).catch(...)`.
+function unwrapParens(chain) {
+  let s = chain.trim();
+  for (;;) {
+    if (s[0] !== '(') return s;
+    let depth = 0, i = 0;
+    for (; i < s.length; i++) {
+      const c = s[i];
+      if (c === "'" || c === '"' || c === '`') { i++; while (i < s.length && !(s[i] === c && s[i - 1] !== '\\')) i++; continue; }
+      if (c === '(' || c === '[' || c === '{') depth++;
+      else if ((c === ')' || c === ']' || c === '}') && --depth === 0) break;
+    }
+    if (i !== s.length - 1) return s;
+    s = s.slice(1, -1).trim();
+  }
+}
+
 const BUILDER = /\.from\s*\([^)]*\)\s*\.\s*(select|insert|update|upsert|delete)\s*\(|\.rpc\s*\(/;
 const PROMISE_BOUNDARY = /\.storage\b|\.(then|finally)\s*\(/;
 
 export function builderCatchSites(text) {
   const sites = [];
   for (const match of text.matchAll(/\??\.\s*catch\s*\(/g)) {
-    const chain = text.slice(chainStart(text, match.index), match.index), calls = ownCalls(chain);
+    const chain = text.slice(chainStart(text, match.index), match.index), calls = ownCalls(unwrapParens(chain));
     if (BUILDER.test(calls) && !PROMISE_BOUNDARY.test(calls)) sites.push({line: text.slice(0, match.index).split('\n').length, chain: chain.replace(/\s+/g, ' ').trim()});
   }
   return sites;
@@ -92,6 +110,9 @@ const bad = [
   "db.from('x')\n  .select('id')\n  .maybeSingle()\n  .catch(console.warn)",
   "await client.rpc('fn',{p:1}).catch(()=>null)",
   "x?.db().from('t').upsert(rows,{onConflict:'id'})?.catch(()=>{})",
+  "await db.from('a').delete().in('id',ids(db.from('b').select('id'))).catch(()=>{})",
+  "await (db.from('t').delete().eq('id',1)).catch(()=>{})",
+  "((client.rpc('fn',{p:')'}))).catch(()=>null)",
 ];
 const good = [
   "await db().storage.from('btg-documents').remove([path]).catch(()=>{});",
@@ -101,6 +122,9 @@ const good = [
   "try{const {error}=await db().from('t').delete().eq('id',1)}catch{}",
   "p=(async()=>{const q=await c.from('t').select('id').eq('id',1);return q.data})().catch(()=>null)",
   "await Promise.all([c.from('a').select('id'),c.rpc('fn')]).catch(()=>[])",
+  "await run(db.from('t').delete().eq('id',1)).catch(()=>{})",
+  "(async()=>{await c.rpc('fn')})().catch(()=>{})",
+  "(db.from('t').select('id').then(r=>r)).catch(()=>{})",
 ];
 for (const snippet of bad) assert.equal(builderCatchSites(snippet).length, 1, `guard must flag: ${snippet}`);
 for (const snippet of good) assert.equal(builderCatchSites(snippet).length, 0, `guard must allow: ${snippet}`);
