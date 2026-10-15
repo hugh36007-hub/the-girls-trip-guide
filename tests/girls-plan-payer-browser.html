@@ -21,6 +21,13 @@
     </div>
   </form>
 </div>
+<script>
+// The picker is built on the next animation frame. This page is run with --virtual-time-budget,
+// which fast-forwards timers but not rendering frames, so the 300 ms check below could fire
+// before any frame had been drawn. Run frame callbacks on timers so both follow the same clock.
+window.requestAnimationFrame=callback=>setTimeout(()=>callback(performance.now()),16);
+window.cancelAnimationFrame=handle=>clearTimeout(handle);
+</script>
 <script src="../girls-inner-page-polish.js"></script>
 <script>
 setTimeout(()=>{
